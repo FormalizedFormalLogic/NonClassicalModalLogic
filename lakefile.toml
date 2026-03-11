@@ -2,5 +2,9 @@ name = "NCML"
 version = "0.1.0"
 defaultTargets = ["NCML"]
 
+[[require]]
+scope = "leanprover-community"
+name = "mathlib"
+
 [[lean_lib]]
 name = "NCML"
