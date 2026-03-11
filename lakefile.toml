@@ -1,0 +1,6 @@
+name = "NCML"
+version = "0.1.0"
+defaultTargets = ["NCML"]
+
+[[lean_lib]]
+name = "NCML"
