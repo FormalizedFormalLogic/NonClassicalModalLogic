@@ -46,25 +46,31 @@ deriving DecidableEq
 
 namespace BDFormula
 
+
+prefix:75 "#" => atom
+notation:80 "⊥" => falsum
+infixr:69 " ⋏ " => and
+infixr:68 " ⋎ " => or
+infixr:60 " 🡒 " => imply
+prefix:90 "□" => box
+prefix:91 "◇" => dia
+
+abbrev iff (φ ψ : BDFormula) := φ 🡒 ψ ⋏ ψ 🡒 φ
+infixr:61 " 🡘 " => iff
+
 @[grind]
 def boxFree : BDFormula → Prop
-  | box _ => False
-  | atom _
-  | falsum => True
-  | and   φ ψ
-  | or    φ ψ
-  | imply φ ψ => φ.boxFree ∧ ψ.boxFree
-  | dia φ     => φ.boxFree
+  | □_ => False
+  | #_ | ⊥ => True
+  | φ ⋏ ψ | φ ⋎ ψ | φ 🡒 ψ => φ.boxFree ∧ ψ.boxFree
+  | ◇φ => φ.boxFree
 
 @[grind]
 def diaFree : BDFormula → Prop
-  | dia _ => False
-  | atom _
-  | falsum => True
-  | and   φ ψ
-  | or    φ ψ
-  | imply φ ψ => φ.diaFree ∧ ψ.diaFree
-  | box φ     => φ.diaFree
+  | ◇_ => False
+  | #_ | ⊥ => True
+  | φ ⋏ ψ | φ ⋎ ψ | φ 🡒 ψ => φ.diaFree ∧ ψ.diaFree
+  | □φ => φ.diaFree
 
 end BDFormula
 

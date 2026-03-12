@@ -12,7 +12,7 @@ variable {κ : Type*} [Nonempty κ]
 
 structure KripkeFrame (κ : Type*) [Nonempty κ] where
   iRel : κ → κ → Prop
-  [iRel_paorder : IsPartialOrder _ iRel]
+  [iRel_preorder : IsPreorder _ iRel]
   mRel : κ → κ → Prop
 
 namespace KripkeFrame
@@ -26,11 +26,11 @@ abbrev iRel' {F : KripkeFrame κ} : F.World → F.World → Prop := F.iRel
 infixl:80 " ≼ " => KripkeFrame.iRel'
 
 class MRelLifting (F : KripkeFrame κ) where
-  mRel_lifting : ∀ x₁ x₂ y₂ : F.World, x₁ ≼ x₂ → x₂ ⊏ y₂ → ∃ y₁, y₁ ≼ y₂ ∧ x₁ ⊏ y₁
+  mRel_lifting : ∀ {x₁ x₂ y₂ : F.World}, x₁ ≼ x₂ → x₂ ⊏ y₂ → ∃ y₁, y₁ ≼ y₂ ∧ x₁ ⊏ y₁
 export MRelLifting (mRel_lifting)
 
 class MixConfluent (F : KripkeFrame κ) where
-  mix_confluent : ∀ x₁ x₂ y₁ : F.World, x₁ ≼ x₂ → x₁ ⊏ y₁ → ∃ y₂, y₁ ≼ y₂ ∧ x₂ ⊏ y₂
+  mix_confluent : ∀ {x₁ x₂ y₁ : F.World}, x₁ ≼ x₂ → x₁ ⊏ y₁ → ∃ y₂, y₁ ≼ y₂ ∧ x₂ ⊏ y₂
 export MixConfluent (mix_confluent)
 
 end KripkeFrame
@@ -45,7 +45,7 @@ namespace KripkeModel
 variable {M : KripkeModel κ} {x₁ x₂ y₁ y₂ : M.World}
 variable {φ ψ : BDFormula}
 
-instance : IsPartialOrder M.World M.iRel := M.iRel_paorder
+instance : IsPreorder M.World M.iRel := M.iRel_preorder
 instance : IsTrans M.World M.iRel := inferInstance
 
 @[grind]
@@ -96,7 +96,7 @@ lemma diaFree_formula_persistent_exrinsicForces [M.MRelLifting] (hφ : φ.diaFre
     apply h x₃ (Trans.trans Ix₁x₂ Ix₂x₃) hx₃φ;
   | box φ ihφ =>
     intro y₂ Mx₂y₂;
-    obtain ⟨y₁, Iy₁y₂, Mx₁y₁⟩ := M.mRel_lifting _ _ _ Ix₁x₂ Mx₂y₂;
+    obtain ⟨y₁, Iy₁y₂, Mx₁y₁⟩ := M.mRel_lifting Ix₁x₂ Mx₂y₂;
     apply ihφ (by grind) (h y₁ Mx₁y₁) Iy₁y₂;
 
 lemma boxFree_formula_persistent_exrinsicForces [M.MixConfluent] (hφ : φ.boxFree) : x₁ ⊩ᵉ φ → x₁ ≼ x₂ → x₂ ⊩ᵉ φ := by
@@ -109,7 +109,7 @@ lemma boxFree_formula_persistent_exrinsicForces [M.MixConfluent] (hφ : φ.boxFr
     apply h x₃ (Trans.trans Ix₁x₂ Ix₂x₃) hx₃φ;
   | dia φ ihφ =>
     obtain ⟨y₁, Mx₁y₁, hy₁⟩ := h;
-    obtain ⟨y₂, Iy₁y₂, My₁y₂⟩ := M.mix_confluent _ _ _ Ix₁x₂ Mx₁y₁;
+    obtain ⟨y₂, Iy₁y₂, My₁y₂⟩ := M.mix_confluent Ix₁x₂ Mx₁y₁;
     use y₂;
     constructor;
     . assumption;
@@ -125,11 +125,11 @@ lemma formula_persistent_exrinsicForces [M.MRelLifting] [M.MixConfluent] : x₁ 
     apply h x₃ (Trans.trans Ix₁x₂ Ix₂x₃) hx₃φ;
   | box φ ihφ =>
     intro y₂ Mx₂y₂;
-    obtain ⟨y₁, Iy₁y₂, Mx₁y₁⟩ := M.mRel_lifting _ _ _ Ix₁x₂ Mx₂y₂;
+    obtain ⟨y₁, Iy₁y₂, Mx₁y₁⟩ := M.mRel_lifting Ix₁x₂ Mx₂y₂;
     apply ihφ (h y₁ Mx₁y₁) Iy₁y₂;
   | dia φ ihφ =>
     obtain ⟨y₁, Mx₁y₁, hy₁⟩ := h;
-    obtain ⟨y₂, Iy₁y₂, My₁y₂⟩ := M.mix_confluent _ _ _ Ix₁x₂ Mx₁y₁;
+    obtain ⟨y₂, Iy₁y₂, My₁y₂⟩ := M.mix_confluent Ix₁x₂ Mx₁y₁;
     use y₂;
     constructor;
     . assumption;
@@ -139,7 +139,7 @@ lemma formula_persistent_exrinsicForces [M.MRelLifting] [M.MixConfluent] : x₁ 
 def ExtrinsicValid (M : KripkeModel κ) (φ : BDFormula) := ∀ x : M.World, x ⊩ᵉ φ
 infixl:80 " ⊧ᵉ " => ExtrinsicValid
 
-def IntrinsicValid (M : KripkeModel κ) (φ : BDFormula) := ∀ x : M.World, x ⊩ᵉ φ
+def IntrinsicValid (M : KripkeModel κ) (φ : BDFormula) := ∀ x : M.World, x ⊩ⁱ φ
 infixl:80 " ⊧ⁱ " => IntrinsicValid
 
 end KripkeModel
@@ -150,7 +150,7 @@ namespace KripkeFrame
 def ExtrinsicValid (F : KripkeFrame κ) (φ : BDFormula) := ∀ V hV, (KripkeModel.mk F V hV) ⊧ᵉ φ
 infixl:80 " ⊧ᵉ " => ExtrinsicValid
 
-def IntrinsicValid (F : KripkeFrame κ) (φ : BDFormula) := ∀ V hV, (KripkeModel.mk F V hV) ⊧ᵉ φ
+def IntrinsicValid (F : KripkeFrame κ) (φ : BDFormula) := ∀ V hV, (KripkeModel.mk F V hV) ⊧ⁱ φ
 infixl:80 " ⊧ⁱ " => IntrinsicValid
 
 end KripkeFrame
@@ -170,7 +170,7 @@ lemma wwwww {M : KripkeModel κ} [M.MRelLifting] [M.MixConfluent] {x₁ : M.Worl
   | dia φ ihφ =>
     constructor;
     . rintro ⟨y₁, Mx₁y₁, h⟩ x₂ Ix₁x₂;
-      obtain ⟨y₂, Iy₁y₂, Mx₁y₂⟩ := M.mix_confluent x₁ x₂ y₁ Ix₁x₂ Mx₁y₁;
+      obtain ⟨y₂, Iy₁y₂, Mx₁y₂⟩ := M.mix_confluent Ix₁x₂ Mx₁y₁;
       use y₂;
       constructor;
       . assumption;
@@ -184,9 +184,35 @@ lemma wwwww {M : KripkeModel κ} [M.MRelLifting] [M.MixConfluent] {x₁ : M.Worl
   | _ => grind;
 
 theorem logicIntrinsic_subset_logicExtrinsic : logicIntrinsic.{u} ⊆ logicExtrinsic.{u} := by
-  dsimp [logicIntrinsic, logicExtrinsic, KripkeModel.IntrinsicValid, KripkeModel.ExtrinsicValid];
+  simp only [logicIntrinsic, KripkeModel.IntrinsicValid, logicExtrinsic, KripkeModel.ExtrinsicValid, Set.setOf_subset_setOf];
   grind [wwwww];
 
+@[simp, grind .]
+lemma axiomCDia_mem_logicExtrinsic : ◇(φ ⋎ ψ) 🡒 (◇φ ⋎ ◇ψ) ∈ logicExtrinsic := by
+  rintro κ _ M _ _ x₁ x₂ Ix₁x₂ ⟨y₂, Mx₂y₂, (hy₂φ | hy₂ψ)⟩ <;> grind;
+
+lemma axiomCDia_not_mem_logicIntrinsic : ◇(#0 ⋎ #1) 🡒 (◇(#0) ⋎ ◇(#1)) ∉ logicIntrinsic.{0} := by
+  simp only [logicIntrinsic, Set.mem_setOf_eq, not_forall, KripkeModel.IntrinsicValid];
+  use (Fin 4), inferInstance;
+  use {
+    iRel x y := x = y ∨ (x = 0 ∧ y = 1)
+    iRel_preorder := { refl := by grind, trans := by grind; }
+    mRel x y := match x, y with | 0, 2 | 1, 3 | 2, 2 | 3, 3 => True | _, _ => False
+    val x a := match a with | 0 => x = 2 | 1 => x = 3 | _ => True
+    val_persistent {x y a} hx Ixy := by grind;
+  }, 0;
+  dsimp [KripkeModel.IntrinsicForces]
+  push_neg;
+  refine ⟨0, ?_, ?_, ⟨1, ?_⟩, ⟨0, ?_⟩⟩ <;> grind;
+
+theorem logicIntrinsic_ssubset_logicExtrinsic : logicIntrinsic.{0} ⊂ logicExtrinsic.{0} := by
+  apply Set.ssubset_iff_exists.mpr;
+  constructor;
+  . exact logicIntrinsic_subset_logicExtrinsic;
+  . use (◇(#0 ⋎ #1) 🡒 (◇(#0) ⋎ ◇(#1)));
+    constructor;
+    . exact axiomCDia_mem_logicExtrinsic;
+    . exact axiomCDia_not_mem_logicIntrinsic;
 
 end NCML.IML
 
