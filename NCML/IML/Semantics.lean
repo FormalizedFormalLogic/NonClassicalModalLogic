@@ -166,8 +166,8 @@ infixl:80 " ⊧ⁱ " => IntrinsicValid
 end KripkeFrame
 
 
-def logicExtrinsic := { φ : BDFormula | ∀ κ : Type*, [Nonempty κ] → ∀ M : KripkeModel κ, [M.MRelLifting] → [M.MixConfluent] → M ⊧ᵉ φ }
-def logicIntrinsic := { φ : BDFormula | ∀ κ : Type*, [Nonempty κ] → ∀ M : KripkeModel κ, M ⊧ⁱ φ }
+abbrev logicExtrinsic := { φ : BDFormula | ∀ {κ : Type*}, [Nonempty κ] → ∀ M : KripkeModel κ, [M.MRelLifting] → [M.MixConfluent] → M ⊧ᵉ φ }
+abbrev logicIntrinsic := { φ : BDFormula | ∀ {κ : Type*}, [Nonempty κ] → ∀ M : KripkeModel κ, M ⊧ⁱ φ }
 
 lemma wwwww {M : KripkeModel κ} [M.MRelLifting] [M.MixConfluent] {x₁ : M.World} {φ} : x₁ ⊩ᵉ φ ↔ x₁ ⊩ⁱ φ := by
   induction φ generalizing x₁ with
@@ -225,7 +225,7 @@ theorem logicIntrinsic_ssubset_logicExtrinsic : logicIntrinsic.{0} ⊂ logicExtr
     . exact axiomCDia_notMem_logicIntrinsic;
 
 
-def logicDiaFreeExtrinsic := { φ : BDFormula | φ.diaFree ∧ (∀ κ : Type*, [Nonempty κ] → ∀ M : KripkeModel κ, [M.MRelLifting] → M ⊧ᵉ φ) }
+abbrev logicDiaFreeExtrinsic := { φ : BDFormula | φ.diaFree ∧ (∀ {κ : Type*}, [Nonempty κ] → ∀ M : KripkeModel κ, [M.MRelLifting] → M ⊧ᵉ φ) }
 
 open KripkeModel
 
@@ -276,6 +276,57 @@ theorem logicDiaFreeExtrinsic_ssubset_logicExtrinsic : logicDiaFreeExtrinsic.{0}
     constructor;
     . exact dnBoxBot_mem_logicExtrinsic;
     . exact dnBoxBot_notMem_logicDiaFreeExtrinsic;
+
+lemma diaFree_equiv {M : KripkeModel κ} [M.MRelLifting] {φ} (hφ : φ.diaFree) {x₁ : M.World} : x₁ ⊩ᵉ φ ↔ x₁ ⊩ⁱ φ := by
+  induction φ generalizing x₁ with
+  | box φ ihφ =>
+    constructor;
+    . intro h y₁ Ix₁y₁ y₂ My₁y₂;
+      exact ihφ (by grind) |>.mp $ KripkeModel.diaFree_formula_persistent_exrinsicForces (by grind) h Ix₁y₁ y₂ My₁y₂;
+    . intro h y₁ Mx₁y₁;
+      exact ihφ (by grind) |>.mpr $ h x₁ (refl x₁) y₁ Mx₁y₁;
+  | _ => grind;
+
+lemma iff_mem_logicIntrinsic_mem_logicDiaFreeExtrinsic_of_diaFree (hφ : φ.diaFree) : (φ ∈ logicIntrinsic.{u}) ↔ φ ∈ logicDiaFreeExtrinsic.{u} := by
+  simp only [Set.mem_setOf_eq]
+  constructor;
+  . intro h;
+    constructor;
+    . assumption;
+    . intro κ _ M _ x;
+      exact diaFree_equiv (by grind) |>.mpr $ h M x;
+  . rintro ⟨_, h⟩ κ _ M x;
+    let M' : KripkeModel κ := {
+      iRel := M.iRel,
+      mRel x y := M.mRel x y ∨ (∃ x', M.iRel x x' ∧ M.mRel x' y),
+      val := M.val,
+      val_persistent := M.val_persistent,
+    };
+    have : M'.MRelLifting := ⟨by
+      rintro x₁ x₂ y₂ Ix₁x₂ Mx₂y₂;
+      use y₂;
+      constructor;
+      . apply refl;
+      . rcases Mx₂y₂ with (h | ⟨x₃, Ix₂x₃, Mx₃y₂⟩);
+        . right; use x₂;
+        . right;
+          use x₃;
+          constructor;
+          . apply _root_.trans Ix₁x₂ Ix₂x₃;
+          . assumption;
+    ⟩
+    have : ∀ ψ, ψ.diaFree → ∀ w, (M.IntrinsicForces w ψ ↔ M'.ExtrinsicForces w ψ) := by
+      intro ψ hψ w;
+      induction ψ generalizing w with
+      | box ψ ih =>
+        replace ih := ih (by grind);
+        constructor;
+        . rintro h v (Mwv | ⟨v', Iwv', Mv'v⟩);
+          . exact ih _ |>.mp $ h w (refl _) v Mwv;
+          . exact ih _ |>.mp $ h _ Iwv' v Mv'v;
+        . grind;
+      | _ => grind;
+    exact this φ (by assumption) x |>.mpr $ h M' x;
 
 end NCML.IML
 
