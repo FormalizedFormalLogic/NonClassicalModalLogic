@@ -59,6 +59,16 @@ def ExtrinsicForces {M : KripkeModel κ} (x₁ : M.World) : BDFormula → Prop
   | .dia φ     => ∃ y₁, x₁ ⊏ y₁ ∧ M.ExtrinsicForces y₁ φ
 infixl:80 " ⊩ᵉ " => ExtrinsicForces
 
+abbrev NotExtrinsicForces (x₁ : M.World) (φ) := ¬x₁ ⊩ᵉ φ
+infixl:80 " ⊮ᵉ " => NotExtrinsicForces
+
+lemma notExtrinsicForces_imp : x₁ ⊮ᵉ (φ 🡒 ψ) ↔ ∃ x₂, x₁ ≼ x₂ ∧ x₂ ⊩ᵉ φ ∧ x₂ ⊮ᵉ ψ := by grind;
+
+lemma extrinsicForces_neg : x₁ ⊩ᵉ ∼φ ↔ ∀ x₂, x₁ ≼ x₂ → x₂ ⊮ᵉ φ := by grind;
+lemma notExtrinsicForces_neg : x₁ ⊮ᵉ ∼φ ↔ ∃ x₂, x₁ ≼ x₂ ∧ x₂ ⊩ᵉ φ := by grind;
+
+lemma notExtrinsticForces_box : x₁ ⊮ᵉ □φ ↔ ∃ y₁, x₁ ⊏ y₁ ∧ y₁ ⊮ᵉ φ := by grind;
+
 @[grind]
 def IntrinsicForces {M : KripkeModel κ} (x₁ : M.World) : BDFormula → Prop
   | .atom a    => M.val x₁ a
@@ -191,7 +201,7 @@ theorem logicIntrinsic_subset_logicExtrinsic : logicIntrinsic.{u} ⊆ logicExtri
 lemma axiomCDia_mem_logicExtrinsic : ◇(φ ⋎ ψ) 🡒 (◇φ ⋎ ◇ψ) ∈ logicExtrinsic := by
   rintro κ _ M _ _ x₁ x₂ Ix₁x₂ ⟨y₂, Mx₂y₂, (hy₂φ | hy₂ψ)⟩ <;> grind;
 
-lemma axiomCDia_not_mem_logicIntrinsic : ◇(#0 ⋎ #1) 🡒 (◇(#0) ⋎ ◇(#1)) ∉ logicIntrinsic.{0} := by
+lemma axiomCDia_notMem_logicIntrinsic : ◇(#0 ⋎ #1) 🡒 (◇(#0) ⋎ ◇(#1)) ∉ logicIntrinsic.{0} := by
   simp only [logicIntrinsic, Set.mem_setOf_eq, not_forall, KripkeModel.IntrinsicValid];
   use (Fin 4), inferInstance;
   use {
@@ -212,7 +222,60 @@ theorem logicIntrinsic_ssubset_logicExtrinsic : logicIntrinsic.{0} ⊂ logicExtr
   . use (◇(#0 ⋎ #1) 🡒 (◇(#0) ⋎ ◇(#1)));
     constructor;
     . exact axiomCDia_mem_logicExtrinsic;
-    . exact axiomCDia_not_mem_logicIntrinsic;
+    . exact axiomCDia_notMem_logicIntrinsic;
+
+
+def logicDiaFreeExtrinsic := { φ : BDFormula | φ.diaFree ∧ (∀ κ : Type*, [Nonempty κ] → ∀ M : KripkeModel κ, [M.MRelLifting] → M ⊧ᵉ φ) }
+
+open KripkeModel
+
+lemma dnBoxBot_mem_logicExtrinsic : (∼∼□⊥ 🡒 □⊥) ∈ logicExtrinsic := by
+  rintro κ _ M _ _ x₁ x₂ Ix₁x₂ h y₂ Mx₂y₂;
+  obtain ⟨x₃, Ix₂x₃, hx₃⟩ := notExtrinsicForces_neg.mp $ extrinsicForces_neg.mp h x₂ (refl _);
+  obtain ⟨y₃, Iy₂y₃, Mx₃y₃⟩ := M.mix_confluent Ix₂x₃ Mx₂y₂;
+  have : y₃ ⊩ᵉ ⊥ := hx₃ _ Mx₃y₃;
+  contradiction;
+
+lemma dnBoxBot_notMem_logicDiaFreeExtrinsic : (∼∼□⊥ 🡒 □⊥) ∉ logicDiaFreeExtrinsic.{0} := by
+  simp only [logicDiaFreeExtrinsic, Set.mem_setOf_eq, not_and, not_forall, KripkeModel.ExtrinsicValid];
+  intro _;
+  use (Fin 5), inferInstance;
+  use {
+    iRel x y := x = y ∨ (match x, y with | 0, 1 | 1, 2 | 0, 2 | 3, 4 => True | _, _ => False),
+    iRel_preorder := { refl := by tauto, trans := by grind; }
+    mRel x y := (x = 0 ∧ y = 3) ∨ (x = 1 ∧ y = 4)
+    val _ _ := True
+    val_persistent := by tauto
+  };
+  refine ⟨?_, 0, ?_⟩;
+  . constructor;
+    rintro x₁ x₂ y₂ Ix₁x₂ (⟨rfl, rfl⟩ | ⟨rfl, rfl⟩);
+    . use 3; grind;
+    . rcases Ix₁x₂ with (rfl | h);
+      . use 4; grind;
+      . use 3; grind;
+  . apply notExtrinsicForces_imp.mpr;
+    use 1;
+    refine ⟨?_, ?_, ?_⟩;
+    . tauto;
+    . apply extrinsicForces_neg.mpr;
+      intro x I1x;
+      apply notExtrinsicForces_neg.mpr;
+      use 2;
+      grind;
+    . apply notExtrinsticForces_box.mpr;
+      use 4;
+      tauto;
+
+theorem logicDiaFreeExtrinsic_ssubset_logicExtrinsic : logicDiaFreeExtrinsic.{0} ⊂ logicExtrinsic.{0} := by
+  apply Set.ssubset_iff_exists.mpr;
+  constructor;
+  . simp only [logicDiaFreeExtrinsic, logicExtrinsic, Set.setOf_subset_setOf];
+    tauto;
+  . use (∼∼□⊥ 🡒 □⊥);
+    constructor;
+    . exact dnBoxBot_mem_logicExtrinsic;
+    . exact dnBoxBot_notMem_logicDiaFreeExtrinsic;
 
 end NCML.IML
 

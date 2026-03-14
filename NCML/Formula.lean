@@ -48,7 +48,7 @@ namespace BDFormula
 
 
 prefix:75 "#" => atom
-notation:80 "⊥" => falsum
+notation:max "⊥" => falsum
 infixr:69 " ⋏ " => and
 infixr:68 " ⋎ " => or
 infixr:60 " 🡒 " => imply
@@ -57,6 +57,9 @@ prefix:91 "◇" => dia
 
 abbrev iff (φ ψ : BDFormula) := φ 🡒 ψ ⋏ ψ 🡒 φ
 infixr:61 " 🡘 " => iff
+
+abbrev neg (φ : BDFormula) := φ 🡒 ⊥
+prefix:85 "∼" => neg
 
 @[grind]
 def boxFree : BDFormula → Prop
