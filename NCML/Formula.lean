@@ -61,6 +61,9 @@ infixr:61 " 🡘 " => iff
 abbrev neg (φ : BDFormula) := φ 🡒 ⊥
 prefix:85 "∼" => neg
 
+abbrev top : BDFormula := ∼⊥
+notation:max "⊤" => top
+
 @[grind]
 def boxFree : BDFormula → Prop
   | □_ => False

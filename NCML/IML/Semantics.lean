@@ -69,6 +69,8 @@ lemma notExtrinsicForces_neg : x₁ ⊮ᵉ ∼φ ↔ ∃ x₂, x₁ ≼ x₂ ∧
 
 lemma notExtrinsticForces_box : x₁ ⊮ᵉ □φ ↔ ∃ y₁, x₁ ⊏ y₁ ∧ y₁ ⊮ᵉ φ := by grind;
 
+@[simp, grind .] lemma extrinsicForces_top : x₁ ⊩ᵉ ⊤ := by grind;
+
 @[grind]
 def IntrinsicForces {M : KripkeModel κ} (x₁ : M.World) : BDFormula → Prop
   | .atom a    => M.val x₁ a
@@ -79,6 +81,8 @@ def IntrinsicForces {M : KripkeModel κ} (x₁ : M.World) : BDFormula → Prop
   | .box φ     => ∀ x₂, x₁ ≼ x₂ → ∀ y₂, x₂ ⊏ y₂ → M.IntrinsicForces y₂ φ
   | .dia φ     => ∀ x₂, x₁ ≼ x₂ → ∃ y₂, x₂ ⊏ y₂ ∧ M.IntrinsicForces y₂ φ
 infixl:80 " ⊩ⁱ " => IntrinsicForces
+
+@[simp, grind .] lemma intrinsticForces_top : x₁ ⊩ⁱ ⊤ := by grind;
 
 lemma formula_persistent_intrinsicForces : x₁ ⊩ⁱ φ → x₁ ≼ x₂ → x₂ ⊩ⁱ φ := by
   intro h Ix₁x₂;
@@ -327,6 +331,66 @@ lemma iff_mem_logicIntrinsic_mem_logicDiaFreeExtrinsic_of_diaFree (hφ : φ.diaF
         . grind;
       | _ => grind;
     exact this φ (by assumption) x |>.mpr $ h M' x;
+
+lemma logicIntrinsic_boxRM_closed : (φ 🡒 ψ) ∈ logicIntrinsic.{u} → (□φ 🡒 □ψ) ∈ logicIntrinsic.{u} := by
+  dsimp only [logicIntrinsic, Set.mem_setOf_eq, KripkeModel.IntrinsicValid];
+  intro h _ _ M x₁ x₂ Ix₁x₂ hφ x₃ Ix₂x₃ y₃ Mx₃y₃;
+  apply h M x₂ y₃ ?_ $ hφ x₃ Ix₂x₃ y₃ Mx₃y₃;
+  sorry;
+
+lemma logicExtrinsic_boxRM_closed : (φ 🡒 ψ) ∈ logicExtrinsic.{u} → (□φ 🡒 □ψ) ∈ logicExtrinsic.{u} := by
+  dsimp only [logicExtrinsic, Set.mem_setOf_eq, KripkeModel.ExtrinsicValid];
+  intro h _ _ M _ _ x₁ x₂ Ix₁x₂ hφ y₂ Mx₂y₂;
+  apply h M y₂ y₂ (refl _) $ hφ y₂ Mx₂y₂;
+
+lemma logicDiaFreeExtrinsic_boxRM_closed : (φ 🡒 ψ) ∈ logicDiaFreeExtrinsic.{u} → (□φ 🡒 □ψ) ∈ logicDiaFreeExtrinsic.{u} := by
+  dsimp only [logicDiaFreeExtrinsic, Set.mem_setOf_eq, KripkeModel.ExtrinsicValid];
+  rintro ⟨_, h⟩;
+  constructor;
+  . assumption;
+  . intro _ _ M _ x₁ x₂ Ix₁x₂ hφ y₂ Mx₂y₂;
+    apply h M y₂ y₂ (refl _) $ hφ y₂ Mx₂y₂;
+
+
+lemma logicExtrinsic_diaRM_closed : (φ 🡒 ψ) ∈ logicExtrinsic.{u} → (◇φ 🡒 ◇ψ) ∈ logicExtrinsic.{u} := by
+  dsimp only [logicExtrinsic, Set.mem_setOf_eq, KripkeModel.ExtrinsicValid];
+  rintro h _ _ M _ _ x₁ x₂ Ix₁x₂ ⟨y₂, Mx₂y₂, hy₂ψ⟩;
+  use y₂;
+  constructor;
+  . assumption;
+  . exact h M y₂ _ (refl _) hy₂ψ;
+
+lemma logicIntrinsic_diaRM_closed : (φ 🡒 ψ) ∈ logicIntrinsic.{u} → (◇φ 🡒 ◇ψ) ∈ logicIntrinsic.{u} := by
+  dsimp only [logicIntrinsic, Set.mem_setOf_eq, KripkeModel.IntrinsicValid];
+  intro h _ _ M x₁ x₂ Ix₁x₂ hφ x₃ Ix₂x₃;
+  obtain ⟨y₃, Mx₃y₃, hy₃φ⟩ := hφ x₃ Ix₂x₃;
+  use y₃;
+  constructor;
+  . assumption;
+  . apply h M x₂ y₃ (by sorry) hy₃φ;
+
+lemma boxTop_mem_logicExtrinsic : □⊤ ∈ logicExtrinsic := by
+  rintro κ _ M _ _ x₁ y₁ Mx₁y₁;
+  apply M.extrinsicForces_top;
+
+lemma boxTop_mem_logicIntrinsic : □⊤ ∈ logicIntrinsic := by
+  rintro κ _ M x₁ y₁ Mx₁y₁ y₂ Mx₁y₂;
+  apply M.intrinsticForces_top;
+
+lemma boxTop_mem_logicDiaFreeExtrinsic : □⊤ ∈ logicDiaFreeExtrinsic := by
+  constructor;
+  . grind;
+  . rintro κ _ M _ _ x₁ y₁ Mx₁y₁;
+    apply M.extrinsicForces_top;
+
+lemma negDiaBot_mem_logicExtrinsic : ∼◇⊥ ∈ logicExtrinsic := by
+  rintro κ _ M _ _ x₁ x₂ Ix₁x₂ ⟨y₂, Mx₂y₂, hy₂⟩;
+  contradiction;
+
+lemma negDiaBot_mem_logicIntrinsic : ∼◇⊥ ∈ logicIntrinsic := by
+  rintro κ _ M x₁ x₂ Ix₁x₂ h;
+  obtain ⟨y₂, Mx₁y₂, hy₂⟩ := h x₂ (refl _);
+  contradiction;
 
 end NCML.IML
 
