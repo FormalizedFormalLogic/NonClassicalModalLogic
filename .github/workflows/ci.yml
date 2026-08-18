@@ -10,7 +10,6 @@ on:
       - main
   workflow_dispatch:
 
-# Supersede stale runs on the same ref.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
@@ -29,11 +28,6 @@ jobs:
           build: false
           use-github-cache: false
 
-      # ── The project's own build cache (`lake pack`/`unpack`) ─────────────────────────────────────
-      # `lake pack` archives the root package's `.lake/build` (our own oleans); restoring + unpacking
-      # it lets `lake build` reuse traces and rebuild only the modules that actually changed. The key
-      # pins toolchain+manifest and appends sha because cache entries are immutable; restore-keys
-      # fall back to the newest cache with a matching toolchain+manifest.
       - name: Restore project cache
         id: cache-restore
         uses: actions/cache/restore@v4
@@ -46,38 +40,12 @@ jobs:
         if: hashFiles('.lake/NCML-x86_64-unknown-linux-gnu.tar.gz') != ''
         run: lake unpack
 
-      # `restore-keys` can fall back to a cache packed before a file was renamed or deleted; `lake
-      # build` only rebuilds modules whose *source* changed, so a stale `.olean`/`.trace` for a
-      # since-removed path survives untouched. `leanchecker` walks every olean it finds, so an
-      # orphaned one — compiled against an older environment — can fail the kernel replay even
-      # though nothing on the current source tree is wrong. Drop any build artifact whose module no
-      # longer has a matching `.lean` file before building.
-      - name: Prune orphaned build artifacts from renamed/removed sources
-        run: |
-          python3 - <<'PY'
-          import pathlib
-          src_root = pathlib.Path('NCML')
-          for build_root in [pathlib.Path('.lake/build/lib/lean/NCML'), pathlib.Path('.lake/build/ir/NCML')]:
-              if not build_root.exists():
-                  continue
-              for f in sorted(build_root.rglob('*')):
-                  if not f.is_file():
-                      continue
-                  rel_dir = f.relative_to(build_root).parent
-                  base = f.name.split('.', 1)[0]
-                  if not (src_root / rel_dir / f'{base}.lean').exists():
-                      print(f'removing orphaned artifact {f}')
-                      f.unlink()
-          PY
-
       - name: Build NCML
         run: lake build NCML
 
       - name: Check environment with leanchecker
         run: lake env leanchecker NCML
 
-      # Re-pack the freshly built oleans and save under the exact primary key. Skipped for PRs from
-      # forks (no write access to the base repo's cache); pushes and same-repo PRs refresh the entry.
       - name: Pack project cache
         run: lake pack
       - name: Save project cache
