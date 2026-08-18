@@ -1,5 +1,7 @@
 module
 
+public import Mathlib.Data.Set.Defs
+
 @[expose] public section
 
 namespace NCML
@@ -79,6 +81,8 @@ def diaFree : BDFormula → Prop
   | □φ => φ.diaFree
 
 end BDFormula
+
+abbrev BDLogic := Set BDFormula
 
 end NCML
 
