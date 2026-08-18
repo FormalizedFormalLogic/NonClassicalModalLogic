@@ -9,6 +9,8 @@ namespace CK
 open NCML
 
 variable {κ : Type*} {M : Model κ}
+variable {x : M.World} {A B : BDFormula}
+
 
 namespace Model
 
@@ -39,14 +41,9 @@ class IsIK (M : Model κ) : Prop extends ForwardConfluent M, BackwardConfluent M
 /-- - [Pac24, Definition 7] -/
 class IsIKB (M : Model κ) : Prop extends IsIK M, SymmetricMRel M
 
-end Model
-
-open Model
-
-variable {x : M.World} {A B : BDFormula}
 
 /-- - [Pac24, Proposition 6] -/
-theorem Model.dia_iff_forward_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] ◇A ↔ ∃ y, x ⊏ y ∧ y ⊩[_] A := by
+theorem dia_iff_forward_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] ◇A ↔ ∃ y, x ⊏ y ∧ y ⊩[_] A := by
   constructor;
   · intro h;
     exact h x (refl x);
@@ -62,27 +59,40 @@ theorem forwardConfluent_iff_backwardConfluent_of_symmetricMRel [M.SymmetricMRel
     constructor;
     intro x y y₁ Mxy Iyy₁;
     obtain ⟨x₁, Ixx₁, My₁x₁⟩ := h.forward_confluent (symm_mRel Mxy) Iyy₁;
-    exact ⟨x₁, Ixx₁, symm_mRel My₁x₁⟩;
+    use x₁;
+    constructor;
+    . assumption;
+    . exact symm_mRel My₁x₁;
   · intro h;
     constructor;
     intro x y x₁ Mxy Ixx₁;
     obtain ⟨y₁, Iyy₁, My₁x₁⟩ := h.backward_confluent (symm_mRel Mxy) Ixx₁;
-    exact ⟨y₁, Iyy₁, symm_mRel My₁x₁⟩;
+    use y₁;
+    constructor;
+    . assumption;
+    . exact symm_mRel My₁x₁;
 
 /--
 - [dGSC25]
 - [Pac24, Theorem 11]
 -/
-theorem Model.forces_N_of_symmetricMRel [M.SymmetricMRel] : x ⊩[_] ∼◇⊥ := by
+theorem forces_N_of_symmetricMRel [M.SymmetricMRel] : x ⊩[_] ∼◇⊥ := by
   intro y _ hy;
   obtain ⟨z, Myz, hz⟩ := hy y (refl y);
   exact M.fallible_mRel hz (symm_mRel Myz);
 
 /--
+- [Pac24, Corollary 12]
+-/
+lemma valid_N_of_symmetricMRel [M.SymmetricMRel] : M ⊧ ∼◇⊥ := fun
+  _ => forces_N_of_symmetricMRel
+
+
+/--
 - [dGSC25]
 - [Pac24, Theorem 11]
 -/
-theorem Model.forces_DP_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] (◇(A ⋎ B) 🡒 (◇A ⋎ ◇B)) := by
+theorem forces_DP_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] (◇(A ⋎ B) 🡒 (◇A ⋎ ◇B)) := by
   intro y _ hy;
   obtain ⟨z, Myz, hz⟩ := Model.dia_iff_forward_of_forwardConfluent.mp hy;
   rcases hz with hz | hz;
@@ -90,10 +100,16 @@ theorem Model.forces_DP_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] (◇
   · exact Or.inr (Model.dia_iff_forward_of_forwardConfluent.mpr ⟨z, Myz, hz⟩);
 
 /--
+- [Pac24, Corollary 12]
+-/
+lemma valid_DP_of_forwardConfluent [M.ForwardConfluent] : M ⊧ (◇(A ⋎ B) 🡒 (◇A ⋎ ◇B)) := fun
+  _ => forces_DP_of_forwardConfluent
+
+/--
 - [dGSC25]
 - [Pac24, Theorem 11]
 -/
-theorem Model.forces_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] [M.BackwardConfluent] :
+theorem forces_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] [M.BackwardConfluent] :
   x ⊩[_] ((◇A 🡒 □B) 🡒 □(A 🡒 B)) := by
   intro y Ixy hy v u Iyv Mvu w Iuw hwA;
   obtain ⟨v₁, Ivv₁, Mv₁w⟩ := backward_confluent Mvu Iuw;
@@ -102,6 +118,14 @@ theorem Model.forces_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfl
     obtain ⟨w₁, Iww₁, Mv₂w₁⟩ := forward_confluent Mv₁w Iv₁v₂;
     exact ⟨w₁, Mv₂w₁, Model.Forces.persistent hwA Iww₁⟩;
   exact hy v₁ (Trans.trans Iyv Ivv₁) hv₁diaA v₁ w (refl v₁) Mv₁w;
+
+/--
+- [Pac24, Corollary 12]
+-/
+lemma valid_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] [M.BackwardConfluent] : M ⊧ ((◇A 🡒 □B) 🡒 □(A 🡒 B)) := fun
+  _ => forces_FS_of_forwardConfluent_of_backwardConfluent
+
+end Model
 
 end CK
 
