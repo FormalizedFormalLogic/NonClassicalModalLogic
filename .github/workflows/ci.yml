@@ -19,7 +19,6 @@ permissions:
 
 jobs:
   build:
-    name: Build project
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
