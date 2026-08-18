@@ -4,38 +4,41 @@ public import NCML.Hilbert.Basic
 
 @[expose] public section
 
-namespace NCML.Hilbert
+open NCML BDFormula
 
-open BDFormula
+abbrev LogicCK : BDLogic := ProvableBDHilbert.logic ∅
 
-/-- The dual `B` axiom schemas (`B□` and `B◇`), as instance sets over all formulas. -/
-inductive BAxioms : Set BDFormula
-  | bBox (A : BDFormula) : BAxioms (A 🡒 □◇A)
-  | bDia (A : BDFormula) : BAxioms (◇(□A) 🡒 A)
+abbrev LogicCKB : BDLogic := ProvableBDHilbert.logic (
+  { A 🡒 □◇A | (A) } ∪
+  { ◇(□A) 🡒 A | (A) }
+)
 
-/-- The `IK` axiom schemas `FS`, `DP`, and `N`, as instance sets over all formulas. -/
-inductive IKAxioms : Set BDFormula
-  | fs (A B : BDFormula) : IKAxioms ((◇A 🡒 □B) 🡒 □(A 🡒 B))
-  | dp (A B : BDFormula) : IKAxioms (◇(A ⋎ B) 🡒 ◇A ⋎ ◇B)
-  | n                    : IKAxioms (∼◇⊥)
+abbrev LogicIK : BDLogic := ProvableBDHilbert.logic (
+  { (◇A 🡒 □B) 🡒 □(A 🡒 B) | (A) (B) } ∪
+  { ◇(A ⋎ B) 🡒 ◇A ⋎ ◇B | (A) (B) } ∪
+  { ∼◇⊥ }
+)
 
-/-- `CK`, the least logic containing all intuitionistic tautologies together with `K□` and `K◇`. -/
-abbrev CK : Set BDFormula := theLogic ∅
+abbrev LogicIKB : BDLogic := ProvableBDHilbert.logic (
+  { (◇A 🡒 □B) 🡒 □(A 🡒 B) | (A) (B) } ∪
+  { ◇(A ⋎ B) 🡒 ◇A ⋎ ◇B | (A) (B) } ∪
+  { ∼◇⊥ } ∪
+  { A 🡒 □◇A | (A) } ∪
+  { ◇(□A) 🡒 A | (A) }
+)
 
-/-- `CKB := CK + {B□, B◇}` (Definition 2). -/
-abbrev CKB : Set BDFormula := theLogic BAxioms
+theorem LogicCK.subset_CKB : LogicCK ⊆ LogicCKB := .logic_monotone (by grind)
+theorem LogicCK.subset_IK : LogicCK ⊆ LogicIK := .logic_monotone (by grind)
+theorem LogicCKB.subset_IKB : LogicCKB ⊆ LogicIKB := .logic_monotone (by grind)
+theorem LogicIK.subset_IKB : LogicIK ⊆ LogicIKB := .logic_monotone (by grind)
 
-/-- `IK := CK + {FS, DP, N}` (Definition 2). -/
-abbrev IK : Set BDFormula := theLogic IKAxioms
-
-/-- `IKB := IK + {B□, B◇} = CKB + {FS, DP, N}` (Definition 2). -/
-abbrev IKB : Set BDFormula := theLogic (IKAxioms ∪ BAxioms)
-
-theorem CK_subset_CKB : CK ⊆ CKB := theLogic_monotone (Set.empty_subset _)
-theorem CK_subset_IK : CK ⊆ IK := theLogic_monotone (Set.empty_subset _)
-theorem CKB_subset_IKB : CKB ⊆ IKB := theLogic_monotone (Set.subset_union_right)
-theorem IK_subset_IKB : IK ⊆ IKB := theLogic_monotone (Set.subset_union_left)
-
-end NCML.Hilbert
+open ProvableBDHilbert in
+/-- - [Pac24, Theorem 3] -/
+theorem LogicCKB.provable_N : (∼◇⊥) ∈ LogicCKB := by
+  have h1 : (⊥ 🡒 □⊥) ∈ LogicCKB := efq;
+  have h2 : (□(⊥ 🡒 □⊥)) ∈ LogicCKB := nec h1;
+  have h3 : (◇⊥ 🡒 ◇(□⊥)) ∈ LogicCKB := mp kDia h2;
+  have h4 : (◇(□⊥) 🡒 ⊥) ∈ LogicCKB := axm (by grind);
+  exact imp_trans h3 h4;
 
 end
