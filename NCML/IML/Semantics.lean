@@ -10,49 +10,41 @@ namespace IML
 
 open NCML
 
-structure Frame (κ : Type*) where
+structure Model (κ : Type*) where
   iRel' : κ → κ → Prop
   [iRel_preorder : IsPreorder _ iRel']
   mRel' : κ → κ → Prop
-
-namespace Frame
-
-variable {κ : Type*}
-
-abbrev World (_ : Frame κ) := κ
-
-abbrev iRel {F : Frame κ} : F.World → F.World → Prop := F.iRel'
-infixl:80 " ≼ " => Frame.iRel
-
-abbrev mRel {F : Frame κ} : F.World → F.World → Prop := F.mRel'
-infixl:80 " ⊏ " => Frame.mRel
-
-variable {F : Frame κ}
-
-instance : IsPreorder F.World F.iRel := F.iRel_preorder
-instance : IsTrans F.World F.iRel := inferInstance
-
-class MRelLifting (F : Frame κ) : Prop where
-  mRel_lifting : ∀ {x₁ x₂ y₂ : F.World}, x₁ ≼ x₂ → x₂ ⊏ y₂ → ∃ y₁, y₁ ≼ y₂ ∧ x₁ ⊏ y₁
-export MRelLifting (mRel_lifting)
-
-class MixConfluent (F : Frame κ) : Prop where
-  mix_confluent : ∀ {x₁ x₂ y₁ : F.World}, x₁ ≼ x₂ → x₁ ⊏ y₁ → ∃ y₂, y₁ ≼ y₂ ∧ x₂ ⊏ y₂
-export MixConfluent (mix_confluent)
-
-end Frame
-
-
-structure Model (κ : Type*) extends Frame κ where
   val : κ → Nat → Prop
-  val_persistent : ∀ {x₁ x₂ : toFrame.World} {a}, val x₁ a → x₁ ≼ x₂ → val x₂ a
+  val_persistent : ∀ {x₁ x₂} {a}, val x₁ a → iRel' x₁ x₂ → val x₂ a
 
 attribute [grind =>] Model.val_persistent
 
 namespace Model
 
-variable {κ : Type*} {M : Model κ} {x₁ x₂ y₁ y₂ : M.World}
-variable {A B : BDFormula}
+variable {κ : Type*}
+
+abbrev World (_ : Model κ) := κ
+
+abbrev iRel {M : Model κ} : M.World → M.World → Prop := M.iRel'
+infixl:80 " ≼ " => Model.iRel
+
+abbrev mRel {M : Model κ} : M.World → M.World → Prop := M.mRel'
+infixl:80 " ⊏ " => Model.mRel
+
+variable {M : Model κ}
+
+instance : IsPreorder M.World M.iRel := M.iRel_preorder
+instance : IsTrans M.World M.iRel := inferInstance
+
+class MRelLifting (M : Model κ) : Prop where
+  mRel_lifting : ∀ {x₁ x₂ y₂ : M.World}, x₁ ≼ x₂ → x₂ ⊏ y₂ → ∃ y₁, y₁ ≼ y₂ ∧ x₁ ⊏ y₁
+export MRelLifting (mRel_lifting)
+
+class MixConfluent (M : Model κ) : Prop where
+  mix_confluent : ∀ {x₁ x₂ y₁ : M.World}, x₁ ≼ x₂ → x₁ ⊏ y₁ → ∃ y₂, y₁ ≼ y₂ ∧ x₂ ⊏ y₂
+export MixConfluent (mix_confluent)
+
+variable {x₁ x₂ y₁ y₂ : M.World} {A B : BDFormula}
 
 @[grind]
 def ExtrinsicForces (M : Model κ) (x₁ : M.World) : BDFormula → Prop
@@ -163,19 +155,6 @@ def IntrinsicValid (M : Model κ) (A : BDFormula) := ∀ x : M.World, x ⊩ⁱ[M
 infixl:80 " ⊧ⁱ " => IntrinsicValid
 
 end Model
-
-
-namespace Frame
-
-variable {κ : Type*}
-
-def ExtrinsicValid (F : Frame κ) (A : BDFormula) := ∀ V hV, (Model.mk F V hV) ⊧ᵉ A
-infixl:80 " ⊧ᵉ " => ExtrinsicValid
-
-def IntrinsicValid (F : Frame κ) (A : BDFormula) := ∀ V hV, (Model.mk F V hV) ⊧ⁱ A
-infixl:80 " ⊧ⁱ " => IntrinsicValid
-
-end Frame
 
 
 open Model
