@@ -18,6 +18,10 @@ These combine into the two ingredients of a Lindenbaum-style construction, both 
 an arbitrary set `Z` of forbidden formulas: the existence of a maximal MP-closed extension avoiding
 `Z` (`exists_maximal_mpClosed_avoiding`), and the dichotomy that a formula missing from such a
 maximal set implies some forbidden formula (`exists_imp_mem_of_maximal`).
+
+For `CKB`, the closure of `X ∪ ◇''Y` is analysed further: a boxed member of it already belongs to
+`Y` (`mem_of_box_mem_mpClosure`), and the closure is consistent whenever `Y` is
+(`bot_not_mem_mpClosure`).
 -/
 
 namespace NCML
@@ -180,6 +184,41 @@ lemma exists_imp_mem_of_maximal (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X)
     fun B hB hmem => hc ⟨B, hB, hmem⟩⟩ hsub (BDFormulaSet.self_mem_impSet hlogY));
 
 end Maximal
+
+/-! ## CKB-specific consequences of the MP-closure -/
+
+section CKB
+
+variable {X Y : BDFormulaSet} {A : BDFormula}
+
+/-- If `□A` belongs to the MP-closure of `X ∪ ◇''Y`, then `A` belongs to `Y`.
+
+This is the derivation chain forming the first half of the cited proof.
+
+- [Pac24, Lemma 16] -/
+lemma mem_of_box_mem_mpClosure (hXl : LogicCKB ⊆ X) (hXm : X.MpClosed) (hYl : LogicCKB ⊆ Y)
+    (hYm : Y.MpClosed) (hdia : ∀ B ∈ X, ◇B ∈ Y) (h : MPClosure (X ∪ (◇·) '' Y) (□A)) : A ∈ Y := by
+  obtain ⟨Γ, hΓ, C, hC, d⟩ := MPClosure.exists_finite_char hXl hXm h;
+  have d₁ : (conj ((Γ.map (◇·)).map (□·)) 🡒 ◇C 🡒 ◇(□A)) ∈ LogicCKB :=
+    imp_trans (imp_trans conj_box (mp kBox (nec d))) kDia;
+  have h₁ : conj ((Γ.map (◇·)).map (□·)) ∈ Y := by
+    refine BDFormulaSet.conj_mem hYl hYm ?_;
+    intro B hB;
+    simp [List.map_map] at hB;
+    obtain ⟨B, hB, rfl⟩ := hB;
+    exact BDFormulaSet.box_dia_mem hYl hYm (hΓ B hB);
+  exact BDFormulaSet.mem_of_dia_box_mem hYl hYm (hYm (hYm (hYl d₁) h₁) (hdia C hC));
+
+/-- The MP-closure of `X ∪ ◇''Y` is consistent whenever `Y` is.
+
+- [Pac24, Lemma 16] -/
+lemma bot_not_mem_mpClosure (hXl : LogicCKB ⊆ X) (hXm : X.MpClosed) (hYl : LogicCKB ⊆ Y)
+    (hYm : Y.MpClosed) (hdia : ∀ B ∈ X, ◇B ∈ Y) (hbot : ⊥ ∉ Y) :
+    ⊥ ∉ (show BDFormulaSet from MPClosure (X ∪ (◇·) '' Y)) := fun h =>
+  hbot <| mem_of_box_mem_mpClosure hXl hXm hYl hYm hdia <|
+    MPClosure.mp (MPClosure.base (Or.inl (hXl (efq (A := □⊥))))) h
+
+end CKB
 
 end NCML
 
