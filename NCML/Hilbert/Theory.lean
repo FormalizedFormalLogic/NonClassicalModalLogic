@@ -6,8 +6,6 @@ public import Mathlib.Order.Zorn
 
 @[expose] public section
 
-namespace NCML
-
 open BDFormula BDFormulaList ProvableBDHilbert
 open scoped BDFormulaSet BDFormulaList
 
@@ -275,7 +273,5 @@ lemma bot_not_mem_mdpClosure [T.Of LogicCKB] [T.Mdp] [U.CKB] (hdia : ∀ B ∈ T
     <| .mdp (.base (Or.inl (T.subset (L := LogicCK) (efq (A := □⊥))))) h
 
 end CKB
-
-end NCML
 
 end

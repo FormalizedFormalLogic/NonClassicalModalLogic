@@ -5,8 +5,6 @@ public import Mathlib.Data.Set.Defs
 
 @[expose] public section
 
-namespace NCML
-
 /-- Propositional formula -/
 inductive PFormula : Type
   | atom   : Nat → PFormula
@@ -168,7 +166,5 @@ noncomputable def conj (Γ : BDFormulaFinset) : BDFormula := ⋀Γ.toList
 @[inherit_doc] scoped prefix:90 "⋀" => BDFormulaFinset.conj
 
 end BDFormulaFinset
-
-end NCML
 
 end

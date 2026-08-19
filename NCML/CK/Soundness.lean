@@ -8,8 +8,6 @@ public import NCML.Hilbert.Logics
 
 namespace CK
 
-open NCML
-
 variable {κ : Type*} {M : Model κ}
 
 namespace Model

@@ -8,8 +8,6 @@ public import Mathlib.Tactic
 
 namespace IML
 
-open NCML
-
 structure Model (κ : Type*) where
   iRel' : κ → κ → Prop
   [iRel_preorder : IsPreorder _ iRel']

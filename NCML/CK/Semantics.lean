@@ -8,8 +8,6 @@ public import Mathlib.Tactic
 
 namespace CK
 
-open NCML
-
 /--
 - [Pac24, Definition 4]
 -/

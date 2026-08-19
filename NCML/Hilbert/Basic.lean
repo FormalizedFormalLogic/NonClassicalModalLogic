@@ -5,7 +5,7 @@ public import Mathlib.Tactic
 
 @[expose] public section
 
-open NCML BDFormula
+open BDFormula
 
 inductive ProofBDHilbert (𝔸 : Set BDFormula) : BDFormula → Type
   | axm       {A}     : A ∈ 𝔸 → ProofBDHilbert 𝔸 A

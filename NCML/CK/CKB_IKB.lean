@@ -11,15 +11,15 @@ public import NCML.CK.Soundness
 # `CKB` and `IKB` prove the same formulas
 
 The canonical model for `CKB` (`CK.CKBcanonicalModel`), whose worlds are the `CKB`-theories
-(`NCML.CKBTheory`).
+(`CKBTheory`).
 
 - [Pac24, Theorem 13, Section 3.2]
 -/
 
 namespace CK
 
-open NCML BDFormula
-open scoped NCML.BDFormulaSet
+open BDFormula
+open scoped BDFormulaSet
 
 namespace CKBTheory
 
