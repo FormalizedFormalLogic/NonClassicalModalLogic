@@ -2,6 +2,7 @@ module
 
 public import NCML.CK.Confluence
 public import NCML.Hilbert.Logics
+public import NCML.Hilbert.Theory
 public import Mathlib.Data.SetLike.Basic
 
 @[expose] public section
@@ -37,6 +38,35 @@ instance : SetLike CKBTheory BDFormula where
 @[simp] lemma mem_carrier {Γ : CKBTheory} {A} : A ∈ Γ.carrier ↔ A ∈ Γ := Iff.rfl
 
 @[ext] theorem ext {Γ Δ : CKBTheory} (h : ∀ A, A ∈ Γ ↔ A ∈ Δ) : Γ = Δ := SetLike.ext h
+
+/-- Lindenbaum lemma for CKB-theories: an MP-closed set of formulas that contains every theorem of
+`CKB` and misses `A` extends to a CKB-theory still missing `A`.
+
+Pac24 does not isolate this statement: it is the Zorn step run inline in the implication case of
+Lemma 19, and again in Lemma 20.
+
+- [Pac24, Lemma 19, Lemma 20]
+-/
+lemma exists_extending {X : BDFormulaSet} {A : BDFormula}
+  (hlog : LogicCKB ⊆ X) (hmp : X.MpClosed) (hA : A ∉ X) :
+  ∃ Γ : CKBTheory, X ⊆ Γ.carrier ∧ A ∉ Γ.carrier := by
+  obtain ⟨Y, hXY, hmax⟩ :=
+    exists_maximal_mpClosed_avoiding (Z := {A}) hmp (by rintro B rfl; exact hA);
+  obtain ⟨-, hmpY, havoid⟩ := hmax.prop;
+  have hAY : A ∉ Y := havoid A rfl;
+  have hlogY : LogicCKB ⊆ Y := hlog.trans hXY;
+  have h₁ : ∀ {B}, B ∉ Y → (B 🡒 A) ∈ Y := by
+    intro B hB;
+    obtain ⟨C, hC, h⟩ := exists_imp_mem_of_maximal hlog hmax hB;
+    exact Set.mem_singleton_iff.mp hC ▸ h;
+  have h₂ : ∀ {B C}, B ⋎ C ∈ Y → B ∈ Y ∨ C ∈ Y := by
+    intro B C hBC;
+    by_contra hc;
+    exact hAY <| BDFormulaSet.or_elim_mem hlogY hmpY (h₁ fun h => hc (Or.inl h))
+      (h₁ fun h => hc (Or.inr h)) hBC;
+  have h₃ : ⊥ ∉ Y := fun h =>
+    hAY <| hmpY (BDFormulaSet.provable_mem hlogY ProvableBDHilbert.efq) h;
+  exact ⟨⟨Y, hlogY, hmpY, h₂, h₃⟩, hXY, hAY⟩;
 
 end CKBTheory
 
