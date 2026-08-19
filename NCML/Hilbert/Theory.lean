@@ -27,20 +27,20 @@ section General
 
 variable {𝔸 : Set BDFormula} {X : BDFormulaSet} {A B C : BDFormula}
 
-theorem provable_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (h : ProvableBDHilbert 𝔸 A) : A ∈ X :=
+lemma provable_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (h : ProvableBDHilbert 𝔸 A) : A ∈ X :=
   hlog h
 
-theorem and_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed) (hA : A ∈ X) (hB : B ∈ X) :
+lemma and_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed) (hA : A ∈ X) (hB : B ∈ X) :
     A ⋏ B ∈ X :=
   hmp (hmp (provable_mem hlog andIntro) hA) hB
 
-theorem lconj_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed) {Γ : List BDFormula}
+lemma lconj_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed) {Γ : List BDFormula}
     (h : ∀ A ∈ Γ, A ∈ X) : lconj Γ ∈ X := by
   induction Γ with
   | nil => exact provable_mem hlog verum;
   | cons A Γ ih => exact and_mem hlog hmp (h A (by simp)) (ih fun B hB => h B (by simp [hB]));
 
-theorem or_elim_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed)
+lemma or_elim_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed)
     (hAC : (A 🡒 C) ∈ X) (hBC : (B 🡒 C) ∈ X) (hAB : (A ⋎ B) ∈ X) : C ∈ X :=
   hmp (hmp (hmp (provable_mem hlog orElim) hAC) hBC) hAB
 
@@ -50,10 +50,10 @@ section CKB
 
 variable {X : BDFormulaSet} {A : BDFormula}
 
-theorem box_dia_mem (hlog : LogicCKB ⊆ X) (hmp : X.MpClosed) (hA : A ∈ X) : □◇A ∈ X :=
+lemma box_dia_mem (hlog : LogicCKB ⊆ X) (hmp : X.MpClosed) (hA : A ∈ X) : □◇A ∈ X :=
   hmp (hlog (ProvableBDHilbert.axm (Or.inl ⟨A, rfl⟩))) hA
 
-theorem mem_of_dia_box_mem (hlog : LogicCKB ⊆ X) (hmp : X.MpClosed) (h : ◇(□A) ∈ X) : A ∈ X :=
+lemma mem_of_dia_box_mem (hlog : LogicCKB ⊆ X) (hmp : X.MpClosed) (h : ◇(□A) ∈ X) : A ∈ X :=
   hmp (hlog (ProvableBDHilbert.axm (Or.inr ⟨A, rfl⟩))) h
 
 end CKB
@@ -67,24 +67,47 @@ inductive MPClosure (X : BDFormulaSet) : BDFormula → Prop
   | base {A} : A ∈ X → MPClosure X A
   | mp {A B} : MPClosure X (A 🡒 B) → MPClosure X A → MPClosure X B
 
-theorem subset_mpClosure (X : BDFormulaSet) : X ⊆ MPClosure X := fun _ => MPClosure.base
+lemma subset_mpClosure (X : BDFormulaSet) : X ⊆ MPClosure X := fun _ => MPClosure.base
 
-theorem MPClosure.mpClosed (X : BDFormulaSet) : BDFormulaSet.MpClosed (MPClosure X) :=
+lemma MPClosure.mpClosed (X : BDFormulaSet) : BDFormulaSet.MpClosed (MPClosure X) :=
   fun hAB hA => MPClosure.mp hAB hA
 
-theorem MPClosure.mono {X Y : BDFormulaSet} (h : X ⊆ Y) {A} (hA : MPClosure X A) : MPClosure Y A := by
+lemma MPClosure.mono {X Y : BDFormulaSet} (h : X ⊆ Y) {A} (hA : MPClosure X A) : MPClosure Y A := by
   induction hA with
   | base hA => exact MPClosure.base (h hA);
   | mp _ _ ih₁ ih₂ => exact MPClosure.mp ih₁ ih₂;
 
-theorem logic_subset_mpClosure {𝔸 : Set BDFormula} {X : BDFormulaSet}
+lemma logic_subset_mpClosure {𝔸 : Set BDFormula} {X : BDFormulaSet}
     (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) : ProvableBDHilbert.logic 𝔸 ⊆ MPClosure X :=
   hlog.trans (subset_mpClosure X)
+
+/-- Finite characterization of the MP-closure of `X ∪ ◇''Y`: every member `A` of the closure is
+already derivable from finitely many `◇B` with `B ∈ Y` together with a single `C ∈ X`. -/
+lemma MPClosure.exists_finite_char {𝔸 : Set BDFormula} {X Y : BDFormulaSet} {A : BDFormula}
+    (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed)
+    (h : MPClosure (X ∪ (◇·) '' Y) A) :
+    ∃ Γ : List BDFormula, (∀ B ∈ Γ, B ∈ Y) ∧
+      ∃ C ∈ X, ProvableBDHilbert 𝔸 (lconj (Γ.map (◇·)) 🡒 C 🡒 A) := by
+  induction h with
+  | base hA =>
+    rcases hA with hA | ⟨B, hB, rfl⟩;
+    · exact ⟨[], by simp, _, hA, dhyp id_⟩;
+    · exact ⟨[B], by simpa using hB, ⊤, BDFormulaSet.provable_mem hlog verum,
+        imp_trans andElim₁ imply₁⟩;
+  | mp _ _ ih₁ ih₂ =>
+    obtain ⟨Γ₁, hΓ₁, C₁, hC₁, d₁⟩ := ih₁;
+    obtain ⟨Γ₂, hΓ₂, C₂, hC₂, d₂⟩ := ih₂;
+    have t₁ := imp_trans (lconj_append_left (Γ₁ := Γ₁.map (◇·)) (Γ₂ := Γ₂.map (◇·))) d₁;
+    have t₂ := imp_trans (lconj_append_right (Γ₁ := Γ₁.map (◇·)) (Γ₂ := Γ₂.map (◇·))) d₂;
+    refine ⟨Γ₁ ++ Γ₂, by grind, C₁ ⋏ C₂, BDFormulaSet.and_mem hlog hmp hC₁ hC₂, ?_⟩;
+    rw [List.map_append];
+    exact mp_ctx₂ (imp_trans t₁ (imp_comp_right andElim₁))
+      (imp_trans t₂ (imp_comp_right andElim₂));
 
 /-- The union of a chain of MP-closed sets is MP-closed: given `(A 🡒 B) ∈ X₁` and `A ∈ X₂` with
 `X₁, X₂` in the chain, one of `X₁ ⊆ X₂` or `X₂ ⊆ X₁` holds, so both facts land in the larger set
 and MP-closedness of that set finishes the argument. -/
-theorem MpClosed_sUnion_of_chain {c : Set BDFormulaSet} (hc : IsChain (· ⊆ ·) c)
+lemma MpClosed_sUnion_of_chain {c : Set BDFormulaSet} (hc : IsChain (· ⊆ ·) c)
     (h : ∀ X ∈ c, BDFormulaSet.MpClosed X) : BDFormulaSet.MpClosed (⋃₀ c) := by
   rintro A B ⟨X₁, hX₁c, hAB⟩ ⟨X₂, hX₂c, hA⟩;
   rcases hc.total hX₁c hX₂c with hsub | hsub;
@@ -104,15 +127,15 @@ section
 
 variable {𝔸 : Set BDFormula} {X : BDFormulaSet} {A : BDFormula}
 
-theorem subset_impSet (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed) :
+lemma subset_impSet (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed) :
     X ⊆ X.impSet A :=
   fun _ hB => hmp (provable_mem hlog imply₁) hB
 
-theorem self_mem_impSet (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) : A ∈ X.impSet A := by
+lemma self_mem_impSet (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) : A ∈ X.impSet A := by
   show (A 🡒 A) ∈ X;
   exact provable_mem hlog id_;
 
-theorem impSet_mpClosed (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed) :
+lemma impSet_mpClosed (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed) :
     (X.impSet A).MpClosed :=
   fun hBC hB => hmp (hmp (provable_mem hlog imply₂) hBC) hB
 

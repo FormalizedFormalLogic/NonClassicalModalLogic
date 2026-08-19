@@ -67,7 +67,6 @@ instance : canonicalModel.SymmetricMRel where
 /-- - [Pac24, Lemma 16] -/
 instance : canonicalModel.BackwardConfluent := sorry
 
-/-- - [Pac24, Proposition 10] -/
 instance : canonicalModel.ForwardConfluent :=
   Model.forwardConfluent_iff_backwardConfluent_of_symmetricMRel.mpr inferInstance
 
