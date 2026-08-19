@@ -29,7 +29,7 @@ PR titles are in English, in the usual conventional-commit form:
 
 `scope` is optional; specify the affected module (`Formula`, `IML`, …) if needed, following precedents in `git log --oneline`.
 
-For `<subject>`, name one representative result of the PR; no verb phrases like "formalize the …" — write "Strict inclusion of `logicIntrinsic` in `logicExtrinsic`", not "formalize that logicIntrinsic is a strict subset of logicExtrinsic". Wrap identifiers from the source (type/theorem/definition names, notation) in backticks, e.g. "Persistence of `logicDiaFreeExtrinsic` under `MixConfluent`", not "Persistence of logicDiaFreeExtrinsic …".
+For `<subject>`, name one representative result of the PR as a noun phrase; no verb phrases like "formalize the …" — write "Strict inclusion of `Foo` in `Bar`", not "formalize that Foo is a strict subset of Bar". Wrap identifiers from the source (type, theorem and definition names, notation) in backticks, as in that example.
 
 PRs (title and body) are written in English. Commit messages — subject, body and trailers alike — are written in English as well.
 

@@ -1,21 +1,22 @@
+# Lake build artifacts
 /.lake
 
 # VSCode
 .vscode/settings.json
 
-CLAUDE.local.md
-
-import_graph.dot
-import_graph.png
-import_graph.pdf
-import_graph.html
-
 # direnv (contains local secrets)
 .envrc
 .direnv/
 
+# `just import-graph` output
+import_graph.dot
+import_graph.html
+import_graph.pdf
+import_graph.png
+
 # Claude Code local files
+CLAUDE.local.md
 .claude/settings.local.json
 .claude/docs/
-.claude/worktrees/
 .claude/scheduled_tasks.lock
+.claude/worktrees/
