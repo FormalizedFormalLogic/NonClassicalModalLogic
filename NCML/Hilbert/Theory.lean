@@ -38,7 +38,7 @@ attribute [grind .] consistent
 
 variable {𝔸 : Set BDFormula} {T : BDTheory} {A B C D : BDFormula}
 
-instance logic_mdp : Mdp (logic 𝔸) := ⟨mp⟩
+instance logic_mdp : Mdp (logic 𝔸) := ⟨ProvableBDHilbert.mdp⟩
 
 instance logic_of : Of (logic 𝔸) (logic 𝔸) := ⟨subset_rfl⟩
 
@@ -160,7 +160,7 @@ lemma exists_finite_char [T.Of (logic 𝔸)] [T.Mdp] (h : A ∈ mdpClosure (T �
       . rw [dia_append];
         have t₁ := imp_trans (conj_append_left (Γ₁ := ◇Γ₁) (Γ₂ := ◇Γ₂)) d₁;
         have t₂ := imp_trans (conj_append_right (Γ₁ := ◇Γ₁) (Γ₂ := ◇Γ₂)) d₂;
-        exact mp_ctx₂
+        exact mdp_ctx₂
           (imp_trans t₁ (imp_comp_right andElim₁))
           (imp_trans t₂ (imp_comp_right andElim₂));
 
@@ -258,7 +258,7 @@ lemma mem_of_box_mem_mdpClosure [T.Of LogicCKB] [T.Mdp] [U.CKB]
   (hdia : ∀ B ∈ T, ◇B ∈ U) (h : □A ∈ BDTheory.mdpClosure (T ∪ ◇U)) : A ∈ U := by
   obtain ⟨Γ, hΓ, C, hC, d⟩ := BDTheory.exists_finite_char (𝔸 := ∅) h;
   have d₁ : (⋀□◇Γ 🡒 ◇C 🡒 ◇(□A)) ∈ LogicCK :=
-    imp_trans (imp_trans conj_box (mp kBox (nec d))) kDia;
+    imp_trans (imp_trans conj_box (mdp kBox (nec d))) kDia;
   have h₁ : ⋀□◇Γ ∈ U := by
     apply BDTheory.conj_mem (𝔸 := ∅);
     intro B hB;

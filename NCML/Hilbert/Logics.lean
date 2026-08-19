@@ -42,7 +42,7 @@ theorem subset_IKB : LogicCKB ⊆ LogicIKB := .logic_monotone (by grind)
 theorem provable_N : (∼◇⊥) ∈ LogicCKB := by
   have h1 : (⊥ 🡒 □⊥) ∈ LogicCKB := efq;
   have h2 : (□(⊥ 🡒 □⊥)) ∈ LogicCKB := nec h1;
-  have h3 : (◇⊥ 🡒 ◇(□⊥)) ∈ LogicCKB := mp kDia h2;
+  have h3 : (◇⊥ 🡒 ◇(□⊥)) ∈ LogicCKB := mdp kDia h2;
   have h4 : (◇(□⊥) 🡒 ⊥) ∈ LogicCKB := axm (by grind);
   exact imp_trans h3 h4;
 
@@ -55,8 +55,8 @@ theorem provable_DP : (◇(A ⋎ B) 🡒 ◇A ⋎ ◇B) ∈ LogicCKB := by
   have h₅ : (□◇B 🡒 □(◇A ⋎ ◇B)) ∈ LogicCKB := box_mono orIntro₂;
   have h₆ : (A 🡒 □(◇A ⋎ ◇B)) ∈ LogicCKB := imp_trans h₁ h₄;
   have h₇ : (B 🡒 □(◇A ⋎ ◇B)) ∈ LogicCKB := imp_trans h₂ h₅;
-  have h₈ : (A ⋎ B 🡒 □(◇A ⋎ ◇B)) ∈ LogicCKB := mp (mp orElim h₆) h₇;
-  have h₉ : (◇(A ⋎ B) 🡒 ◇(□(◇A ⋎ ◇B))) ∈ LogicCKB := mp kDia (nec h₈);
+  have h₈ : (A ⋎ B 🡒 □(◇A ⋎ ◇B)) ∈ LogicCKB := mdp (mdp orElim h₆) h₇;
+  have h₉ : (◇(A ⋎ B) 🡒 ◇(□(◇A ⋎ ◇B))) ∈ LogicCKB := mdp kDia (nec h₈);
   exact imp_trans h₉ h₃;
 
 end LogicCKB

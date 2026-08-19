@@ -20,7 +20,7 @@ inductive ProofBDHilbert (𝔸 : Set BDFormula) : BDFormula → Type
   | efq       {A}     : ProofBDHilbert 𝔸 (⊥ 🡒 A)
   | kBox      {A B}   : ProofBDHilbert 𝔸 (□(A 🡒 B) 🡒 □A 🡒 □B)
   | kDia      {A B}   : ProofBDHilbert 𝔸 (□(A 🡒 B) 🡒 ◇A 🡒 ◇B)
-  | mp        {A B}   : ProofBDHilbert 𝔸 (A 🡒 B) → ProofBDHilbert 𝔸 A → ProofBDHilbert 𝔸 B
+  | mdp       {A B}   : ProofBDHilbert 𝔸 (A 🡒 B) → ProofBDHilbert 𝔸 A → ProofBDHilbert 𝔸 B
   | nec       {A}     : ProofBDHilbert 𝔸 A → ProofBDHilbert 𝔸 (□A)
 
 abbrev ProvableBDHilbert (𝔸 : Set BDFormula) (A : BDFormula) := Nonempty (ProofBDHilbert 𝔸 A)
@@ -45,43 +45,43 @@ lemma axm (h : A ∈ 𝔸) : ⊢ᴴ[CK;𝔸] A := ⟨ProofBDHilbert.axm h⟩
 @[simp, grind .] lemma kDia : ⊢ᴴ[CK;𝔸] □(A 🡒 B) 🡒 ◇A 🡒 ◇B := ⟨ProofBDHilbert.kDia⟩
 
 @[grind =>]
-lemma mp : (⊢ᴴ[CK;𝔸] A 🡒 B) → (⊢ᴴ[CK;𝔸] A) → (⊢ᴴ[CK;𝔸] B) :=
-  fun ⟨h₁⟩ ⟨h₂⟩ => ⟨ProofBDHilbert.mp h₁ h₂⟩
+lemma mdp : (⊢ᴴ[CK;𝔸] A 🡒 B) → (⊢ᴴ[CK;𝔸] A) → (⊢ᴴ[CK;𝔸] B) :=
+  fun ⟨h₁⟩ ⟨h₂⟩ => ⟨ProofBDHilbert.mdp h₁ h₂⟩
 
 @[grind <=]
 lemma nec : (⊢ᴴ[CK;𝔸] A) → (⊢ᴴ[CK;𝔸] □A) :=
   fun ⟨h⟩ => ⟨ProofBDHilbert.nec h⟩
 
 lemma imp_trans (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 C :=
-  mp (mp imply₂ (mp imply₁ h₂)) h₁
+  mdp (mdp imply₂ (mdp imply₁ h₂)) h₁
 
-@[grind .] lemma imp_id : ⊢ᴴ[CK;𝔸] A 🡒 A := mp (mp imply₂ (imply₁ (B := A 🡒 A))) (imply₁ (B := A))
+@[grind .] lemma imp_id : ⊢ᴴ[CK;𝔸] A 🡒 A := mdp (mdp imply₂ (imply₁ (B := A 🡒 A))) (imply₁ (B := A))
 
 @[grind .] lemma verum : ⊢ᴴ[CK;𝔸] ⊤ := imp_id
 
-lemma dhyp (h : ⊢ᴴ[CK;𝔸] B) : ⊢ᴴ[CK;𝔸] A 🡒 B := mp imply₁ h
+lemma dhyp (h : ⊢ᴴ[CK;𝔸] B) : ⊢ᴴ[CK;𝔸] A 🡒 B := mdp imply₁ h
 
-lemma mp_ctx (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 C) (h₂ : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] A 🡒 C :=
-  mp (mp imply₂ h₁) h₂
+lemma mdp_ctx (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 C) (h₂ : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] A 🡒 C :=
+  mdp (mdp imply₂ h₁) h₂
 
-lemma mp_ctx₂ (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 C 🡒 D) (h₂ : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 D :=
-  mp_ctx (imp_trans h₁ imply₂) h₂
+lemma mdp_ctx₂ (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 C 🡒 D) (h₂ : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 D :=
+  mdp_ctx (imp_trans h₁ imply₂) h₂
 
-lemma imp_comp_left (h : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] (A 🡒 B) 🡒 (A 🡒 C) := mp imply₂ (dhyp h)
+lemma imp_comp_left (h : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] (A 🡒 B) 🡒 (A 🡒 C) := mdp imply₂ (dhyp h)
 
 lemma imp_comp_right (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] (B 🡒 C) 🡒 (A 🡒 C) :=
-  mp_ctx (imp_trans imply₁ imply₂) (dhyp h)
+  mdp_ctx (imp_trans imply₁ imply₂) (dhyp h)
 
 lemma and_intro_ctx (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] A 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 B ⋏ C :=
-  mp_ctx (imp_trans h₁ andIntro) h₂
+  mdp_ctx (imp_trans h₁ andIntro) h₂
 
-lemma box_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] □A 🡒 □B := mp kBox (nec h)
+lemma box_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] □A 🡒 □B := mdp kBox (nec h)
 
 @[grind .] lemma box_or_inl : ⊢ᴴ[CK;𝔸] □A 🡒 □(A ⋎ B) := box_mono orIntro₁
 
 @[grind .] lemma box_or_inr : ⊢ᴴ[CK;𝔸] □B 🡒 □(A ⋎ B) := box_mono orIntro₂
 
-@[grind .] lemma box_and_intro : ⊢ᴴ[CK;𝔸] □A 🡒 □B 🡒 □(A ⋏ B) := imp_trans (mp kBox (nec andIntro)) kBox
+@[grind .] lemma box_and_intro : ⊢ᴴ[CK;𝔸] □A 🡒 □B 🡒 □(A ⋏ B) := imp_trans (mdp kBox (nec andIntro)) kBox
 
 @[grind .]
 lemma imp_bot_imp_box_bot : ⊢ᴴ[CK;𝔸] (A 🡒 ⊥) 🡒 (A 🡒 □⊥) := imp_comp_left (efq (A := □⊥))
@@ -101,7 +101,7 @@ lemma conj_append_right : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₂ := b
 lemma conj_box : ⊢ᴴ[CK;𝔸] ⋀□Γ 🡒 □⋀Γ := by
   induction Γ with
   | nil => exact dhyp (nec verum);
-  | cons A Γ ih => exact mp_ctx (imp_trans andElim₁ box_and_intro) (imp_trans andElim₂ ih);
+  | cons A Γ ih => exact mdp_ctx (imp_trans andElim₁ box_and_intro) (imp_trans andElim₂ ih);
 
 @[induction_eliminator]
 lemma rec
@@ -118,7 +118,7 @@ lemma rec
     (efq       : ∀ {A} (h : ⊢ᴴ[CK;𝔸] ⊥ 🡒 A), motive _ h)
     (kBox      : ∀ {A B} (h : ⊢ᴴ[CK;𝔸] □(A 🡒 B) 🡒 □A 🡒 □B), motive _ h)
     (kDia      : ∀ {A B} (h : ⊢ᴴ[CK;𝔸] □(A 🡒 B) 🡒 ◇A 🡒 ◇B), motive _ h)
-    (mp        : ∀ {A B} (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] A), motive _ h₁ → motive _ h₂ → motive _ (mp h₁ h₂))
+    (mdp       : ∀ {A B} (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] A), motive _ h₁ → motive _ h₂ → motive _ (mdp h₁ h₂))
     (nec       : ∀ {A} (h : ⊢ᴴ[CK;𝔸] A), motive A h → motive _ (nec h)) :
     ∀ {A} (h : ⊢ᴴ[CK;𝔸] A), motive _ h := by
   rintro A ⟨h⟩;
@@ -135,7 +135,7 @@ lemma rec
   | efq => exact efq _;
   | kBox => exact kBox _;
   | kDia => exact kDia _;
-  | mp h₁ h₂ ih₁ ih₂ => exact mp ⟨h₁⟩ ⟨h₂⟩ ih₁ ih₂;
+  | mdp h₁ h₂ ih₁ ih₂ => exact mdp ⟨h₁⟩ ⟨h₂⟩ ih₁ ih₂;
   | nec h ih => exact nec ⟨h⟩ ih;
 
 theorem monotone (h : 𝔸₁ ⊆ 𝔸₂) : ⊢ᴴ[CK;𝔸₁] A → ⊢ᴴ[CK;𝔸₂] A := by
@@ -153,7 +153,7 @@ theorem monotone (h : 𝔸₁ ⊆ 𝔸₂) : ⊢ᴴ[CK;𝔸₁] A → ⊢ᴴ[CK;
   | efq        => exact efq;
   | kBox       => exact kBox;
   | kDia       => exact kDia;
-  | mp _ _ ih₁ ih₂ => exact mp ih₁ ih₂;
+  | mdp _ _ ih₁ ih₂ => exact mdp ih₁ ih₂;
   | nec _ ih   => exact nec ih;
 
 abbrev logic (𝔸 : Set BDFormula) : BDLogic := { A | ⊢ᴴ[CK;𝔸] A }
