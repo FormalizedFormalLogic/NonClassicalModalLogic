@@ -100,50 +100,6 @@ lemma Forces.of_fallible (h : M.Fallible x) : x ⊩[_] A := by
 def Valid (M : Model κ) (A : BDFormula) := ∀ x : M.World, x ⊩[M] A
 infixl:80 " ⊧ " => Valid
 
-universe v
-
-/-- The transport of `M` along `ULift.down` to a model whose worlds are `ULift M.World`. -/
-def ulift (M : Model κ) : Model (ULift.{v} M.World) where
-  iRel' x y := M.iRel' x.down y.down
-  iRel_preorder :=
-    { refl := fun x => M.iRel_preorder.refl x.down,
-      trans := fun x y z => M.iRel_preorder.trans x.down y.down z.down }
-  mRel' x y := M.mRel' x.down y.down
-  Fallible' x := M.Fallible' x.down
-  fallible_iRel' := M.fallible_iRel'
-  fallible_mRel' := M.fallible_mRel'
-  fallible_exists_mRel' h := (M.fallible_exists_mRel' h).elim fun y hy => ⟨⟨y⟩, hy⟩
-  val x a := M.val x.down a
-  val_persistent := M.val_persistent
-  fallible_val := M.fallible_val
-
-@[simp]
-lemma ulift_forces {x : ULift.{v} M.World} : x ⊩[M.ulift] A ↔ x.down ⊩[M] A := by
-  induction A generalizing x with
-  | atom a => exact Iff.rfl;
-  | falsum => exact Iff.rfl;
-  | imply A B ihA ihB =>
-    constructor;
-    · intro h y Ixy hy;
-      exact ihB.mp (h ⟨y⟩ Ixy (ihA.mpr hy));
-    · intro h y Ixy hy;
-      exact ihB.mpr (h y.down Ixy (ihA.mp hy));
-  | box A ih =>
-    constructor;
-    · intro h y z Ixy Myz;
-      exact ih.mp (h ⟨y⟩ ⟨z⟩ Ixy Myz);
-    · intro h y z Ixy Myz;
-      exact ih.mpr (h y.down z.down Ixy Myz);
-  | dia A ih =>
-    constructor;
-    · intro h y Ixy;
-      obtain ⟨z, Myz, hz⟩ := h ⟨y⟩ Ixy;
-      exact ⟨z.down, Myz, ih.mp hz⟩;
-    · intro h y Ixy;
-      obtain ⟨z, Myz, hz⟩ := h y.down Ixy;
-      exact ⟨⟨z⟩, Myz, ih.mpr hz⟩;
-  | _ => grind;
-
 end Model
 
 end CK

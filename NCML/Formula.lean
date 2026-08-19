@@ -97,6 +97,9 @@ def prebox (X : BDFormulaSet) : BDFormulaSet := { A | □A ∈ X }
 /-- The set of formulas `A` with `◇A` in `X`. -/
 def predia (X : BDFormulaSet) : BDFormulaSet := { A | ◇A ∈ X }
 
+@[inherit_doc] scoped prefix:90 "□⁻¹" => BDFormulaSet.prebox
+@[inherit_doc] scoped prefix:91 "◇⁻¹" => BDFormulaSet.predia
+
 @[simp, grind] lemma mem_prebox {X : BDFormulaSet} {A} : A ∈ X.prebox ↔ □A ∈ X := Iff.rfl
 @[simp, grind] lemma mem_predia {X : BDFormulaSet} {A} : A ∈ X.predia ↔ ◇A ∈ X := Iff.rfl
 

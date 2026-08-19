@@ -1,6 +1,7 @@
 module
 
 public import NCML.Hilbert.Basic
+public import NCML.Hilbert.Propositional
 
 @[expose] public section
 
@@ -29,34 +30,36 @@ abbrev LogicIKB : BDLogic := ProvableBDHilbert.logic (
 
 theorem LogicCK.subset_CKB : LogicCK ⊆ LogicCKB := .logic_monotone (by grind)
 theorem LogicCK.subset_IK : LogicCK ⊆ LogicIK := .logic_monotone (by grind)
-theorem LogicCKB.subset_IKB : LogicCKB ⊆ LogicIKB := .logic_monotone (by grind)
 theorem LogicIK.subset_IKB : LogicIK ⊆ LogicIKB := .logic_monotone (by grind)
 
-open ProvableBDHilbert in
+
+namespace LogicCKB
+
+open ProvableBDHilbert
+
+theorem subset_IKB : LogicCKB ⊆ LogicIKB := .logic_monotone (by grind)
+
 /-- - [Pac24, Theorem 3] -/
-theorem LogicCKB.provable_N : (∼◇⊥) ∈ LogicCKB := by
+theorem provable_N : (∼◇⊥) ∈ LogicCKB := by
   have h1 : (⊥ 🡒 □⊥) ∈ LogicCKB := efq;
   have h2 : (□(⊥ 🡒 □⊥)) ∈ LogicCKB := nec h1;
   have h3 : (◇⊥ 🡒 ◇(□⊥)) ∈ LogicCKB := mp kDia h2;
   have h4 : (◇(□⊥) 🡒 ⊥) ∈ LogicCKB := axm (by grind);
   exact imp_trans h3 h4;
 
-section
-
-open ProvableBDHilbert
-
-variable {A B : BDFormula}
-
 /-- - [Pac24, Theorem 3] -/
-theorem LogicCKB.provable_DP : (◇(A ⋎ B) 🡒 ◇A ⋎ ◇B) ∈ LogicCKB := by
+theorem provable_DP : (◇(A ⋎ B) 🡒 ◇A ⋎ ◇B) ∈ LogicCKB := by
   have h₁ : (A 🡒 □◇A) ∈ LogicCKB := axm (by grind);
   have h₂ : (B 🡒 □◇B) ∈ LogicCKB := axm (by grind);
   have h₃ : (◇(□(◇A ⋎ ◇B)) 🡒 ◇A ⋎ ◇B) ∈ LogicCKB := axm (by grind);
-  have h₄ : (A ⋎ B 🡒 □(◇A ⋎ ◇B)) ∈ LogicCKB :=
-    mp (mp orElim (imp_trans h₁ (mp kBox (nec orIntro₁))))
-      (imp_trans h₂ (mp kBox (nec orIntro₂)));
-  exact imp_trans (mp kDia (nec h₄)) h₃;
+  have h₄ : (□◇A 🡒 □(◇A ⋎ ◇B)) ∈ LogicCKB := box_mono orIntro₁;
+  have h₅ : (□◇B 🡒 □(◇A ⋎ ◇B)) ∈ LogicCKB := box_mono orIntro₂;
+  have h₆ : (A 🡒 □(◇A ⋎ ◇B)) ∈ LogicCKB := imp_trans h₁ h₄;
+  have h₇ : (B 🡒 □(◇A ⋎ ◇B)) ∈ LogicCKB := imp_trans h₂ h₅;
+  have h₈ : (A ⋎ B 🡒 □(◇A ⋎ ◇B)) ∈ LogicCKB := mp (mp orElim h₆) h₇;
+  have h₉ : (◇(A ⋎ B) 🡒 ◇(□(◇A ⋎ ◇B))) ∈ LogicCKB := mp kDia (nec h₈);
+  exact imp_trans h₉ h₃;
 
-end
+end LogicCKB
 
 end
