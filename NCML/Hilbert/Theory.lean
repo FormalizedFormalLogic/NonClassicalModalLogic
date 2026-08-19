@@ -35,7 +35,7 @@ def MpClosed (X : BDFormulaSet) : Prop := ∀ {A B}, (A 🡒 B) ∈ X → A ∈ 
 
 section General
 
-variable {𝔸 : Set BDFormula} {X : BDFormulaSet} {A B C : BDFormula}
+variable {𝔸 : Set BDFormula} {X : BDFormulaSet} {A B C D : BDFormula}
 
 lemma provable_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (h : ProvableBDHilbert 𝔸 A) : A ∈ X :=
   hlog h
@@ -53,6 +53,14 @@ lemma conj_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed) {�
 lemma or_elim_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed)
     (hAC : (A 🡒 C) ∈ X) (hBC : (B 🡒 C) ∈ X) (hAB : (A ⋎ B) ∈ X) : C ∈ X :=
   hmp (hmp (hmp (provable_mem hlog orElim) hAC) hBC) hAB
+
+/-- Disjunction elimination through a `□`: two implications into boxed formulas, applied to a
+disjunction, yield the box of the disjunction. A routine closure lemma in the family of
+`or_elim_mem`, not isolated as a result anywhere in the literature. -/
+lemma box_or_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed)
+    (h₁ : (A 🡒 □C) ∈ X) (h₂ : (B 🡒 □D) ∈ X) (h : (A ⋎ B) ∈ X) : □(C ⋎ D) ∈ X :=
+  or_elim_mem hlog hmp (hmp (provable_mem hlog (imp_comp_left box_or_inl)) h₁)
+    (hmp (provable_mem hlog (imp_comp_left box_or_inr)) h₂) h
 
 end General
 

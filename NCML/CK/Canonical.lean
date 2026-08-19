@@ -94,8 +94,85 @@ instance : canonicalModel.SymmetricMRel where
       have h₃ : (A 🡒 □◇A) ∈ LogicCKB := ProvableBDHilbert.axm (Or.inl ⟨A, rfl⟩);
       exact h₁ (Γ.mdp (Γ.logicCKB_subset h₃) hA);
 
-/-- - [Pac24, Lemma 16] -/
-instance : canonicalModel.BackwardConfluent := sorry
+section BackwardConfluence
+
+variable {X Y : BDFormulaSet} {Δ : CKBTheory} {A B : BDFormula}
+
+/-- The formulas a theory `Γ` with `Γ ⊏ Δ` must avoid: `⊥`, because `Γ` is consistent, and `□C`
+for every `C ∉ Δ`, because `Γ.carrier.prebox ⊆ Δ.carrier`. -/
+private abbrev CKBTheory.forbidden (Δ : CKBTheory) : BDFormulaSet :=
+  {⊥} ∪ (□·) '' {C | C ∉ Δ.carrier}
+
+/-- Avoiding `Δ.forbidden` is what makes a set a candidate `mRel`-predecessor of `Δ`. -/
+private lemma prebox_subset_of_avoid (h : ∀ B ∈ Δ.forbidden, B ∉ X) : X.prebox ⊆ Δ.carrier := by
+  intro C hC;
+  by_contra hc;
+  exact h (□C) (Or.inr ⟨C, hc, rfl⟩) hC;
+
+/-- A formula missing from a maximal set avoiding `Δ.forbidden` implies a boxed formula missing
+from `Δ`. The `⊥` branch of the dichotomy is normalized into this shape through `⊢ ⊥ 🡒 □⊥`. -/
+private lemma exists_box_imp_mem (hlog : LogicCKB ⊆ X)
+  (hmax : Maximal (fun Y => X ⊆ Y ∧ Y.MpClosed ∧ ∀ B ∈ Δ.forbidden, B ∉ Y) Y) (hA : A ∉ Y) :
+  ∃ C ∉ Δ.carrier, (A 🡒 □C) ∈ Y := by
+  obtain ⟨hXY, hmpY, -⟩ := hmax.prop;
+  obtain ⟨C, hC, h⟩ := exists_imp_mem_of_maximal hlog hmax hA;
+  rcases hC with rfl | ⟨C, hC, rfl⟩;
+  · exact ⟨⊥, Δ.consistent, hmpY (BDFormulaSet.provable_mem (hlog.trans hXY)
+      ProvableBDHilbert.imp_bot_imp_box_bot) h⟩;
+  · exact ⟨C, hC, h⟩;
+
+/-- A maximal MP-closed set avoiding `Δ.forbidden` is prime.
+
+The cited proof of this step argues classically, deriving `∼A ∈ Y` from `A ∉ Y`, which is not
+available intuitionistically. The argument used here instead pulls the primeness of `Δ` back
+through `□`: a disjunct missing from `Y` implies some `□C` with `C ∉ Δ`, and `□(C ⋎ D) ∈ Y` then
+forces `C ⋎ D ∈ Δ`.
+
+- [Pac24, Lemma 16] -/
+private lemma prime_of_maximal (hlog : LogicCKB ⊆ X)
+  (hmax : Maximal (fun Y => X ⊆ Y ∧ Y.MpClosed ∧ ∀ B ∈ Δ.forbidden, B ∉ Y) Y)
+  (h : A ⋎ B ∈ Y) : A ∈ Y ∨ B ∈ Y := by
+  by_contra hc;
+  obtain ⟨hXY, hmpY, havoid⟩ := hmax.prop;
+  obtain ⟨C, hC, h₁⟩ := exists_box_imp_mem hlog hmax fun hA => hc (Or.inl hA);
+  obtain ⟨D, hD, h₂⟩ := exists_box_imp_mem hlog hmax fun hB => hc (Or.inr hB);
+  have h₃ : C ⋎ D ∈ Δ.carrier :=
+    prebox_subset_of_avoid havoid (BDFormulaSet.box_or_mem (hlog.trans hXY) hmpY h₁ h₂ h);
+  exact (Δ.prime h₃).elim hC hD;
+
+end BackwardConfluence
+
+/-- The predecessor of `Δ₁` is a maximal MP-closed extension of the MP-closure of
+`Γ.carrier ∪ ◇''Δ₁.carrier` avoiding `Δ₁.forbidden`. The hypothesis `Δ.carrier ⊆ Γ.carrier.predia`
+is not needed, matching the cited proof.
+
+Two corrections to that proof. Its Zorn poset does not require its members to be closed under
+modus ponens, and without that requirement the complement of the forbidden set is a maximum
+element of the poset which is not a theory; the poset used here carries MP-closedness. And its
+primeness argument does not go through as written, being classical; `prime_of_maximal` replaces
+it.
+
+- [Pac24, Lemma 16] -/
+instance : canonicalModel.BackwardConfluent where
+  backward_confluent {Γ Δ Δ₁} := by
+    rintro ⟨MΓΔ, -⟩ IΔΔ₁;
+    have hdia : ∀ B ∈ Γ.carrier, ◇B ∈ Δ₁.carrier := fun B hB =>
+      IΔΔ₁ (MΓΔ (BDFormulaSet.box_dia_mem Γ.logicCKB_subset Γ.mdp hB));
+    have hlog : LogicCKB ⊆ (show BDFormulaSet from MPClosure (Γ.carrier ∪ (◇·) '' Δ₁.carrier)) :=
+      logic_subset_mpClosure (Γ.logicCKB_subset.trans Set.subset_union_left);
+    have havoid : ∀ B ∈ Δ₁.forbidden,
+        B ∉ (show BDFormulaSet from MPClosure (Γ.carrier ∪ (◇·) '' Δ₁.carrier)) := by
+      rintro B (rfl | ⟨C, hC, rfl⟩) hB;
+      · exact bot_not_mem_mpClosure Γ.logicCKB_subset Γ.mdp Δ₁.logicCKB_subset Δ₁.mdp hdia
+          Δ₁.consistent hB;
+      · exact hC (mem_of_box_mem_mpClosure Γ.logicCKB_subset Γ.mdp Δ₁.logicCKB_subset Δ₁.mdp
+          hdia hB);
+    obtain ⟨Y, hsub, hmax⟩ := exists_maximal_mpClosed_avoiding (MPClosure.mpClosed _) havoid;
+    obtain ⟨-, hmpY, havoidY⟩ := hmax.prop;
+    exact ⟨⟨Y, hlog.trans hsub, hmpY, fun h => prime_of_maximal hlog hmax h,
+        havoidY ⊥ (Or.inl rfl)⟩,
+      fun B hB => hsub (MPClosure.base (Or.inl hB)), prebox_subset_of_avoid havoidY,
+      fun B hB => hsub (MPClosure.base (Or.inr ⟨B, hB, rfl⟩))⟩;
 
 instance : canonicalModel.ForwardConfluent :=
   Model.forwardConfluent_iff_backwardConfluent_of_symmetricMRel.mpr inferInstance
