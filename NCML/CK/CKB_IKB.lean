@@ -154,11 +154,69 @@ instance : CKBcanonicalModel.ForwardConfluent :=
 instance : CKBcanonicalModel.IsIKB where
   not_fallible _ h := h.elim
 
+section Diamond
+
+variable {T Y : BDTheory} {Γ : CKBTheory} {A B : BDFormula}
+
+/-- The formulas a theory `Δ` with `Γ ⊏ Δ` must avoid: those `C` with `◇C ∉ Γ`. -/
+private abbrev CKBTheory.diaForbidden (Γ : CKBTheory) : BDTheory := {C | ◇C ∉ Γ.1}
+
+/-- A maximal MP-closed set avoiding `Γ.diaForbidden` is prime. -/
+private lemma prime_of_maximal_dia [T.Of LogicCKB]
+  (hmax : Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ ∀ B ∈ CKBTheory.diaForbidden Γ, B ∉ Y) Y)
+  (h : A ⋎ B ∈ Y) : A ∈ Y ∨ B ∈ Y := by
+  by_contra hc;
+  obtain ⟨hTY, hmdpY, havoid⟩ := hmax.prop;
+  have hlogY : Y.Of LogicCKB := ⟨(T.subset (L := LogicCKB)).trans hTY⟩;
+  obtain ⟨C, hC, h₁⟩ := exists_imp_mem_of_maximal (𝔸 := ∅) (T := T) hmax fun hA => hc (Or.inl hA);
+  obtain ⟨D, hD, h₂⟩ := exists_imp_mem_of_maximal (𝔸 := ∅) (T := T) hmax fun hB => hc (Or.inr hB);
+  have h₃ : (A 🡒 C ⋎ D) ∈ Y :=
+    Y.mdp (BDTheory.provable_mem (𝔸 := ∅)
+      (ProvableBDHilbert.imp_comp_left ProvableBDHilbert.orIntro₁)) h₁;
+  have h₄ : (B 🡒 C ⋎ D) ∈ Y :=
+    Y.mdp (BDTheory.provable_mem (𝔸 := ∅)
+      (ProvableBDHilbert.imp_comp_left ProvableBDHilbert.orIntro₂)) h₂;
+  have h₅ : C ⋎ D ∈ Y := BDTheory.or_elim_mem (𝔸 := ∅) h₃ h₄ h;
+  exact havoid (C ⋎ D) (fun hmem => (BDTheory.dia_or_mem hmem).elim hC hD) h₅;
+
+/-- A CKB-theory containing `◇A` has a `⊏`-successor containing `A`.
+
+- [Pac24, Lemma 19] -/
+private lemma exists_mRel_of_dia_mem (h : ◇A ∈ Γ.1) :
+  ∃ Δ : CKBTheory,
+  BDFormulaSet.prebox Γ.1 ⊆ Δ.1 ∧ Δ.1 ⊆ BDFormulaSet.predia Γ.1 ∧ A ∈ Δ.1 := by
+  have hmdpX : BDTheory.Mdp (BDTheory.impSet (BDFormulaSet.prebox Γ.1) A) :=
+    BDTheory.impSet_mdpClosed (𝔸 := ∅);
+  have hsub : BDFormulaSet.prebox Γ.1 ⊆ BDTheory.impSet (BDFormulaSet.prebox Γ.1) A :=
+    BDTheory.subset_impSet (𝔸 := ∅);
+  have hlogX : BDTheory.Of LogicCKB (BDTheory.impSet (BDFormulaSet.prebox Γ.1) A) :=
+    ⟨(BDTheory.subset (L := LogicCKB) (T := BDFormulaSet.prebox Γ.1)).trans hsub⟩;
+  have havoid : ∀ B ∈ CKBTheory.diaForbidden Γ,
+      B ∉ BDTheory.impSet (BDFormulaSet.prebox Γ.1) A := by
+    intro B hB hmem;
+    have h₁ : (◇A 🡒 ◇B) ∈ Γ.1 :=
+      Γ.1.mdp (Γ.1.subset (L := LogicCK) (ProvableBDHilbert.kDia (A := A) (B := B))) hmem;
+    exact hB (Γ.1.mdp h₁ h);
+  obtain ⟨Y, hXY, hmax⟩ := exists_maximal_mdpClosed_avoiding havoid;
+  obtain ⟨-, hmdpY, havoidY⟩ := hmax.prop;
+  have hlogY : Y.Of LogicCKB := ⟨hlogX.subset.trans hXY⟩;
+  have hprime : Y.Prime := ⟨fun hor => prime_of_maximal_dia hmax hor⟩;
+  have hcons : Y.Consistent := ⟨havoidY ⊥ (BDTheory.dia_bot_not_mem (T := Γ.1))⟩;
+  have hckb : Y.CKB := ⟨⟩;
+  have hpredia : Y ⊆ BDFormulaSet.predia Γ.1 := by
+    intro B hB;
+    by_contra hc;
+    exact havoidY B hc hB;
+  exact ⟨⟨Y, hckb⟩, hsub.trans hXY, hpredia,
+    hXY (BDTheory.self_mem_impSet (𝔸 := ∅))⟩;
+
+end Diamond
+
 /-- Truth lemma for the canonical model: a CKB-theory forces exactly the formulas it contains.
 
 - [Pac24, Lemma 19]
 -/
-theorem truth_lemma {Γ : CKBTheory} {A : BDFormula} : Γ ⊩[CKBcanonicalModel] A ↔ A ∈ Γ.1 := by
+theorem truthlemma {Γ : CKBTheory} {A : BDFormula} : Γ ⊩[CKBcanonicalModel] A ↔ A ∈ Γ.1 := by
   induction A generalizing Γ with
   | atom a => exact Iff.rfl;
   | falsum => exact ⟨False.elim, fun h => (Γ.1.consistent h).elim⟩;
@@ -195,7 +253,9 @@ theorem truth_lemma {Γ : CKBTheory} {A : BDFormula} : Γ ⊩[CKBcanonicalModel]
     · intro h;
       obtain ⟨Δ, MΓΔ, hΔA⟩ := h Γ Set.Subset.rfl;
       exact MΓΔ.2 (ih.mp hΔA);
-    · sorry
+    · intro h Δ IΓΔ;
+      obtain ⟨Θ, h₁, h₂, h₃⟩ := exists_mRel_of_dia_mem (Γ := Δ) (IΓΔ h);
+      exact ⟨Θ, ⟨h₁, h₂⟩, ih.mpr h₃⟩;
 
 end CK
 

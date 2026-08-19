@@ -84,6 +84,18 @@ lemma mem_of_dia_box_mem [T.CKB] (h : ◇(□A) ∈ T) : A ∈ T := by
   apply ProvableBDHilbert.axm;
   grind;
 
+instance prebox_mdp [T.Of LogicCK] [T.Mdp] : Mdp (BDFormulaSet.prebox T) :=
+  ⟨fun hAB hA => mdp (T := T) (mdp (T := T) (provable_mem (𝔸 := ∅) kBox) hAB) hA⟩
+
+instance prebox_of [T.Of LogicCKB] : Of LogicCKB (BDFormulaSet.prebox T) :=
+  ⟨fun _ hA => T.subset (L := LogicCKB) (nec hA)⟩
+
+lemma dia_or_mem [T.CKB] (h : ◇(A ⋎ B) ∈ T) : ◇A ∈ T ∨ ◇B ∈ T :=
+  prime (mdp (T.subset (L := LogicCKB) LogicCKB.provable_DP) h)
+
+lemma dia_bot_not_mem [T.CKB] : ◇(⊥ : BDFormula) ∉ T :=
+  fun h => T.consistent (mdp (T.subset (L := LogicCKB) LogicCKB.provable_N) h)
+
 end CKB
 
 end BDTheory
