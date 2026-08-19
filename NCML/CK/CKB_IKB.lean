@@ -120,13 +120,13 @@ end BackwardConfluence
 `□⁻¹Δ ⊆ Θ` and `Θ ⊆ ◇⁻¹Δ`. -/
 lemma CKBTheory.exists_mRel_extending {Γ Θ : CKBTheory} (hdia : ∀ B ∈ Γ.1, ◇B ∈ Θ.1) :
   ∃ Δ : CKBTheory, Γ.1 ⊆ Δ.1 ∧ □⁻¹Δ.1 ⊆ Θ.1 ∧ Θ.1 ⊆ ◇⁻¹Δ.1 := by
-  have hlog : (BDTheory.MdpClosure (Γ.1 ∪ ◇Θ.1)).Of LogicCKB :=
+  have hlog : (BDTheory.mdpClosure (Γ.1 ∪ ◇Θ.1)).Of LogicCKB :=
     ⟨(Γ.1.subset (L := LogicCKB)).trans
-      (Set.subset_union_left.trans BDTheory.subset_mpClosure)⟩;
-  have havoid : ∀ B ∈ CKBTheory.forbidden Θ, B ∉ BDTheory.MdpClosure (Γ.1 ∪ ◇Θ.1) := by
+      (Set.subset_union_left.trans BDTheory.subset_mdpClosure)⟩;
+  have havoid : ∀ B ∈ CKBTheory.forbidden Θ, B ∉ BDTheory.mdpClosure (Γ.1 ∪ ◇Θ.1) := by
     rintro B (rfl | ⟨C, hC, rfl⟩) hB;
-    · exact bot_not_mem_mpClosure hdia hB;
-    · exact hC (mem_of_box_mem_mpClosure hdia hB);
+    · exact bot_not_mem_mdpClosure hdia hB;
+    · exact hC (mem_of_box_mem_mdpClosure hdia hB);
   obtain ⟨Y, hsub, hmax⟩ := exists_maximal_mdpClosed_avoiding havoid;
   obtain ⟨-, hmdpY, havoidY⟩ := hmax.prop;
   use ⟨Y, {

@@ -49,20 +49,21 @@ end ProvableBDHilbert
 section Conj
 
 open ProvableBDHilbert BDFormulaList
+open scoped BDFormulaList
 
 variable {𝔸 : Set BDFormula} {Γ Γ₁ Γ₂ : BDFormulaList}
 
-lemma conj_append_left : ⊢ᴴ[CK;𝔸] conj (Γ₁ ++ Γ₂) 🡒 conj Γ₁ := by
+lemma conj_append_left : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₁ := by
   induction Γ₁ with
   | nil => exact dhyp verum;
   | cons A Γ₁ ih => exact and_intro_ctx andElim₁ (imp_trans andElim₂ ih);
 
-lemma conj_append_right : ⊢ᴴ[CK;𝔸] conj (Γ₁ ++ Γ₂) 🡒 conj Γ₂ := by
+lemma conj_append_right : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₂ := by
   induction Γ₁ with
   | nil => exact id_;
   | cons A Γ₁ ih => exact imp_trans andElim₂ ih;
 
-lemma conj_box : ⊢ᴴ[CK;𝔸] conj (Γ.map (□·)) 🡒 □(conj Γ) := by
+lemma conj_box : ⊢ᴴ[CK;𝔸] ⋀□Γ 🡒 □⋀Γ := by
   induction Γ with
   | nil => exact dhyp (nec verum);
   | cons A Γ ih => exact mp_ctx (imp_trans andElim₁ box_and_intro) (imp_trans andElim₂ ih);
