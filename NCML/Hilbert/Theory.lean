@@ -118,7 +118,7 @@ variable {T T₁ T₂ : BDTheory} {X Y : BDFormulaSet} {𝔸 : Set BDFormula} {A
 
 lemma subset_mdpClosure : T ⊆ T.mdpClosure := fun _ => mdpClosure.base
 
-instance : T.mdpClosure.Mdp := ⟨fun hAB hA => .mdp hAB hA⟩
+instance : T.mdpClosure.Mdp := ⟨.mdp⟩
 
 
 lemma mono_mdpClosure (h : T₁ ⊆ T₂): T₁.mdpClosure ⊆ T₂.mdpClosure := by
@@ -189,7 +189,7 @@ lemma mem_impSet {T : BDTheory} {A B} : B ∈ T.impSet A ↔ (A 🡒 B) ∈ T :=
 
 section
 
-variable {𝔸 : Set BDFormula} {T : BDTheory} {A : BDFormula}
+variable {L : BDLogic} {𝔸 : Set BDFormula} {T : BDTheory} {A : BDFormula}
 
 -- `(T := T)` is required here and in `impSet_mdpClosed`: otherwise `mdp` resolves against
 -- `T.impSet A` instead of `T`.
@@ -204,6 +204,11 @@ lemma self_mem_impSet [T.Of (logic 𝔸)] : A ∈ T.impSet A := by
 lemma impSet_mdpClosed [T.Of (logic 𝔸)] [T.Mdp] : (T.impSet A).Mdp :=
   ⟨fun hBC hB => mdp (T := T) (mdp (T := T) (provable_mem (𝔸 := 𝔸) imply₂) hBC) hB⟩
 
+instance impSet_mdp [T.Of LogicCK] [T.Mdp] : (T.impSet A).Mdp := impSet_mdpClosed (𝔸 := ∅)
+
+instance impSet_of [T.Of LogicCK] [T.Mdp] [T.Of L] : (T.impSet A).Of L :=
+  ⟨subset.trans (subset_impSet (𝔸 := ∅))⟩
+
 end
 
 end BDTheory
@@ -212,31 +217,33 @@ end BDTheory
 
 section Maximal
 
-variable {𝔸 : Set BDFormula} {T Y Z : BDTheory} {A : BDFormula}
+variable {L : BDLogic} {𝔸 : Set BDFormula} {T Y Z : BDTheory} {A : BDFormula}
 
-/-- Every MP-closed `T` disjoint from `Z` extends to a maximal MP-closed theory still disjoint
-from `Z`. -/
-lemma exists_maximal_mdpClosed_avoiding [T.Mdp] (hdisj : ∀ A ∈ Z, A ∉ T) :
+/-- Every MP-closed theory `T` of `L` disjoint from `Z` extends to a maximal MP-closed theory of
+`L` still disjoint from `Z`. -/
+lemma exists_maximal_mdpClosed_avoiding [T.Mdp] [T.Of L] (hdisj : ∀ A ∈ Z, A ∉ T) :
   ∃ Y : BDTheory, T ⊆ Y ∧
-  Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ ∀ A ∈ Z, A ∉ Y) Y := by
-  refine zorn_subset_nonempty _ ?_ T ⟨subset_rfl, ‹T.Mdp›, hdisj⟩;
+  Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ Y.Of L ∧ ∀ A ∈ Z, A ∉ Y) Y := by
+  refine zorn_subset_nonempty _ ?_ T ⟨subset_rfl, ‹T.Mdp›, ‹T.Of L›, hdisj⟩;
   rintro c hcS hchain ⟨Y₀, hY₀⟩;
   refine ⟨⋃₀ c, ⟨(hcS hY₀).1.trans (Set.subset_sUnion_of_mem hY₀),
-    MdpClosed_sUnion_of_chain hchain fun W hW => (hcS hW).2.1, ?_⟩,
+    MdpClosed_sUnion_of_chain hchain fun W hW => (hcS hW).2.1,
+    ⟨(hcS hY₀).2.2.1.subset.trans (Set.subset_sUnion_of_mem hY₀)⟩, ?_⟩,
     fun W hW => Set.subset_sUnion_of_mem hW⟩;
   rintro A hA ⟨W, hW, hAW⟩;
-  exact (hcS hW).2.2 A hA hAW;
+  exact (hcS hW).2.2.2 A hA hAW;
 
 /-- If `Y` is maximal among the MP-closed extensions of `T` avoiding `Z`, then every `A ∉ Y` is
 refuted by some forbidden formula: `A 🡒 B ∈ Y` for some `B ∈ Z`. -/
-lemma exists_imp_mem_of_maximal [T.Of (logic 𝔸)]
-  (hmax : Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ ∀ B ∈ Z, B ∉ Y) Y) (hA : A ∉ Y) :
+lemma exists_imp_mem_of_maximal
+  (hmax : Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ Y.Of (logic 𝔸) ∧ ∀ B ∈ Z, B ∉ Y) Y)
+  (hA : A ∉ Y) :
   ∃ B ∈ Z, (A 🡒 B) ∈ Y := by
-  obtain ⟨hTY, hmdp, -⟩ := hmax.prop;
-  have hlogY : Y.Of (logic 𝔸) := ⟨T.subset.trans hTY⟩;
+  obtain ⟨hTY, hmdpY, hlogY, -⟩ := hmax.prop;
   have hsub := BDTheory.subset_impSet (𝔸 := 𝔸) (T := Y) (A := A);
   by_contra! hc;
-  exact hA (hmax.le_of_ge ⟨hTY.trans hsub, BDTheory.impSet_mdpClosed (𝔸 := 𝔸), hc⟩
+  exact hA (hmax.le_of_ge
+    ⟨hTY.trans hsub, BDTheory.impSet_mdpClosed (𝔸 := 𝔸), ⟨hlogY.subset.trans hsub⟩, hc⟩
     hsub (BDTheory.self_mem_impSet (𝔸 := 𝔸)));
 
 end Maximal
