@@ -1,7 +1,6 @@
 module
 
 public import NCML.Hilbert.Logics
-public import NCML.Hilbert.Propositional
 public import Mathlib.Order.Preorder.Chain
 public import Mathlib.Order.Zorn
 
@@ -141,7 +140,7 @@ lemma exists_finite_char [T.Of (logic 𝔸)] [T.Mdp] (h : A ∈ mdpClosure (T �
     · use [];
       constructor;
       . tauto;
-      . exact ⟨_, hA, dhyp id_⟩
+      . exact ⟨_, hA, dhyp imp_id⟩
     · use [B];
       constructor;
       . grind;
@@ -198,7 +197,7 @@ lemma subset_impSet [T.Of (logic 𝔸)] [T.Mdp] : T ⊆ T.impSet A :=
 
 lemma self_mem_impSet [T.Of (logic 𝔸)] : A ∈ T.impSet A := by
   show (A 🡒 A) ∈ T;
-  exact provable_mem (𝔸 := 𝔸) id_;
+  exact provable_mem (𝔸 := 𝔸) imp_id;
 
 -- Not an instance: the axiom set `𝔸` behind `T.Of (logic 𝔸)` cannot be recovered from the goal.
 lemma impSet_mdpClosed [T.Of (logic 𝔸)] [T.Mdp] : (T.impSet A).Mdp :=

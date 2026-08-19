@@ -1,7 +1,6 @@
 module
 
 public import NCML.Hilbert.Basic
-public import NCML.Hilbert.Propositional
 
 @[expose] public section
 
