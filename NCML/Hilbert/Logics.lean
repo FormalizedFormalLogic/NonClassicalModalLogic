@@ -4,7 +4,7 @@ public import NCML.Hilbert.Basic
 
 @[expose] public section
 
-open NCML BDFormula
+open BDFormula
 
 abbrev LogicCK : BDLogic := ProvableBDHilbert.logic ∅
 

@@ -4,8 +4,6 @@ public import Mathlib.Data.Set.Defs
 
 @[expose] public section
 
-namespace NCML
-
 /-- Propositional formula -/
 inductive PFormula : Type
   | atom   : Nat → PFormula
@@ -83,7 +81,5 @@ def diaFree : BDFormula → Prop
 end BDFormula
 
 abbrev BDLogic := Set BDFormula
-
-end NCML
 
 end

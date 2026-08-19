@@ -6,8 +6,6 @@ public import NCML.CK.Semantics
 
 namespace CK
 
-open NCML
-
 variable {κ : Type*} {M : Model κ}
 variable {x : M.World} {A B : BDFormula}
 

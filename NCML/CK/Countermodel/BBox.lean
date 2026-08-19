@@ -6,7 +6,7 @@ public import NCML.CK.Confluence
 
 namespace CK
 
-open NCML Model BDFormula
+open Model BDFormula
 
 namespace BBox
 

@@ -6,7 +6,7 @@ public import Mathlib.Tactic
 
 @[expose] public section
 
-namespace NCML.IML
+namespace IML
 
 variable {κ : Type*} [Nonempty κ]
 
@@ -392,6 +392,6 @@ lemma negDiaBot_mem_logicIntrinsic : ∼◇⊥ ∈ logicIntrinsic := by
   obtain ⟨y₂, Mx₁y₂, hy₂⟩ := h x₂ (refl _);
   contradiction;
 
-end NCML.IML
+end IML
 
 end
