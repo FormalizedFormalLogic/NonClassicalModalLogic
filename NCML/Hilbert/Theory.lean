@@ -3,6 +3,7 @@ module
 public import NCML.Hilbert.Logics
 public import NCML.Hilbert.Propositional
 public import Mathlib.Order.Preorder.Chain
+public import Mathlib.Order.Zorn
 
 @[expose] public section
 
@@ -12,6 +13,11 @@ public import Mathlib.Order.Preorder.Chain
 Sets of formulas closed under modus ponens (`BDFormulaSet.MpClosed`), the MP-closure of a set
 (`MPClosure`), and the implication set of a theory (`BDFormulaSet.impSet`), the relative deduction
 lemma used to build maximal MP-closed sets.
+
+These combine into the two ingredients of a Lindenbaum-style construction, both stated relative to
+an arbitrary set `Z` of forbidden formulas: the existence of a maximal MP-closed extension avoiding
+`Z` (`exists_maximal_mpClosed_avoiding`), and the dichotomy that a formula missing from such a
+maximal set implies some forbidden formula (`exists_imp_mem_of_maximal`).
 -/
 
 namespace NCML
@@ -142,6 +148,38 @@ lemma impSet_mpClosed (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClo
 end
 
 end BDFormulaSet
+
+/-! ## Maximal MP-closed sets avoiding a set of forbidden formulas -/
+
+section Maximal
+
+variable {𝔸 : Set BDFormula} {X Y Z : BDFormulaSet} {A : BDFormula}
+
+/-- Every MP-closed `X` disjoint from `Z` extends to a maximal MP-closed set still disjoint
+from `Z`. -/
+lemma exists_maximal_mpClosed_avoiding (hmp : X.MpClosed) (hdisj : ∀ A ∈ Z, A ∉ X) :
+    ∃ Y, X ⊆ Y ∧ Maximal (fun Y => X ⊆ Y ∧ Y.MpClosed ∧ ∀ A ∈ Z, A ∉ Y) Y := by
+  refine zorn_subset_nonempty _ ?_ X ⟨subset_rfl, hmp, hdisj⟩;
+  rintro c hcS hchain ⟨Y₀, hY₀⟩;
+  refine ⟨⋃₀ c, ⟨(hcS hY₀).1.trans (Set.subset_sUnion_of_mem hY₀),
+    MpClosed_sUnion_of_chain hchain fun W hW => (hcS hW).2.1, ?_⟩,
+    fun W hW => Set.subset_sUnion_of_mem hW⟩;
+  rintro A hA ⟨W, hW, hAW⟩;
+  exact (hcS hW).2.2 A hA hAW;
+
+/-- If `Y` is maximal among the MP-closed extensions of `X` avoiding `Z`, then every `A ∉ Y` is
+refuted by some forbidden formula: `A 🡒 B ∈ Y` for some `B ∈ Z`. -/
+lemma exists_imp_mem_of_maximal (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X)
+    (hmax : Maximal (fun Y => X ⊆ Y ∧ Y.MpClosed ∧ ∀ B ∈ Z, B ∉ Y) Y) (hA : A ∉ Y) :
+    ∃ B ∈ Z, (A 🡒 B) ∈ Y := by
+  obtain ⟨hXY, hmp, _⟩ := hmax.prop;
+  have hlogY := hlog.trans hXY;
+  have hsub := BDFormulaSet.subset_impSet (A := A) hlogY hmp;
+  by_contra hc;
+  exact hA (hmax.le_of_ge ⟨hXY.trans hsub, BDFormulaSet.impSet_mpClosed hlogY hmp,
+    fun B hB hmem => hc ⟨B, hB, hmem⟩⟩ hsub (BDFormulaSet.self_mem_impSet hlogY));
+
+end Maximal
 
 end NCML
 
