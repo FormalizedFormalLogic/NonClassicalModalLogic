@@ -39,6 +39,10 @@ attribute [grind .] consistent
 
 variable {𝔸 : Set BDFormula} {T : BDTheory} {A B C D : BDFormula}
 
+instance logic_mdp : Mdp (logic 𝔸) := ⟨mp⟩
+
+instance logic_of : Of (logic 𝔸) (logic 𝔸) := ⟨subset_rfl⟩
+
 lemma provable_mem [T.Of (logic 𝔸)] (h : ⊢ᴴ[CK;𝔸] A) : A ∈ T :=
   subset (L := (ProvableBDHilbert.logic 𝔸)) h
 

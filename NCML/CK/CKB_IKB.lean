@@ -159,6 +159,16 @@ instance : CKBcanonicalModel.ForwardConfluent :=
 instance : CKBcanonicalModel.IsIKB where
   not_fallible _ h := h.elim
 
+instance : CKBcanonicalModel.ulift.IsIKB where
+  symm_mRel Mxy := Model.symm_mRel (M := CKBcanonicalModel) Mxy
+  forward_confluent Mxy Ixx₁ := by
+    obtain ⟨y₁, Iyy₁, Mx₁y₁⟩ := Model.forward_confluent (M := CKBcanonicalModel) Mxy Ixx₁;
+    exact ⟨⟨y₁⟩, Iyy₁, Mx₁y₁⟩;
+  backward_confluent Mxy Iyy₁ := by
+    obtain ⟨x₁, Ixx₁, Mx₁y₁⟩ := Model.backward_confluent (M := CKBcanonicalModel) Mxy Iyy₁;
+    exact ⟨⟨x₁⟩, Ixx₁, Mx₁y₁⟩;
+  not_fallible _ h := h.elim
+
 section Box
 
 variable {Γ : CKBTheory} {A : BDFormula}
@@ -300,7 +310,11 @@ theorem CKB_IKB_TFAE : List.TFAE [
   tfae_have 3 → 4 := fun h _ M _ => h M
   tfae_have 1 → 3 := fun h _ M _ => CK.Model.valid_of_mem_LogicCKB h
   tfae_have 2 → 4 := fun h _ M _ => CK.Model.valid_of_mem_LogicIKB h
-  tfae_have 4 → 1 := by sorry
+  tfae_have 4 → 1 := by
+    intro h;
+    by_contra hA;
+    obtain ⟨Γ, -, hAΓ⟩ := CK.CKBTheory.exists_extending (T := LogicCKB) hA;
+    exact hAΓ (CK.truthlemma.mp (CK.Model.ulift_forces.mp (h CK.CKBcanonicalModel.ulift ⟨Γ⟩)));
   tfae_finish
 
 end
