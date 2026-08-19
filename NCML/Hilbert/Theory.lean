@@ -252,26 +252,26 @@ end Maximal
 
 section CKB
 
-variable {T Y : BDTheory} {A : BDFormula}
+variable {T U : BDTheory} {A : BDFormula}
 
-/-- If `□A` belongs to the MP-closure of `T ∪ ◇Y`, then `A` belongs to `Y`. -/
-lemma mem_of_box_mem_mdpClosure [T.Of LogicCKB] [T.Mdp] [Y.CKB]
-  (hdia : ∀ B ∈ T, ◇B ∈ Y) (h : □A ∈ BDTheory.mdpClosure (T ∪ ◇Y)) : A ∈ Y := by
+/-- If `□A` belongs to the MP-closure of `T ∪ ◇U`, then `A` belongs to `U`. -/
+lemma mem_of_box_mem_mdpClosure [T.Of LogicCKB] [T.Mdp] [U.CKB]
+  (hdia : ∀ B ∈ T, ◇B ∈ U) (h : □A ∈ BDTheory.mdpClosure (T ∪ ◇U)) : A ∈ U := by
   obtain ⟨Γ, hΓ, C, hC, d⟩ := BDTheory.exists_finite_char (𝔸 := ∅) h;
   have d₁ : (⋀□◇Γ 🡒 ◇C 🡒 ◇(□A)) ∈ LogicCK :=
     imp_trans (imp_trans conj_box (mp kBox (nec d))) kDia;
-  have h₁ : ⋀□◇Γ ∈ Y := by
+  have h₁ : ⋀□◇Γ ∈ U := by
     apply BDTheory.conj_mem (𝔸 := ∅);
     intro B hB;
     simp at hB;
     obtain ⟨B, hB, rfl⟩ := hB;
     exact BDTheory.box_dia_mem (hΓ B hB);
-  exact BDTheory.mem_of_dia_box_mem (Y.mdp (Y.mdp (Y.subset (L := LogicCK) d₁) h₁) (hdia C hC));
+  exact BDTheory.mem_of_dia_box_mem (U.mdp (U.mdp (U.subset (L := LogicCK) d₁) h₁) (hdia C hC));
 
-/-- The MP-closure of `T ∪ ◇Y` is consistent whenever `Y` is. -/
-lemma bot_not_mem_mdpClosure [T.Of LogicCKB] [T.Mdp] [Y.CKB] (hdia : ∀ B ∈ T, ◇B ∈ Y) :
-  ⊥ ∉ BDTheory.mdpClosure (T ∪ ◇Y) := fun h =>
-  Y.consistent
+/-- The MP-closure of `T ∪ ◇U` is consistent whenever `U` is. -/
+lemma bot_not_mem_mdpClosure [T.Of LogicCKB] [T.Mdp] [U.CKB] (hdia : ∀ B ∈ T, ◇B ∈ U) :
+  ⊥ ∉ BDTheory.mdpClosure (T ∪ ◇U) := fun h =>
+  U.consistent
     <| mem_of_box_mem_mdpClosure hdia
     <| .mdp (.base (Or.inl (T.subset (L := LogicCK) (efq (A := □⊥))))) h
 
