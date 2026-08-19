@@ -84,6 +84,23 @@ end BDFormula
 
 abbrev BDLogic := Set BDFormula
 
+abbrev BDFormulaSet := Set BDFormula
+
+namespace BDFormulaSet
+
+open BDFormula
+
+/-- The set of formulas `A` with `□A` in `X`. -/
+def prebox (X : BDFormulaSet) : BDFormulaSet := { A | □A ∈ X }
+
+/-- The set of formulas `A` with `◇A` in `X`. -/
+def predia (X : BDFormulaSet) : BDFormulaSet := { A | ◇A ∈ X }
+
+@[simp, grind] lemma mem_prebox {X : BDFormulaSet} {A} : A ∈ X.prebox ↔ □A ∈ X := Iff.rfl
+@[simp, grind] lemma mem_predia {X : BDFormulaSet} {A} : A ∈ X.predia ↔ ◇A ∈ X := Iff.rfl
+
+end BDFormulaSet
+
 end NCML
 
 end
