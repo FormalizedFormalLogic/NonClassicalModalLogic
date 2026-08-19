@@ -41,6 +41,8 @@ class IsIK (M : Model κ) : Prop extends ForwardConfluent M, BackwardConfluent M
 /-- - [Pac24, Definition 7] -/
 class IsIKB (M : Model κ) : Prop extends IsIK M, SymmetricMRel M
 
+instance [M.IsIKB] : M.IsCKB where
+
 
 /-- - [Pac24, Proposition 6] -/
 theorem dia_iff_forward_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] ◇A ↔ ∃ y, x ⊏ y ∧ y ⊩[_] A := by
