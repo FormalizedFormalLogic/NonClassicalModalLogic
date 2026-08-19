@@ -10,4 +10,5 @@ public import NCML.Formula
 public import NCML.Hilbert.Basic
 public import NCML.Hilbert.Logics
 public import NCML.Hilbert.Propositional
+public import NCML.Hilbert.Theory
 public import NCML.IML.Semantics
