@@ -35,6 +35,8 @@ instance : SetLike CKBTheory BDFormula where
   coe Γ := Γ.carrier
   coe_injective p q h := by cases p; cases q; congr;
 
+instance (Γ : CKBTheory) : Γ.carrier.MdpClosed := ⟨Γ.mdp⟩
+
 @[simp] lemma mem_carrier {Γ : CKBTheory} {A} : A ∈ Γ.carrier ↔ A ∈ Γ := Iff.rfl
 
 @[ext] theorem ext {Γ Δ : CKBTheory} (h : ∀ A, A ∈ Γ ↔ A ∈ Δ) : Γ = Δ := SetLike.ext h
@@ -48,10 +50,10 @@ Lemma 19, and again in Lemma 20.
 - [Pac24, Lemma 19, Lemma 20]
 -/
 lemma exists_extending {X : BDFormulaSet} {A : BDFormula}
-  (hlog : LogicCKB ⊆ X) (hmp : X.MpClosed) (hA : A ∉ X) :
-  ∃ Γ : CKBTheory, X ⊆ Γ.carrier ∧ A ∉ Γ.carrier := by
+  (hlog : LogicCKB ⊆ X) [X.MdpClosed] (hA : A ∉ X) :
+  ∃ Γ : CKBTheory, X ⊆ Γ ∧ A ∉ Γ := by
   obtain ⟨Y, hXY, hmax⟩ :=
-    exists_maximal_mpClosed_avoiding (Z := {A}) hmp (by rintro B rfl; exact hA);
+    exists_maximal_mdpClosed_avoiding (Z := {A}) (by rintro B rfl; exact hA);
   obtain ⟨-, hmpY, havoid⟩ := hmax.prop;
   have hAY : A ∉ Y := havoid A rfl;
   have hlogY : LogicCKB ⊆ Y := hlog.trans hXY;
@@ -62,11 +64,11 @@ lemma exists_extending {X : BDFormulaSet} {A : BDFormula}
   have h₂ : ∀ {B C}, B ⋎ C ∈ Y → B ∈ Y ∨ C ∈ Y := by
     intro B C hBC;
     by_contra hc;
-    exact hAY <| BDFormulaSet.or_elim_mem hlogY hmpY (h₁ fun h => hc (Or.inl h))
+    exact hAY <| BDFormulaSet.or_elim_mem hlogY (h₁ fun h => hc (Or.inl h))
       (h₁ fun h => hc (Or.inr h)) hBC;
   have h₃ : ⊥ ∉ Y := fun h =>
-    hAY <| hmpY (BDFormulaSet.provable_mem hlogY ProvableBDHilbert.efq) h;
-  exact ⟨⟨Y, hlogY, hmpY, h₂, h₃⟩, hXY, hAY⟩;
+    hAY <| hmpY.mdp (BDFormulaSet.provable_mem hlogY ProvableBDHilbert.efq) h;
+  exact ⟨⟨Y, hlogY, hmpY.mdp, h₂, h₃⟩, hXY, hAY⟩;
 
 end CKBTheory
 
@@ -112,12 +114,12 @@ private lemma prebox_subset_of_avoid (h : ∀ B ∈ Δ.forbidden, B ∉ X) : X.p
 /-- A formula missing from a maximal set avoiding `Δ.forbidden` implies a boxed formula missing
 from `Δ`. The `⊥` branch of the dichotomy is normalized into this shape through `⊢ ⊥ 🡒 □⊥`. -/
 private lemma exists_box_imp_mem (hlog : LogicCKB ⊆ X)
-  (hmax : Maximal (fun Y => X ⊆ Y ∧ Y.MpClosed ∧ ∀ B ∈ Δ.forbidden, B ∉ Y) Y) (hA : A ∉ Y) :
+  (hmax : Maximal (fun Y => X ⊆ Y ∧ Y.MdpClosed ∧ ∀ B ∈ Δ.forbidden, B ∉ Y) Y) (hA : A ∉ Y) :
   ∃ C ∉ Δ.carrier, (A 🡒 □C) ∈ Y := by
   obtain ⟨hXY, hmpY, -⟩ := hmax.prop;
   obtain ⟨C, hC, h⟩ := exists_imp_mem_of_maximal hlog hmax hA;
   rcases hC with rfl | ⟨C, hC, rfl⟩;
-  · exact ⟨⊥, Δ.consistent, hmpY (BDFormulaSet.provable_mem (hlog.trans hXY)
+  · exact ⟨⊥, Δ.consistent, hmpY.mdp (BDFormulaSet.provable_mem (hlog.trans hXY)
       ProvableBDHilbert.imp_bot_imp_box_bot) h⟩;
   · exact ⟨C, hC, h⟩;
 
@@ -130,14 +132,14 @@ forces `C ⋎ D ∈ Δ`.
 
 - [Pac24, Lemma 16] -/
 private lemma prime_of_maximal (hlog : LogicCKB ⊆ X)
-  (hmax : Maximal (fun Y => X ⊆ Y ∧ Y.MpClosed ∧ ∀ B ∈ Δ.forbidden, B ∉ Y) Y)
+  (hmax : Maximal (fun Y => X ⊆ Y ∧ Y.MdpClosed ∧ ∀ B ∈ Δ.forbidden, B ∉ Y) Y)
   (h : A ⋎ B ∈ Y) : A ∈ Y ∨ B ∈ Y := by
   by_contra hc;
   obtain ⟨hXY, hmpY, havoid⟩ := hmax.prop;
   obtain ⟨C, hC, h₁⟩ := exists_box_imp_mem hlog hmax fun hA => hc (Or.inl hA);
   obtain ⟨D, hD, h₂⟩ := exists_box_imp_mem hlog hmax fun hB => hc (Or.inr hB);
   have h₃ : C ⋎ D ∈ Δ.carrier :=
-    prebox_subset_of_avoid havoid (BDFormulaSet.box_or_mem (hlog.trans hXY) hmpY h₁ h₂ h);
+    prebox_subset_of_avoid havoid (BDFormulaSet.box_or_mem (X := Y) (hlog.trans hXY) h₁ h₂ h);
   exact (Δ.prime h₃).elim hC hD;
 
 end BackwardConfluence
@@ -157,19 +159,17 @@ instance : canonicalModel.BackwardConfluent where
   backward_confluent {Γ Δ Δ₁} := by
     rintro ⟨MΓΔ, -⟩ IΔΔ₁;
     have hdia : ∀ B ∈ Γ.carrier, ◇B ∈ Δ₁.carrier := fun B hB =>
-      IΔΔ₁ (MΓΔ (BDFormulaSet.box_dia_mem Γ.logicCKB_subset Γ.mdp hB));
+      IΔΔ₁ (MΓΔ (BDFormulaSet.box_dia_mem (X := Γ.carrier) Γ.logicCKB_subset hB));
     have hlog : LogicCKB ⊆ (show BDFormulaSet from MPClosure (Γ.carrier ∪ (◇·) '' Δ₁.carrier)) :=
       logic_subset_mpClosure (Γ.logicCKB_subset.trans Set.subset_union_left);
     have havoid : ∀ B ∈ Δ₁.forbidden,
         B ∉ (show BDFormulaSet from MPClosure (Γ.carrier ∪ (◇·) '' Δ₁.carrier)) := by
       rintro B (rfl | ⟨C, hC, rfl⟩) hB;
-      · exact bot_not_mem_mpClosure Γ.logicCKB_subset Γ.mdp Δ₁.logicCKB_subset Δ₁.mdp hdia
-          Δ₁.consistent hB;
-      · exact hC (mem_of_box_mem_mpClosure Γ.logicCKB_subset Γ.mdp Δ₁.logicCKB_subset Δ₁.mdp
-          hdia hB);
-    obtain ⟨Y, hsub, hmax⟩ := exists_maximal_mpClosed_avoiding (MPClosure.mpClosed _) havoid;
+      · exact bot_not_mem_mpClosure Γ.logicCKB_subset Δ₁.logicCKB_subset hdia Δ₁.consistent hB;
+      · exact hC (mem_of_box_mem_mpClosure Γ.logicCKB_subset Δ₁.logicCKB_subset hdia hB);
+    obtain ⟨Y, hsub, hmax⟩ := exists_maximal_mdpClosed_avoiding havoid;
     obtain ⟨-, hmpY, havoidY⟩ := hmax.prop;
-    exact ⟨⟨Y, hlog.trans hsub, hmpY, fun h => prime_of_maximal hlog hmax h,
+    exact ⟨⟨Y, hlog.trans hsub, hmpY.mdp, fun h => prime_of_maximal hlog hmax h,
         havoidY ⊥ (Or.inl rfl)⟩,
       fun B hB => hsub (MPClosure.base (Or.inl hB)), prebox_subset_of_avoid havoidY,
       fun B hB => hsub (MPClosure.base (Or.inr ⟨B, hB, rfl⟩))⟩;
@@ -206,10 +206,9 @@ private lemma mem_of_forces_imply
   (ihB : ∀ {Δ : CKBTheory}, Δ ⊩[canonicalModel] B ↔ B ∈ Δ.carrier)
   (h : Γ ⊩[canonicalModel] (A 🡒 B)) : A 🡒 B ∈ Γ.carrier := by
   by_contra hc;
-  have hsub : Γ.carrier ⊆ Γ.carrier.impSet A :=
-    BDFormulaSet.subset_impSet Γ.logicCKB_subset Γ.mdp;
-  obtain ⟨Δ, hXΔ, hBΔ⟩ := CKBTheory.exists_extending (Γ.logicCKB_subset.trans hsub)
-    (BDFormulaSet.impSet_mpClosed Γ.logicCKB_subset Γ.mdp) hc;
+  have hsub : Γ.carrier ⊆ Γ.carrier.impSet A := BDFormulaSet.subset_impSet Γ.logicCKB_subset;
+  have := BDFormulaSet.impSet_mdpClosed (A := A) Γ.logicCKB_subset;
+  obtain ⟨Δ, hXΔ, hBΔ⟩ := CKBTheory.exists_extending (Γ.logicCKB_subset.trans hsub) hc;
   exact hBΔ <| ihB.mp <| h Δ (hsub.trans hXΔ) <|
     ihA.mpr <| hXΔ <| BDFormulaSet.self_mem_impSet Γ.logicCKB_subset;
 
@@ -224,17 +223,18 @@ theorem truth_lemma {Γ : CKBTheory} {A : BDFormula} : Γ ⊩[canonicalModel] A 
   | and A B ihA ihB =>
     constructor;
     · rintro ⟨hA, hB⟩;
-      exact BDFormulaSet.and_mem Γ.logicCKB_subset Γ.mdp (ihA.mp hA) (ihB.mp hB);
+      exact BDFormulaSet.and_mem Γ.logicCKB_subset (ihA.mp hA) (ihB.mp hB);
     · intro h;
-      exact ⟨ihA.mpr (Γ.mdp (Γ.logicCKB_subset ProvableBDHilbert.andElim₁) h),
-        ihB.mpr (Γ.mdp (Γ.logicCKB_subset ProvableBDHilbert.andElim₂) h)⟩;
+      constructor;
+      . exact ihA.mpr (Γ.mdp (Γ.logicCKB_subset ProvableBDHilbert.andElim₁) h);
+      . exact ihB.mpr (Γ.mdp (Γ.logicCKB_subset ProvableBDHilbert.andElim₂) h);
   | or A B ihA ihB =>
     constructor;
     · rintro (hA | hB);
       · exact Γ.mdp (Γ.logicCKB_subset ProvableBDHilbert.orIntro₁) (ihA.mp hA);
       · exact Γ.mdp (Γ.logicCKB_subset ProvableBDHilbert.orIntro₂) (ihB.mp hB);
     · intro h;
-      exact (Γ.prime h).imp ihA.mpr ihB.mpr;
+      rcases Γ.prime h <;> grind;
   | imply A B ihA ihB => exact ⟨mem_of_forces_imply ihA ihB, forces_imply_of_mem ihA ihB⟩;
   -- The two open cases are the halves that must produce an `mRel`-successor of `Γ`, and each needs
   -- its own Zorn construction: the `□` case that of [Pac24, Lemma 18], the `◇` case one resting on
