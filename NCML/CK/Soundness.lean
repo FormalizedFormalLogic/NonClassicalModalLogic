@@ -32,7 +32,7 @@ theorem valid_of_mem_logic (h𝔸 : ∀ B ∈ 𝔸, M ⊧ B) (hA : A ∈ Provabl
     constructor;
     . exact Mz₁u₁;
     . exact (hyAB z₁ u₁ (Trans.trans Iyz Izz₁) Mz₁u₁) u₁ (refl _) huA;
-  | mp _ _ ihAB ihA => exact ihAB x x (refl _) (ihA x);
+  | mdp _ _ ihAB ihA => exact ihAB x x (refl _) (ihA x);
   | _ => grind;
 
 theorem valid_of_mem_LogicCK (hA : A ∈ LogicCK) : M ⊧ A := valid_of_mem_logic (by simp) hA

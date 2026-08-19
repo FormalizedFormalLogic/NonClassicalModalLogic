@@ -39,6 +39,26 @@ jobs:
         if: hashFiles('.lake/NCML-x86_64-unknown-linux-gnu.tar.gz') != ''
         run: lake unpack
 
+      # `leanchecker` walks every olean it finds, and a restored cache can predate a rename or a
+      # deletion, so drop artifacts whose module no longer has a source file.
+      - name: Prune orphaned build artifacts
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          src_root = pathlib.Path('NCML')
+          for build_root in [pathlib.Path('.lake/build/lib/lean/NCML'), pathlib.Path('.lake/build/ir/NCML')]:
+              if not build_root.exists():
+                  continue
+              for f in sorted(build_root.rglob('*')):
+                  if not f.is_file():
+                      continue
+                  rel_dir = f.relative_to(build_root).parent
+                  base = f.name.split('.', 1)[0]
+                  if not (src_root / rel_dir / f'{base}.lean').exists():
+                      print(f'removing orphaned artifact {f}')
+                      f.unlink()
+          PY
+
       - name: Build NCML
         run: lake build NCML
 
