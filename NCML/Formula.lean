@@ -106,8 +106,6 @@ def box (X : BDFormulaSet) : BDFormulaSet := (□·) '' X
 /-- The image of `X` under `◇`. -/
 def dia (X : BDFormulaSet) : BDFormulaSet := (◇·) '' X
 
--- Scoped: these overload the formula-level `□`/`◇`, and an unscoped overload is ambiguous in
--- pattern position, breaking every `match` on `BDFormula.box`/`BDFormula.dia`.
 @[inherit_doc] scoped prefix:90 "□" => BDFormulaSet.box
 @[inherit_doc] scoped prefix:91 "◇" => BDFormulaSet.dia
 
@@ -138,8 +136,7 @@ end BDFormulaList
 
 namespace BDFormulaFinset
 
-/-- Conjunction of a finset of formulas, via an arbitrary enumeration as a list. Different
-enumeration orders give syntactically different (but provably equivalent) results. -/
+/-- Conjunction of a finset of formulas, via an arbitrary enumeration as a list. -/
 noncomputable def conj (Γ : BDFormulaFinset) : BDFormula := BDFormulaList.conj Γ.toList
 
 end BDFormulaFinset

@@ -70,8 +70,6 @@ section CKB
 
 class CKB (T : BDTheory) extends T.Mdp, T.Prime, T.Consistent, T.Of LogicCKB where
 
--- `LogicCK` is `logic ∅`, so this instance is what lets the `logic 𝔸`-indexed closure lemmas above
--- be applied to a `CKB` theory: it supplies the otherwise unrecoverable `𝔸` as `∅`.
 instance [T.Of LogicCKB] : T.Of LogicCK := ⟨LogicCK.subset_CKB.trans (subset (L := LogicCKB))⟩
 
 lemma box_dia_mem [T.CKB] (hA : A ∈ T) : □◇A ∈ T := by
@@ -157,9 +155,7 @@ lemma exists_finite_char [T.Of (logic 𝔸)] [T.Mdp] (h : A ∈ MdpClosure (T �
 end BDTheory
 
 
-/-- The union of a chain of MP-closed theories is MP-closed: given `(A 🡒 B) ∈ T₁` and `A ∈ T₂` with
-`T₁, T₂` in the chain, one of `T₁ ⊆ T₂` or `T₂ ⊆ T₁` holds, so both facts land in the larger theory
-and MP-closedness of that theory finishes the argument. -/
+/-- The union of a chain of MP-closed theories is MP-closed. -/
 lemma MdpClosed_sUnion_of_chain {c : Set BDTheory} (hc : IsChain (· ⊆ ·) c)
   (h : ∀ T ∈ c, T.Mdp) : BDTheory.Mdp (⋃₀ c) := by
   constructor;
@@ -182,8 +178,8 @@ section
 
 variable {𝔸 : Set BDFormula} {T : BDTheory} {A : BDFormula}
 
--- Here and in `impSet_mdpClosed`, `(T := T)` is required: the expected type is a membership in
--- `T.impSet A`, so `mdp` would otherwise be resolved for `T.impSet A` rather than for `T`.
+-- `(T := T)` is required here and in `impSet_mdpClosed`: otherwise `mdp` resolves against
+-- `T.impSet A` instead of `T`.
 lemma subset_impSet [T.Of (logic 𝔸)] [T.Mdp] : T ⊆ T.impSet A :=
   fun _ hB => mdp (T := T) (provable_mem (𝔸 := 𝔸) imply₁) hB
 
@@ -223,7 +219,6 @@ refuted by some forbidden formula: `A 🡒 B ∈ Y` for some `B ∈ Z`. -/
 lemma exists_imp_mem_of_maximal [T.Of (logic 𝔸)]
   (hmax : Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ ∀ B ∈ Z, B ∉ Y) Y) (hA : A ∉ Y) :
   ∃ B ∈ Z, (A 🡒 B) ∈ Y := by
-  -- `hmdp` and `hlogY` are unused by name, but are what instance resolution picks up below.
   obtain ⟨hTY, hmdp, -⟩ := hmax.prop;
   have hlogY : Y.Of (logic 𝔸) := ⟨T.subset.trans hTY⟩;
   have hsub := BDTheory.subset_impSet (𝔸 := 𝔸) (T := Y) (A := A);
@@ -241,14 +236,10 @@ variable {T Y : BDTheory} {A : BDFormula}
 
 /-- If `□A` belongs to the MP-closure of `T ∪ ◇Y`, then `A` belongs to `Y`.
 
-This is the derivation chain forming the first half of the cited proof.
-
 - [Pac24, Lemma 16] -/
 lemma mem_of_box_mem_mpClosure [T.Of LogicCKB] [T.Mdp] [Y.CKB]
   (hdia : ∀ B ∈ T, ◇B ∈ Y) (h : □A ∈ BDTheory.MdpClosure (T ∪ ◇Y)) : A ∈ Y := by
   obtain ⟨Γ, hΓ, C, hC, d⟩ := BDTheory.exists_finite_char (𝔸 := ∅) h;
-  -- The ascriptions on `Γ.map (◇·)` disambiguate `◇` between `BDFormula.dia` and
-  -- `BDFormulaSet.dia`: as the receiver of `.map` it is elaborated without an expected type.
   have d₁ : (conj ((Γ.map (◇·) : BDFormulaList).map (□·)) 🡒 ◇C 🡒 ◇(□A)) ∈ LogicCK :=
     imp_trans (imp_trans conj_box (mp kBox (nec d))) kDia;
   have h₁ : conj ((Γ.map (◇·) : BDFormulaList).map (□·)) ∈ Y := by
