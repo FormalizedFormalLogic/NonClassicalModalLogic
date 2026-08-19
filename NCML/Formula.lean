@@ -1,5 +1,6 @@
 module
 
+public import Mathlib.Data.Finset.Dedup
 public import Mathlib.Data.Set.Defs
 
 @[expose] public section
@@ -81,5 +82,89 @@ def diaFree : BDFormula → Prop
 end BDFormula
 
 abbrev BDLogic := Set BDFormula
+
+abbrev BDFormulaSet := Set BDFormula
+
+namespace BDFormulaSet
+
+open BDFormula
+
+/-- The set of formulas `A` with `□A` in `X`. -/
+def prebox (X : BDFormulaSet) : BDFormulaSet := { A | □A ∈ X }
+
+/-- The set of formulas `A` with `◇A` in `X`. -/
+def predia (X : BDFormulaSet) : BDFormulaSet := { A | ◇A ∈ X }
+
+@[inherit_doc] scoped prefix:90 "□⁻¹" => BDFormulaSet.prebox
+@[inherit_doc] scoped prefix:91 "◇⁻¹" => BDFormulaSet.predia
+
+@[simp, grind =] lemma mem_prebox {X : BDFormulaSet} {A} : A ∈ X.prebox ↔ □A ∈ X := Iff.rfl
+@[simp, grind =] lemma mem_predia {X : BDFormulaSet} {A} : A ∈ X.predia ↔ ◇A ∈ X := Iff.rfl
+
+/-- The image of `X` under `□`. -/
+def box (X : BDFormulaSet) : BDFormulaSet := (□·) '' X
+
+/-- The image of `X` under `◇`. -/
+def dia (X : BDFormulaSet) : BDFormulaSet := (◇·) '' X
+
+@[inherit_doc] scoped prefix:90 "□" => BDFormulaSet.box
+@[inherit_doc] scoped prefix:91 "◇" => BDFormulaSet.dia
+
+variable {X : BDFormulaSet} {A : BDFormula}
+
+@[grind =] lemma mem_box_iff : A ∈ □X ↔ ∃ B ∈ X, □B = A := Iff.rfl
+@[grind =] lemma mem_dia_iff : A ∈ ◇X ↔ ∃ B ∈ X, ◇B = A := Iff.rfl
+
+@[simp, grind =] lemma mem_box : □A ∈ □X ↔ A ∈ X := by grind;
+@[simp, grind =] lemma mem_dia : ◇A ∈ ◇X ↔ A ∈ X := by grind;
+
+end BDFormulaSet
+
+abbrev BDFormulaList := List BDFormula
+
+abbrev BDFormulaFinset := Finset BDFormula
+
+namespace BDFormulaList
+
+/-- Conjunction of a list of formulas, right-folded with `⊤` as the base case. -/
+def conj (Γ : BDFormulaList) : BDFormula := Γ.foldr (· ⋏ ·) ⊤
+
+@[inherit_doc] scoped prefix:90 "⋀" => BDFormulaList.conj
+
+/-- The image of `Γ` under `□`. -/
+def box (Γ : BDFormulaList) : BDFormulaList := Γ.map (□·)
+
+/-- The image of `Γ` under `◇`. -/
+def dia (Γ : BDFormulaList) : BDFormulaList := Γ.map (◇·)
+
+@[inherit_doc] scoped prefix:90 "□" => BDFormulaList.box
+@[inherit_doc] scoped prefix:91 "◇" => BDFormulaList.dia
+
+variable {Γ Γ₁ Γ₂ : BDFormulaList} {A : BDFormula}
+
+@[simp] lemma conj_nil : ⋀([] : BDFormulaList) = ⊤ := rfl
+
+@[simp] lemma conj_cons (A : BDFormula) (Γ : BDFormulaList) : ⋀(A :: Γ) = A ⋏ ⋀Γ := rfl
+
+@[simp, grind =] lemma mem_box_iff : A ∈ □Γ ↔ ∃ B ∈ Γ, □B = A := List.mem_map
+
+@[simp, grind =] lemma mem_dia_iff : A ∈ ◇Γ ↔ ∃ B ∈ Γ, ◇B = A := List.mem_map
+
+@[simp, grind =] lemma box_append : □(Γ₁ ++ Γ₂) = □Γ₁ ++ □Γ₂ := List.map_append ..
+
+@[simp, grind =] lemma dia_append : ◇(Γ₁ ++ Γ₂) = ◇Γ₁ ++ ◇Γ₂ := List.map_append ..
+
+end BDFormulaList
+
+namespace BDFormulaFinset
+
+open scoped BDFormulaList
+
+/-- Conjunction of a finset of formulas, via an arbitrary enumeration as a list. -/
+noncomputable def conj (Γ : BDFormulaFinset) : BDFormula := ⋀Γ.toList
+
+@[inherit_doc] scoped prefix:90 "⋀" => BDFormulaFinset.conj
+
+end BDFormulaFinset
 
 end

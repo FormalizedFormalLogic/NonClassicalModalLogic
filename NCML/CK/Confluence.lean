@@ -39,6 +39,8 @@ class IsIK (M : Model κ) : Prop extends ForwardConfluent M, BackwardConfluent M
 /-- - [Pac24, Definition 7] -/
 class IsIKB (M : Model κ) : Prop extends IsIK M, SymmetricMRel M
 
+instance [M.IsIKB] : M.IsCKB where
+
 
 /-- - [Pac24, Proposition 6] -/
 theorem dia_iff_forward_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] ◇A ↔ ∃ y, x ⊏ y ∧ y ⊩[_] A := by
@@ -122,6 +124,15 @@ theorem forces_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] 
 -/
 lemma valid_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] [M.BackwardConfluent] : M ⊧ ((◇A 🡒 □B) 🡒 □(A 🡒 B)) := fun
   _ => forces_FS_of_forwardConfluent_of_backwardConfluent
+
+lemma valid_BDia_of_symmetricMRel_of_forwardConfluent [M.SymmetricMRel] [M.ForwardConfluent] : M ⊧ (◇(□A) 🡒 A) := by
+  intro x y _ hy;
+  obtain ⟨z, Myz, hz⟩ := Model.dia_iff_forward_of_forwardConfluent.mp hy;
+  exact hz z y (refl z) (symm_mRel Myz);
+
+lemma valid_BBox_of_symmetricMRel_of_forwardConfluent [M.SymmetricMRel] [M.ForwardConfluent] : M ⊧ (A 🡒 □◇A) := by
+  intro x;
+  grind [forward_confluent, symm_mRel];
 
 end Model
 
