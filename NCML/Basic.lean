@@ -1,1 +1,3 @@
+module
+
 def hello := "world"
