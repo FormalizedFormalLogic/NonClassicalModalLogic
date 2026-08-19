@@ -1,0 +1,16 @@
+# Format and regenerate keys of references.bib
+format-bib:
+    bibtool -F -r .bibtoolrsc -i ./references.bib -o references.bib
+    sed -i '1{/^$/d}' references.bib
+
+# Generate the import graph of NCML as import_graph.{dot,png,pdf,html} (requires graphviz)
+import-graph:
+    lake exe graph --to NCML import_graph.dot import_graph.png import_graph.pdf import_graph.html
+
+# Count lines of Lean source in NCML/, excluding blank and comment lines (requires cloc)
+cloc:
+    cloc --include-lang=Lean NCML/
+
+# Regenerate NCML.lean to include all modules (run after adding/removing files)
+mk-all:
+    lake exe mk_all --module
