@@ -11,13 +11,7 @@ namespace CK
 open NCML
 
 /--
-`fallible_exists_mRel'` is not part of Pac24's Definition 4, and is added here to close a gap:
-without it a fallible world need not have any `mRel'`-successor, so a fallible world fails to
-force `◇A` and the axiom scheme `efq` (`⊥ 🡒 A`) is not valid. It plays the role of the
-condition `✦Rx` iff `x = ✦` imposed on the single exploding world `✦` in dGSC25.
-
 - [Pac24, Definition 4]
-- [dGSC25, Definition IV.1]
 -/
 structure Model (κ : Type*) where
   iRel' : κ → κ → Prop
