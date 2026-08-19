@@ -10,7 +10,9 @@ namespace CK
 
 open NCML
 
-/-- - [Pac24, Definition 4] -/
+/--
+- [Pac24, Definition 4]
+-/
 structure Model (κ : Type*) where
   iRel' : κ → κ → Prop
   [iRel_preorder : IsPreorder _ iRel']
@@ -18,6 +20,7 @@ structure Model (κ : Type*) where
   Fallible' : κ → Prop
   fallible_iRel' : ∀ {x y}, Fallible' x → iRel' x y → Fallible' y
   fallible_mRel' : ∀ {x y}, Fallible' x → mRel' x y → Fallible' y
+  fallible_exists_mRel' : ∀ {x}, Fallible' x → ∃ y, mRel' x y
   val : κ → Nat → Prop
   val_persistent : ∀ {x y} {a}, val x a → iRel' x y → val y a
   fallible_val : ∀ {x} {a}, Fallible' x → val x a
@@ -51,6 +54,10 @@ lemma fallible_iRel {x y : M.World} (h : M.Fallible x) (Ixy : x ≼ y) : M.Falli
 lemma fallible_mRel {x y : M.World} (h : M.Fallible x) (Mxy : x ⊏ y) : M.Fallible y :=
   M.fallible_mRel' h Mxy
 
+@[grind =>]
+lemma fallible_exists_mRel {x : M.World} (h : M.Fallible x) : ∃ y, x ⊏ y :=
+  M.fallible_exists_mRel' h
+
 variable {x y z : M.World} {A B : BDFormula}
 
 /-- - [Pac24, Definition 4] -/
@@ -66,7 +73,7 @@ def Forces (M : Model κ) (x : M.World) : BDFormula → Prop
 
 notation:80 x:81 " ⊩[" M "] " A:81 => Forces M x A
 
-/-- Routine consequence of `Model`'s conditions. -/
+@[grind =>]
 lemma Forces.persistent (h : x ⊩[_] A) (Ixy : x ≼ y) : y ⊩[_] A := by
   induction A generalizing y with
   | imply A B _ _ =>
@@ -80,9 +87,15 @@ lemma Forces.persistent (h : x ⊩[_] A) (Ixy : x ≼ y) : y ⊩[_] A := by
     exact h y₁ (Trans.trans Ixy Iyy₁);
   | _ => grind;
 
-/-- Routine consequence of `Model`'s conditions. -/
-lemma Forces.of_fallible_of_diaFree (hA : A.diaFree) (h : M.Fallible x) : x ⊩[_] A := by
-  induction A generalizing x <;> grind [Model.fallible_val];
+@[grind =>]
+lemma Forces.of_fallible (h : M.Fallible x) : x ⊩[_] A := by
+  induction A generalizing x with
+  | dia A ih =>
+    intro y Ixy;
+    have hy : M.Fallible y := M.fallible_iRel h Ixy;
+    obtain ⟨z, Myz⟩ := M.fallible_exists_mRel hy;
+    exact ⟨z, Myz, ih (M.fallible_mRel hy Myz)⟩;
+  | _ => grind [Model.fallible_val];
 
 def Valid (M : Model κ) (A : BDFormula) := ∀ x : M.World, x ⊩[M] A
 infixl:80 " ⊧ " => Valid
