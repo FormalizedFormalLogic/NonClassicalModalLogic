@@ -1,6 +1,5 @@
 module  -- shake: keep-all --deprecated_module: ignore
 
-public import NCML.Basic
 public import NCML.CK.CKB_IKB
 public import NCML.CK.Confluence
 public import NCML.CK.Countermodel.BBox

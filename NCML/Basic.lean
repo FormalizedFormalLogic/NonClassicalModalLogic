@@ -1,3 +1,0 @@
-module
-
-def hello := "world"
