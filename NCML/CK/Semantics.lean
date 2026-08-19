@@ -79,7 +79,7 @@ def Forces (M : Model κ) (x : M.World) : BDFormula → Prop
 
 notation:80 x:81 " ⊩[" M "] " A:81 => Forces M x A
 
-/-- Routine consequence of `Model`'s conditions. -/
+@[grind =>]
 lemma Forces.persistent (h : x ⊩[_] A) (Ixy : x ≼ y) : y ⊩[_] A := by
   induction A generalizing y with
   | imply A B _ _ =>
@@ -93,7 +93,7 @@ lemma Forces.persistent (h : x ⊩[_] A) (Ixy : x ≼ y) : y ⊩[_] A := by
     exact h y₁ (Trans.trans Ixy Iyy₁);
   | _ => grind;
 
-/-- Routine consequence of `Model`'s conditions. -/
+@[grind =>]
 lemma Forces.of_fallible (h : M.Fallible x) : x ⊩[_] A := by
   induction A generalizing x with
   | dia A ih =>

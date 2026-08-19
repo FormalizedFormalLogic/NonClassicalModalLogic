@@ -3,4 +3,5 @@
 import NCML.Basic
 import NCML.Hilbert.Logics
 import NCML.CK.Confluence
+import NCML.CK.Soundness
 import NCML.CK.Countermodel.BBox
