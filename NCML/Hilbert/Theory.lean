@@ -7,178 +7,210 @@ public import Mathlib.Order.Zorn
 
 @[expose] public section
 
-/-!
-# MP-closed sets of formulas
-
-Sets of formulas closed under modus ponens (`BDFormulaSet.MdpClosed`), the MP-closure of a set
-(`MPClosure`), and the implication set of a theory (`BDFormulaSet.impSet`), the relative deduction
-lemma used to build maximal MP-closed sets.
-
-These combine into the two ingredients of a Lindenbaum-style construction, both stated relative to
-an arbitrary set `Z` of forbidden formulas: the existence of a maximal MP-closed extension avoiding
-`Z` (`exists_maximal_mdpClosed_avoiding`), and the dichotomy that a formula missing from such a
-maximal set implies some forbidden formula (`exists_imp_mem_of_maximal`).
-
-For `CKB`, the closure of `X ∪ ◇''Y` is analysed further: a boxed member of it already belongs to
-`Y` (`mem_of_box_mem_mpClosure`), and the closure is consistent whenever `Y` is
-(`bot_not_mem_mpClosure`).
--/
-
 namespace NCML
 
 open BDFormula BDFormulaList ProvableBDHilbert
+open scoped BDFormulaSet
 
-namespace BDFormulaSet
+abbrev BDTheory := Set BDFormula
 
-/-- `X` is closed under modus ponens. -/
-class MdpClosed (X : BDFormulaSet) : Prop where
-  mdp : ∀ {A B}, (A 🡒 B) ∈ X → A ∈ X → B ∈ X
 
-export MdpClosed (mdp)
 
-section General
+namespace BDTheory
 
-variable {𝔸 : Set BDFormula} {X : BDFormulaSet} {A B C D : BDFormula}
+class Mdp (T : BDTheory) where
+  mdp {A B} : (A 🡒 B) ∈ T → A ∈ T → B ∈ T
+export Mdp (mdp)
 
-lemma provable_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (h : ProvableBDHilbert 𝔸 A) : A ∈ X :=
-  hlog h
+class Prime (T : BDTheory) where
+  prime {A B} : A ⋎ B ∈ T → A ∈ T ∨ B ∈ T
+export Prime (prime)
 
-lemma and_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) [X.MdpClosed] (hA : A ∈ X) (hB : B ∈ X) :
-    A ⋏ B ∈ X :=
-  mdp (mdp (provable_mem hlog andIntro) hA) hB
+class Consistent (T : BDTheory) where
+  consistent : ⊥ ∉ T
+export Consistent (consistent)
 
-lemma conj_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) [X.MdpClosed] {Γ : BDFormulaList}
-    (h : ∀ A ∈ Γ, A ∈ X) : Γ.conj ∈ X := by
+class Of (L : BDLogic) (T : BDTheory) where
+  subset : L ⊆ T
+export Of (subset)
+
+attribute [grind =>] mdp prime
+attribute [grind .] consistent
+
+variable {𝔸 : Set BDFormula} {T : BDTheory} {A B C D : BDFormula}
+
+lemma provable_mem [T.Of (logic 𝔸)] (h : ⊢ᴴ[CK;𝔸] A) : A ∈ T :=
+  subset (L := (ProvableBDHilbert.logic 𝔸)) h
+
+lemma and_mem [T.Of (logic 𝔸)] [T.Mdp] (hA : A ∈ T) (hB : B ∈ T) : A ⋏ B ∈ T :=
+  mdp (mdp (provable_mem (𝔸 := 𝔸) andIntro) hA) hB
+
+lemma conj_mem [T.Of (logic 𝔸)] [T.Mdp]
+  {Γ : BDFormulaList} (h : ∀ A ∈ Γ, A ∈ T) : Γ.conj ∈ T := by
   induction Γ with
-  | nil => exact provable_mem hlog verum;
-  | cons A Γ ih => exact and_mem hlog (h A (by simp)) (ih fun B hB => h B (by simp [hB]));
+  | nil => exact provable_mem (𝔸 := 𝔸) verum;
+  | cons A Γ ih =>
+    apply and_mem (𝔸 := 𝔸);
+    . simp_all;
+    . exact ih (by grind);
 
-lemma or_elim_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) [X.MdpClosed]
-    (hAC : (A 🡒 C) ∈ X) (hBC : (B 🡒 C) ∈ X) (hAB : (A ⋎ B) ∈ X) : C ∈ X :=
-  mdp (mdp (mdp (provable_mem hlog orElim) hAC) hBC) hAB
+lemma or_elim_mem [T.Of (logic 𝔸)] [T.Mdp]
+  (hAC : (A 🡒 C) ∈ T) (hBC : (B 🡒 C) ∈ T) (hAB : (A ⋎ B) ∈ T) : C ∈ T :=
+  mdp (mdp (mdp (provable_mem (𝔸 := 𝔸) orElim) hAC) hBC) hAB
 
-/-- Disjunction elimination through a `□`: two implications into boxed formulas, applied to a
-disjunction, yield the box of the disjunction. A routine closure lemma in the family of
-`or_elim_mem`, not isolated as a result anywhere in the literature. -/
-lemma box_or_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) [X.MdpClosed]
-    (h₁ : (A 🡒 □C) ∈ X) (h₂ : (B 🡒 □D) ∈ X) (h : (A ⋎ B) ∈ X) : □(C ⋎ D) ∈ X :=
-  or_elim_mem hlog (mdp (provable_mem hlog (imp_comp_left box_or_inl)) h₁)
-    (mdp (provable_mem hlog (imp_comp_left box_or_inr)) h₂) h
-
-end General
+lemma box_or_mem [T.Of (logic 𝔸)] [T.Mdp]
+  (h₁ : (A 🡒 □C) ∈ T) (h₂ : (B 🡒 □D) ∈ T) (h : (A ⋎ B) ∈ T) : □(C ⋎ D) ∈ T := by
+  exact
+    or_elim_mem (𝔸 := 𝔸)
+    (mdp (provable_mem (𝔸 := 𝔸) (imp_comp_left box_or_inl)) h₁)
+    (mdp (provable_mem (𝔸 := 𝔸) (imp_comp_left box_or_inr)) h₂)
+    h;
 
 section CKB
 
-variable {X : BDFormulaSet} {A : BDFormula}
+class CKB (T : BDTheory) extends T.Mdp, T.Prime, T.Consistent, T.Of LogicCKB where
 
-lemma box_dia_mem (hlog : LogicCKB ⊆ X) [X.MdpClosed] (hA : A ∈ X) : □◇A ∈ X :=
-  mdp (hlog (ProvableBDHilbert.axm (Or.inl ⟨A, rfl⟩))) hA
+-- `LogicCK` is `logic ∅`, so this instance is what lets the `logic 𝔸`-indexed closure lemmas above
+-- be applied to a `CKB` theory: it supplies the otherwise unrecoverable `𝔸` as `∅`.
+instance [T.Of LogicCKB] : T.Of LogicCK := ⟨LogicCK.subset_CKB.trans (subset (L := LogicCKB))⟩
 
-lemma mem_of_dia_box_mem (hlog : LogicCKB ⊆ X) [X.MdpClosed] (h : ◇(□A) ∈ X) : A ∈ X :=
-  mdp (hlog (ProvableBDHilbert.axm (Or.inr ⟨A, rfl⟩))) h
+lemma box_dia_mem [T.CKB] (hA : A ∈ T) : □◇A ∈ T := by
+  apply mdp ?_ hA;
+  apply T.subset (L := LogicCKB);
+  apply ProvableBDHilbert.axm;
+  grind;
+
+lemma mem_of_dia_box_mem [T.CKB] (h : ◇(□A) ∈ T) : A ∈ T := by
+  apply mdp ?_ h;
+  apply T.subset (L := LogicCKB);
+  apply ProvableBDHilbert.axm;
+  grind;
 
 end CKB
 
-end BDFormulaSet
+end BDTheory
 
-/-! ## MP-closure -/
 
-/-- The closure of `X` under modus ponens. -/
-inductive MPClosure (X : BDFormulaSet) : BDFormula → Prop
-  | base {A} : A ∈ X → MPClosure X A
-  | mp {A B} : MPClosure X (A 🡒 B) → MPClosure X A → MPClosure X B
+abbrev CKBTheory := { T : BDTheory // T.CKB }
 
-lemma subset_mpClosure (X : BDFormulaSet) : X ⊆ MPClosure X := fun _ => MPClosure.base
 
-instance MPClosure.mdpClosed (X : BDFormulaSet) : BDFormulaSet.MdpClosed (MPClosure X) :=
-  ⟨fun hAB hA => MPClosure.mp hAB hA⟩
+inductive BDTheory.MdpClosure (T : BDTheory) : BDTheory
+  | base {A} : A ∈ T → MdpClosure T A
+  | mdp {A B} : MdpClosure T (A 🡒 B) → MdpClosure T A → MdpClosure T B
 
-lemma MPClosure.mono {X Y : BDFormulaSet} (h : X ⊆ Y) {A} (hA : MPClosure X A) : MPClosure Y A := by
+namespace BDTheory
+
+variable {T T₁ T₂ : BDTheory} {X Y : BDFormulaSet} {𝔸 : Set BDFormula} {A : BDFormula}
+
+lemma subset_mpClosure : T ⊆ T.MdpClosure := fun _ => MdpClosure.base
+
+instance : T.MdpClosure.Mdp := ⟨fun hAB hA => .mdp hAB hA⟩
+
+
+lemma mono_MdpClosure (h : T₁ ⊆ T₂): T₁.MdpClosure ⊆ T₂.MdpClosure := by
+  intro A hA;
   induction hA with
-  | base hA => exact MPClosure.base (h hA);
-  | mp _ _ ih₁ ih₂ => exact MPClosure.mp ih₁ ih₂;
+  | base hA => exact .base (h hA);
+  | mdp _ _ ih₁ ih₂ => exact .mdp ih₁ ih₂;
 
-lemma logic_subset_mpClosure {𝔸 : Set BDFormula} {X : BDFormulaSet}
-    (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) : ProvableBDHilbert.logic 𝔸 ⊆ MPClosure X :=
-  hlog.trans (subset_mpClosure X)
+lemma logic_subset_mpClosure [T.Of (logic 𝔸)] : T.MdpClosure.Of (ProvableBDHilbert.logic 𝔸) := by
+  constructor;
+  trans T;
+  . exact T.subset;
+  . exact subset_mpClosure;
 
-/-- Finite characterization of the MP-closure of `X ∪ ◇''Y`: every member `A` of the closure is
-already derivable from finitely many `◇B` with `B ∈ Y` together with a single `C ∈ X`. -/
-lemma MPClosure.exists_finite_char {𝔸 : Set BDFormula} {X Y : BDFormulaSet} {A : BDFormula}
-    (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) [X.MdpClosed]
-    (h : MPClosure (X ∪ (◇·) '' Y) A) :
-    ∃ Γ : BDFormulaList, (∀ B ∈ Γ, B ∈ Y) ∧
-      ∃ C ∈ X, ProvableBDHilbert 𝔸 (conj (Γ.map (◇·)) 🡒 C 🡒 A) := by
+/-- Finite characterization of the MP-closure of `T ∪ ◇Y`: every member `A` of the closure is
+already derivable from finitely many `◇B` with `B ∈ Y` together with a single `C ∈ T`. -/
+lemma exists_finite_char [T.Of (logic 𝔸)] [T.Mdp] (h : A ∈ MdpClosure (T ∪ ◇Y)) :
+  ∃ Γ : BDFormulaList, (∀ B ∈ Γ, B ∈ Y) ∧
+  ∃ C ∈ T, ⊢ᴴ[CK;𝔸] (conj (Γ.map (◇·)) 🡒 C 🡒 A) := by
   induction h with
   | base hA =>
     rcases hA with hA | ⟨B, hB, rfl⟩;
-    · exact ⟨[], by simp, _, hA, dhyp id_⟩;
-    · exact ⟨[B], by simpa using hB, ⊤, BDFormulaSet.provable_mem hlog verum,
-        imp_trans andElim₁ imply₁⟩;
-  | mp _ _ ih₁ ih₂ =>
+    · use [];
+      constructor;
+      . tauto;
+      . exact ⟨_, hA, dhyp id_⟩
+    · use [B];
+      constructor;
+      . grind;
+      . use ⊤;
+        constructor;
+        . exact provable_mem (𝔸 := 𝔸) verum;
+        . exact imp_trans andElim₁ imply₁;
+  | mdp _ _ ih₁ ih₂ =>
     obtain ⟨Γ₁, hΓ₁, C₁, hC₁, d₁⟩ := ih₁;
     obtain ⟨Γ₂, hΓ₂, C₂, hC₂, d₂⟩ := ih₂;
-    have t₁ := imp_trans (conj_append_left (Γ₁ := Γ₁.map (◇·)) (Γ₂ := Γ₂.map (◇·))) d₁;
-    have t₂ := imp_trans (conj_append_right (Γ₁ := Γ₁.map (◇·)) (Γ₂ := Γ₂.map (◇·))) d₂;
-    refine ⟨Γ₁ ++ Γ₂, by grind, C₁ ⋏ C₂, BDFormulaSet.and_mem hlog hC₁ hC₂, ?_⟩;
-    rw [List.map_append];
-    exact mp_ctx₂ (imp_trans t₁ (imp_comp_right andElim₁))
-      (imp_trans t₂ (imp_comp_right andElim₂));
+    use Γ₁ ++ Γ₂;
+    constructor;
+    . grind;
+    . use C₁ ⋏ C₂;
+      constructor;
+      . exact and_mem (𝔸 := 𝔸) hC₁ hC₂;
+      . rw [List.map_append];
+        have t₁ := imp_trans (conj_append_left (Γ₁ := Γ₁.map (◇·)) (Γ₂ := Γ₂.map (◇·))) d₁;
+        have t₂ := imp_trans (conj_append_right (Γ₁ := Γ₁.map (◇·)) (Γ₂ := Γ₂.map (◇·))) d₂;
+        exact mp_ctx₂
+          (imp_trans t₁ (imp_comp_right andElim₁))
+          (imp_trans t₂ (imp_comp_right andElim₂));
 
-/-- The union of a chain of MP-closed sets is MP-closed: given `(A 🡒 B) ∈ X₁` and `A ∈ X₂` with
-`X₁, X₂` in the chain, one of `X₁ ⊆ X₂` or `X₂ ⊆ X₁` holds, so both facts land in the larger set
-and MP-closedness of that set finishes the argument. -/
-lemma MdpClosed_sUnion_of_chain {c : Set BDFormulaSet} (hc : IsChain (· ⊆ ·) c)
-    (h : ∀ X ∈ c, BDFormulaSet.MdpClosed X) : BDFormulaSet.MdpClosed (⋃₀ c) := by
+end BDTheory
+
+
+/-- The union of a chain of MP-closed theories is MP-closed: given `(A 🡒 B) ∈ T₁` and `A ∈ T₂` with
+`T₁, T₂` in the chain, one of `T₁ ⊆ T₂` or `T₂ ⊆ T₁` holds, so both facts land in the larger theory
+and MP-closedness of that theory finishes the argument. -/
+lemma MdpClosed_sUnion_of_chain {c : Set BDTheory} (hc : IsChain (· ⊆ ·) c)
+  (h : ∀ T ∈ c, T.Mdp) : BDTheory.Mdp (⋃₀ c) := by
   constructor;
-  rintro A B ⟨X₁, hX₁c, hAB⟩ ⟨X₂, hX₂c, hA⟩;
-  rcases hc.total hX₁c hX₂c with hsub | hsub;
-  · exact ⟨X₂, hX₂c, (h X₂ hX₂c).mdp (hsub hAB) hA⟩;
-  · exact ⟨X₁, hX₁c, (h X₁ hX₁c).mdp hAB (hsub hA)⟩;
+  rintro A B ⟨T₁, hT₁c, hAB⟩ ⟨T₂, hT₂c, hA⟩;
+  rcases hc.total hT₁c hT₂c with hsub | hsub;
+  · exact ⟨T₂, hT₂c, (h T₂ hT₂c).mdp (hsub hAB) hA⟩;
+  · exact ⟨T₁, hT₁c, (h T₁ hT₁c).mdp hAB (hsub hA)⟩;
 
 /-! ## The implication set -/
 
-namespace BDFormulaSet
+namespace BDTheory
 
-/-- The formulas `B` with `A 🡒 B ∈ X`, i.e. `X` "under the assumption `A`". -/
-def impSet (X : BDFormulaSet) (A : BDFormula) : BDFormulaSet := { B | (A 🡒 B) ∈ X }
+/-- The formulas `B` with `A 🡒 B ∈ T`, i.e. `T` "under the assumption `A`". -/
+def impSet (T : BDTheory) (A : BDFormula) : BDTheory := { B | (A 🡒 B) ∈ T }
 
 @[simp, grind]
-lemma mem_impSet {X : BDFormulaSet} {A B} : B ∈ X.impSet A ↔ (A 🡒 B) ∈ X := Iff.rfl
+lemma mem_impSet {T : BDTheory} {A B} : B ∈ T.impSet A ↔ (A 🡒 B) ∈ T := Iff.rfl
 
 section
 
-variable {𝔸 : Set BDFormula} {X : BDFormulaSet} {A : BDFormula}
+variable {𝔸 : Set BDFormula} {T : BDTheory} {A : BDFormula}
 
--- Here and in `impSet_mdpClosed`, `(X := X)` is required: the expected type is a membership in
--- `X.impSet A`, so `mdp` would otherwise be resolved for `X.impSet A` rather than for `X`.
-lemma subset_impSet (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) [X.MdpClosed] : X ⊆ X.impSet A :=
-  fun _ hB => mdp (X := X) (provable_mem hlog imply₁) hB
+-- Here and in `impSet_mdpClosed`, `(T := T)` is required: the expected type is a membership in
+-- `T.impSet A`, so `mdp` would otherwise be resolved for `T.impSet A` rather than for `T`.
+lemma subset_impSet [T.Of (logic 𝔸)] [T.Mdp] : T ⊆ T.impSet A :=
+  fun _ hB => mdp (T := T) (provable_mem (𝔸 := 𝔸) imply₁) hB
 
-lemma self_mem_impSet (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) : A ∈ X.impSet A := by
-  show (A 🡒 A) ∈ X;
-  exact provable_mem hlog id_;
+lemma self_mem_impSet [T.Of (logic 𝔸)] : A ∈ T.impSet A := by
+  show (A 🡒 A) ∈ T;
+  exact provable_mem (𝔸 := 𝔸) id_;
 
--- Not an instance: the axiom set `𝔸` behind `hlog` cannot be recovered from the goal.
-lemma impSet_mdpClosed (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) [X.MdpClosed] :
-    (X.impSet A).MdpClosed :=
-  ⟨fun hBC hB => mdp (X := X) (mdp (X := X) (provable_mem hlog imply₂) hBC) hB⟩
+-- Not an instance: the axiom set `𝔸` behind `T.Of (logic 𝔸)` cannot be recovered from the goal.
+lemma impSet_mdpClosed [T.Of (logic 𝔸)] [T.Mdp] : (T.impSet A).Mdp :=
+  ⟨fun hBC hB => mdp (T := T) (mdp (T := T) (provable_mem (𝔸 := 𝔸) imply₂) hBC) hB⟩
 
 end
 
-end BDFormulaSet
+end BDTheory
 
-/-! ## Maximal MP-closed sets avoiding a set of forbidden formulas -/
+/-! ## Maximal MP-closed theories avoiding a set of forbidden formulas -/
 
 section Maximal
 
-variable {𝔸 : Set BDFormula} {X Y Z : BDFormulaSet} {A : BDFormula}
+variable {𝔸 : Set BDFormula} {T Y Z : BDTheory} {A : BDFormula}
 
-/-- Every MP-closed `X` disjoint from `Z` extends to a maximal MP-closed set still disjoint
+/-- Every MP-closed `T` disjoint from `Z` extends to a maximal MP-closed theory still disjoint
 from `Z`. -/
-lemma exists_maximal_mdpClosed_avoiding [X.MdpClosed] (hdisj : ∀ A ∈ Z, A ∉ X) :
-    ∃ Y, X ⊆ Y ∧ Maximal (fun Y => X ⊆ Y ∧ Y.MdpClosed ∧ ∀ A ∈ Z, A ∉ Y) Y := by
-  refine zorn_subset_nonempty _ ?_ X ⟨subset_rfl, ‹X.MdpClosed›, hdisj⟩;
+lemma exists_maximal_mdpClosed_avoiding [T.Mdp] (hdisj : ∀ A ∈ Z, A ∉ T) :
+  ∃ Y : BDTheory, T ⊆ Y ∧
+  Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ ∀ A ∈ Z, A ∉ Y) Y := by
+  refine zorn_subset_nonempty _ ?_ T ⟨subset_rfl, ‹T.Mdp›, hdisj⟩;
   rintro c hcS hchain ⟨Y₀, hY₀⟩;
   refine ⟨⋃₀ c, ⟨(hcS hY₀).1.trans (Set.subset_sUnion_of_mem hY₀),
     MdpClosed_sUnion_of_chain hchain fun W hW => (hcS hW).2.1, ?_⟩,
@@ -186,18 +218,18 @@ lemma exists_maximal_mdpClosed_avoiding [X.MdpClosed] (hdisj : ∀ A ∈ Z, A �
   rintro A hA ⟨W, hW, hAW⟩;
   exact (hcS hW).2.2 A hA hAW;
 
-/-- If `Y` is maximal among the MP-closed extensions of `X` avoiding `Z`, then every `A ∉ Y` is
+/-- If `Y` is maximal among the MP-closed extensions of `T` avoiding `Z`, then every `A ∉ Y` is
 refuted by some forbidden formula: `A 🡒 B ∈ Y` for some `B ∈ Z`. -/
-lemma exists_imp_mem_of_maximal (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X)
-    (hmax : Maximal (fun Y => X ⊆ Y ∧ Y.MdpClosed ∧ ∀ B ∈ Z, B ∉ Y) Y) (hA : A ∉ Y) :
-    ∃ B ∈ Z, (A 🡒 B) ∈ Y := by
-  -- `hmp` is unused by name, but is what instance resolution picks up below.
-  obtain ⟨hXY, hmp, -⟩ := hmax.prop;
-  have hlogY := hlog.trans hXY;
-  have hsub := BDFormulaSet.subset_impSet (A := A) hlogY;
+lemma exists_imp_mem_of_maximal [T.Of (logic 𝔸)]
+  (hmax : Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ ∀ B ∈ Z, B ∉ Y) Y) (hA : A ∉ Y) :
+  ∃ B ∈ Z, (A 🡒 B) ∈ Y := by
+  -- `hmdp` and `hlogY` are unused by name, but are what instance resolution picks up below.
+  obtain ⟨hTY, hmdp, -⟩ := hmax.prop;
+  have hlogY : Y.Of (logic 𝔸) := ⟨T.subset.trans hTY⟩;
+  have hsub := BDTheory.subset_impSet (𝔸 := 𝔸) (T := Y) (A := A);
   by_contra hc;
-  exact hA (hmax.le_of_ge ⟨hXY.trans hsub, BDFormulaSet.impSet_mdpClosed hlogY,
-    fun B hB hmem => hc ⟨B, hB, hmem⟩⟩ hsub (BDFormulaSet.self_mem_impSet hlogY));
+  exact hA (hmax.le_of_ge ⟨hTY.trans hsub, BDTheory.impSet_mdpClosed (𝔸 := 𝔸),
+    fun B hB hmem => hc ⟨B, hB, hmem⟩⟩ hsub (BDTheory.self_mem_impSet (𝔸 := 𝔸)));
 
 end Maximal
 
@@ -205,35 +237,36 @@ end Maximal
 
 section CKB
 
-variable {X Y : BDFormulaSet} {A : BDFormula}
+variable {T Y : BDTheory} {A : BDFormula}
 
-/-- If `□A` belongs to the MP-closure of `X ∪ ◇''Y`, then `A` belongs to `Y`.
+/-- If `□A` belongs to the MP-closure of `T ∪ ◇Y`, then `A` belongs to `Y`.
 
 This is the derivation chain forming the first half of the cited proof.
 
 - [Pac24, Lemma 16] -/
-lemma mem_of_box_mem_mpClosure (hXl : LogicCKB ⊆ X) [X.MdpClosed] (hYl : LogicCKB ⊆ Y)
-    [Y.MdpClosed] (hdia : ∀ B ∈ X, ◇B ∈ Y) (h : MPClosure (X ∪ (◇·) '' Y) (□A)) : A ∈ Y := by
-  obtain ⟨Γ, hΓ, C, hC, d⟩ := MPClosure.exists_finite_char hXl h;
-  have d₁ : (conj ((Γ.map (◇·)).map (□·)) 🡒 ◇C 🡒 ◇(□A)) ∈ LogicCKB :=
+lemma mem_of_box_mem_mpClosure [T.Of LogicCKB] [T.Mdp] [Y.CKB]
+  (hdia : ∀ B ∈ T, ◇B ∈ Y) (h : □A ∈ BDTheory.MdpClosure (T ∪ ◇Y)) : A ∈ Y := by
+  obtain ⟨Γ, hΓ, C, hC, d⟩ := BDTheory.exists_finite_char (𝔸 := ∅) h;
+  -- The ascriptions on `Γ.map (◇·)` disambiguate `◇` between `BDFormula.dia` and
+  -- `BDFormulaSet.dia`: as the receiver of `.map` it is elaborated without an expected type.
+  have d₁ : (conj ((Γ.map (◇·) : BDFormulaList).map (□·)) 🡒 ◇C 🡒 ◇(□A)) ∈ LogicCK :=
     imp_trans (imp_trans conj_box (mp kBox (nec d))) kDia;
-  have h₁ : conj ((Γ.map (◇·)).map (□·)) ∈ Y := by
-    refine BDFormulaSet.conj_mem hYl ?_;
+  have h₁ : conj ((Γ.map (◇·) : BDFormulaList).map (□·)) ∈ Y := by
+    apply BDTheory.conj_mem (𝔸 := ∅);
     intro B hB;
     simp [List.map_map] at hB;
     obtain ⟨B, hB, rfl⟩ := hB;
-    exact BDFormulaSet.box_dia_mem hYl (hΓ B hB);
-  exact BDFormulaSet.mem_of_dia_box_mem hYl
-    (BDFormulaSet.mdp (BDFormulaSet.mdp (hYl d₁) h₁) (hdia C hC));
+    exact BDTheory.box_dia_mem (hΓ B hB);
+  exact BDTheory.mem_of_dia_box_mem (Y.mdp (Y.mdp (Y.subset (L := LogicCK) d₁) h₁) (hdia C hC));
 
-/-- The MP-closure of `X ∪ ◇''Y` is consistent whenever `Y` is.
+/-- The MP-closure of `T ∪ ◇Y` is consistent whenever `Y` is.
 
 - [Pac24, Lemma 16] -/
-lemma bot_not_mem_mpClosure (hXl : LogicCKB ⊆ X) [X.MdpClosed] (hYl : LogicCKB ⊆ Y)
-    [Y.MdpClosed] (hdia : ∀ B ∈ X, ◇B ∈ Y) (hbot : ⊥ ∉ Y) :
-    ⊥ ∉ (show BDFormulaSet from MPClosure (X ∪ (◇·) '' Y)) := fun h =>
-  hbot <| mem_of_box_mem_mpClosure hXl hYl hdia <|
-    MPClosure.mp (MPClosure.base (Or.inl (hXl (efq (A := □⊥))))) h
+lemma bot_not_mem_mpClosure [T.Of LogicCKB] [T.Mdp] [Y.CKB] (hdia : ∀ B ∈ T, ◇B ∈ Y) :
+  ⊥ ∉ BDTheory.MdpClosure (T ∪ ◇Y) := fun h =>
+  Y.consistent
+    <| mem_of_box_mem_mpClosure hdia
+    <| .mdp (.base (Or.inl (T.subset (L := LogicCK) (efq (A := □⊥))))) h
 
 end CKB
 

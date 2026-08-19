@@ -100,6 +100,25 @@ def predia (X : BDFormulaSet) : BDFormulaSet := { A | ◇A ∈ X }
 @[simp, grind] lemma mem_prebox {X : BDFormulaSet} {A} : A ∈ X.prebox ↔ □A ∈ X := Iff.rfl
 @[simp, grind] lemma mem_predia {X : BDFormulaSet} {A} : A ∈ X.predia ↔ ◇A ∈ X := Iff.rfl
 
+/-- The image of `X` under `□`. -/
+def box (X : BDFormulaSet) : BDFormulaSet := (□·) '' X
+
+/-- The image of `X` under `◇`. -/
+def dia (X : BDFormulaSet) : BDFormulaSet := (◇·) '' X
+
+-- Scoped: these overload the formula-level `□`/`◇`, and an unscoped overload is ambiguous in
+-- pattern position, breaking every `match` on `BDFormula.box`/`BDFormula.dia`.
+@[inherit_doc] scoped prefix:90 "□" => BDFormulaSet.box
+@[inherit_doc] scoped prefix:91 "◇" => BDFormulaSet.dia
+
+variable {X : BDFormulaSet} {A : BDFormula}
+
+@[grind] lemma mem_box_iff : A ∈ □X ↔ ∃ B ∈ X, □B = A := Iff.rfl
+@[grind] lemma mem_dia_iff : A ∈ ◇X ↔ ∃ B ∈ X, ◇B = A := Iff.rfl
+
+@[simp, grind] lemma mem_box : □A ∈ □X ↔ A ∈ X := by grind;
+@[simp, grind] lemma mem_dia : ◇A ∈ ◇X ↔ A ∈ X := by grind;
+
 end BDFormulaSet
 
 abbrev BDFormulaList := List BDFormula
