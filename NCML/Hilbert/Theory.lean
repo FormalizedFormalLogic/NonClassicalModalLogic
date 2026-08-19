@@ -22,7 +22,7 @@ maximal set implies some forbidden formula (`exists_imp_mem_of_maximal`).
 
 namespace NCML
 
-open BDFormula ProvableBDHilbert
+open BDFormula BDFormulaList ProvableBDHilbert
 
 namespace BDFormulaSet
 
@@ -40,8 +40,8 @@ lemma and_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed) (hA
     A ⋏ B ∈ X :=
   hmp (hmp (provable_mem hlog andIntro) hA) hB
 
-lemma lconj_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed) {Γ : List BDFormula}
-    (h : ∀ A ∈ Γ, A ∈ X) : lconj Γ ∈ X := by
+lemma conj_mem (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed) {Γ : BDFormulaList}
+    (h : ∀ A ∈ Γ, A ∈ X) : Γ.conj ∈ X := by
   induction Γ with
   | nil => exact provable_mem hlog verum;
   | cons A Γ ih => exact and_mem hlog hmp (h A (by simp)) (ih fun B hB => h B (by simp [hB]));
@@ -92,8 +92,8 @@ already derivable from finitely many `◇B` with `B ∈ Y` together with a singl
 lemma MPClosure.exists_finite_char {𝔸 : Set BDFormula} {X Y : BDFormulaSet} {A : BDFormula}
     (hlog : ProvableBDHilbert.logic 𝔸 ⊆ X) (hmp : X.MpClosed)
     (h : MPClosure (X ∪ (◇·) '' Y) A) :
-    ∃ Γ : List BDFormula, (∀ B ∈ Γ, B ∈ Y) ∧
-      ∃ C ∈ X, ProvableBDHilbert 𝔸 (lconj (Γ.map (◇·)) 🡒 C 🡒 A) := by
+    ∃ Γ : BDFormulaList, (∀ B ∈ Γ, B ∈ Y) ∧
+      ∃ C ∈ X, ProvableBDHilbert 𝔸 (conj (Γ.map (◇·)) 🡒 C 🡒 A) := by
   induction h with
   | base hA =>
     rcases hA with hA | ⟨B, hB, rfl⟩;
@@ -103,8 +103,8 @@ lemma MPClosure.exists_finite_char {𝔸 : Set BDFormula} {X Y : BDFormulaSet} {
   | mp _ _ ih₁ ih₂ =>
     obtain ⟨Γ₁, hΓ₁, C₁, hC₁, d₁⟩ := ih₁;
     obtain ⟨Γ₂, hΓ₂, C₂, hC₂, d₂⟩ := ih₂;
-    have t₁ := imp_trans (lconj_append_left (Γ₁ := Γ₁.map (◇·)) (Γ₂ := Γ₂.map (◇·))) d₁;
-    have t₂ := imp_trans (lconj_append_right (Γ₁ := Γ₁.map (◇·)) (Γ₂ := Γ₂.map (◇·))) d₂;
+    have t₁ := imp_trans (conj_append_left (Γ₁ := Γ₁.map (◇·)) (Γ₂ := Γ₂.map (◇·))) d₁;
+    have t₂ := imp_trans (conj_append_right (Γ₁ := Γ₁.map (◇·)) (Γ₂ := Γ₂.map (◇·))) d₂;
     refine ⟨Γ₁ ++ Γ₂, by grind, C₁ ⋏ C₂, BDFormulaSet.and_mem hlog hmp hC₁ hC₂, ?_⟩;
     rw [List.map_append];
     exact mp_ctx₂ (imp_trans t₁ (imp_comp_right andElim₁))

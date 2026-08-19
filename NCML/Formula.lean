@@ -1,5 +1,6 @@
 module
 
+public import Mathlib.Data.Finset.Dedup
 public import Mathlib.Data.Set.Defs
 
 @[expose] public section
@@ -100,6 +101,29 @@ def predia (X : BDFormulaSet) : BDFormulaSet := { A | ◇A ∈ X }
 @[simp, grind] lemma mem_predia {X : BDFormulaSet} {A} : A ∈ X.predia ↔ ◇A ∈ X := Iff.rfl
 
 end BDFormulaSet
+
+abbrev BDFormulaList := List BDFormula
+
+abbrev BDFormulaFinset := Finset BDFormula
+
+namespace BDFormulaList
+
+/-- Conjunction of a list of formulas, right-folded with `⊤` as the base case. -/
+def conj (Γ : BDFormulaList) : BDFormula := Γ.foldr (· ⋏ ·) ⊤
+
+@[simp] lemma conj_nil : conj ([] : BDFormulaList) = ⊤ := rfl
+
+@[simp] lemma conj_cons (A : BDFormula) (Γ : BDFormulaList) : conj (A :: Γ) = A ⋏ conj Γ := rfl
+
+end BDFormulaList
+
+namespace BDFormulaFinset
+
+/-- Conjunction of a finset of formulas, via an arbitrary enumeration as a list. Different
+enumeration orders give syntactically different (but provably equivalent) results. -/
+noncomputable def conj (Γ : BDFormulaFinset) : BDFormula := BDFormulaList.conj Γ.toList
+
+end BDFormulaFinset
 
 end NCML
 

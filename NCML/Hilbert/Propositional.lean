@@ -48,37 +48,29 @@ end Combinators
 
 end ProvableBDHilbert
 
-section Lconj
+section Conj
 
-/-- Conjunction of a list of formulas, right-folded with `⊤` as the base case. -/
-def lconj (Γ : List BDFormula) : BDFormula := Γ.foldr (· ⋏ ·) ⊤
-
-@[simp] lemma lconj_nil : lconj ([] : List BDFormula) = ⊤ := rfl
-
-@[simp] lemma lconj_cons (A : BDFormula) (Γ : List BDFormula) :
-  lconj (A :: Γ) = A ⋏ lconj Γ := rfl
-
-open ProvableBDHilbert
+open ProvableBDHilbert BDFormulaList
 
 local notation:50 𝔸:51 " ⊢ " A:51 => ProvableBDHilbert 𝔸 A
 
-variable {𝔸 : Set BDFormula} {Γ Γ₁ Γ₂ : List BDFormula}
+variable {𝔸 : Set BDFormula} {Γ Γ₁ Γ₂ : BDFormulaList}
 
-lemma lconj_append_left : 𝔸 ⊢ lconj (Γ₁ ++ Γ₂) 🡒 lconj Γ₁ := by
+lemma conj_append_left : 𝔸 ⊢ conj (Γ₁ ++ Γ₂) 🡒 conj Γ₁ := by
   induction Γ₁ with
   | nil => exact dhyp verum;
   | cons A Γ₁ ih => exact and_intro_ctx andElim₁ (imp_trans andElim₂ ih);
 
-lemma lconj_append_right : 𝔸 ⊢ lconj (Γ₁ ++ Γ₂) 🡒 lconj Γ₂ := by
+lemma conj_append_right : 𝔸 ⊢ conj (Γ₁ ++ Γ₂) 🡒 conj Γ₂ := by
   induction Γ₁ with
   | nil => exact id_;
   | cons A Γ₁ ih => exact imp_trans andElim₂ ih;
 
-lemma lconj_box : 𝔸 ⊢ lconj (Γ.map (□·)) 🡒 □(lconj Γ) := by
+lemma conj_box : 𝔸 ⊢ conj (Γ.map (□·)) 🡒 □(conj Γ) := by
   induction Γ with
   | nil => exact dhyp (nec verum);
   | cons A Γ ih => exact mp_ctx (imp_trans andElim₁ box_and_intro) (imp_trans andElim₂ ih);
 
-end Lconj
+end Conj
 
 end
