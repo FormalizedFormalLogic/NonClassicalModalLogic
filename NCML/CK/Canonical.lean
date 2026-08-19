@@ -104,6 +104,74 @@ instance : canonicalModel.ForwardConfluent :=
 instance : canonicalModel.IsIKB where
   not_fallible _ h := h.elim
 
+section TruthLemma
+
+variable {Γ : CKBTheory} {A B : BDFormula}
+
+/-- The implication case of the truth lemma, right-to-left.
+
+- [Pac24, Lemma 19]
+-/
+private lemma forces_imply_of_mem
+  (ihA : ∀ {Δ : CKBTheory}, Δ ⊩[canonicalModel] A ↔ A ∈ Δ.carrier)
+  (ihB : ∀ {Δ : CKBTheory}, Δ ⊩[canonicalModel] B ↔ B ∈ Δ.carrier)
+  (h : A 🡒 B ∈ Γ.carrier) : Γ ⊩[canonicalModel] (A 🡒 B) :=
+  fun Δ IΓΔ hΔA => ihB.mpr (Δ.mdp (IΓΔ h) (ihA.mp hΔA))
+
+/-- The implication case of the truth lemma, left-to-right. Contrapositively, a theory missing
+`A 🡒 B` extends to one containing `A` and missing `B`, namely a Lindenbaum extension of
+`Γ.carrier.impSet A`.
+
+- [Pac24, Lemma 19]
+-/
+private lemma mem_of_forces_imply
+  (ihA : ∀ {Δ : CKBTheory}, Δ ⊩[canonicalModel] A ↔ A ∈ Δ.carrier)
+  (ihB : ∀ {Δ : CKBTheory}, Δ ⊩[canonicalModel] B ↔ B ∈ Δ.carrier)
+  (h : Γ ⊩[canonicalModel] (A 🡒 B)) : A 🡒 B ∈ Γ.carrier := by
+  by_contra hc;
+  have hsub : Γ.carrier ⊆ Γ.carrier.impSet A :=
+    BDFormulaSet.subset_impSet Γ.logicCKB_subset Γ.mdp;
+  obtain ⟨Δ, hXΔ, hBΔ⟩ := CKBTheory.exists_extending (Γ.logicCKB_subset.trans hsub)
+    (BDFormulaSet.impSet_mpClosed Γ.logicCKB_subset Γ.mdp) hc;
+  exact hBΔ <| ihB.mp <| h Δ (hsub.trans hXΔ) <|
+    ihA.mpr <| hXΔ <| BDFormulaSet.self_mem_impSet Γ.logicCKB_subset;
+
+/-- Truth lemma for the canonical model: a CKB-theory forces exactly the formulas it contains.
+
+- [Pac24, Lemma 19]
+-/
+theorem truth_lemma {Γ : CKBTheory} {A : BDFormula} : Γ ⊩[canonicalModel] A ↔ A ∈ Γ.carrier := by
+  induction A generalizing Γ with
+  | atom a => exact Iff.rfl;
+  | falsum => exact ⟨False.elim, fun h => (Γ.consistent h).elim⟩;
+  | and A B ihA ihB =>
+    constructor;
+    · rintro ⟨hA, hB⟩;
+      exact BDFormulaSet.and_mem Γ.logicCKB_subset Γ.mdp (ihA.mp hA) (ihB.mp hB);
+    · intro h;
+      exact ⟨ihA.mpr (Γ.mdp (Γ.logicCKB_subset ProvableBDHilbert.andElim₁) h),
+        ihB.mpr (Γ.mdp (Γ.logicCKB_subset ProvableBDHilbert.andElim₂) h)⟩;
+  | or A B ihA ihB =>
+    constructor;
+    · rintro (hA | hB);
+      · exact Γ.mdp (Γ.logicCKB_subset ProvableBDHilbert.orIntro₁) (ihA.mp hA);
+      · exact Γ.mdp (Γ.logicCKB_subset ProvableBDHilbert.orIntro₂) (ihB.mp hB);
+    · intro h;
+      exact (Γ.prime h).imp ihA.mpr ihB.mpr;
+  | imply A B ihA ihB => exact ⟨mem_of_forces_imply ihA ihB, forces_imply_of_mem ihA ihB⟩;
+  -- The two open cases are the halves that must produce an `mRel`-successor of `Γ`, and each needs
+  -- its own Zorn construction: the `□` case that of [Pac24, Lemma 18], the `◇` case one resting on
+  -- the diamond principle.
+  | box A ih => sorry
+  | dia A ih =>
+    constructor;
+    · intro h;
+      obtain ⟨Δ, MΓΔ, hΔA⟩ := h Γ Set.Subset.rfl;
+      exact MΓΔ.2 (ih.mp hΔA);
+    · sorry
+
+end TruthLemma
+
 end CK
 
 end
