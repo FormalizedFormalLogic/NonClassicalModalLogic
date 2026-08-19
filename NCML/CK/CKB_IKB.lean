@@ -26,10 +26,7 @@ namespace CKBTheory
 instance (Γ : CKBTheory) : Γ.1.CKB := Γ.2
 
 /-- Lindenbaum lemma for CKB-theories: an MP-closed set of formulas containing every theorem of
-`CKB` and missing `A` extends to a CKB-theory still missing `A`.
-
-- [Pac24, Lemma 19, Lemma 20]
--/
+`CKB` and missing `A` extends to a CKB-theory still missing `A`. -/
 lemma exists_extending {T : BDTheory} {A : BDFormula} [T.Of LogicCKB] [T.Mdp] (hA : A ∉ T) :
   ∃ Γ : CKBTheory, T ⊆ Γ.1 ∧ A ∉ Γ.1 := by
   obtain ⟨Y, hTY, hmax⟩ := exists_maximal_mdpClosed_avoiding (Z := {A}) (by rintro B rfl; exact hA);
@@ -40,16 +37,15 @@ lemma exists_extending {T : BDTheory} {A : BDFormula} [T.Of LogicCKB] [T.Mdp] (h
     intro B hB;
     obtain ⟨C, hC, h⟩ := exists_imp_mem_of_maximal (𝔸 := ∅) (T := T) hmax hB;
     exact Set.mem_singleton_iff.mp hC ▸ h;
-  have h₂ : Y.Prime := by
-    constructor;
-    intro B C hBC;
-    by_contra hc;
-    exact hAY <| BDTheory.or_elim_mem (𝔸 := ∅) (h₁ fun h => hc (Or.inl h))
-      (h₁ fun h => hc (Or.inr h)) hBC;
-  have h₃ : Y.Consistent :=
-    ⟨fun h => hAY <| Y.mdp (BDTheory.provable_mem (𝔸 := ∅) ProvableBDHilbert.efq) h⟩;
-  have hckb : Y.CKB := ⟨⟩;
-  exact ⟨⟨Y, hckb⟩, hTY, hAY⟩;
+  exact ⟨⟨Y, {
+    prime := by
+      intro B C hBC;
+      by_contra! hc;
+      exact hAY <| BDTheory.or_elim_mem (𝔸 := ∅) (h₁ hc.1) (h₁ hc.2) hBC;
+    consistent := by
+      intro h;
+      exact hAY <| Y.mdp (BDTheory.provable_mem (𝔸 := ∅) ProvableBDHilbert.efq) h
+  }⟩, hTY, hAY⟩;
 
 end CKBTheory
 
@@ -89,7 +85,7 @@ private abbrev CKBTheory.forbidden (Δ : CKBTheory) : BDTheory := {⊥} ∪ □{
 private lemma prebox_subset_of_avoid (h : ∀ B ∈ CKBTheory.forbidden Δ, B ∉ T) :
   □⁻¹T ⊆ Δ.1 := by
   intro C hC;
-  by_contra hc;
+  by_contra! hc;
   exact h (□C) (Or.inr ⟨C, hc, rfl⟩) hC;
 
 /-- A formula missing from a maximal set avoiding `Δ.forbidden` implies a boxed formula missing
@@ -106,27 +102,22 @@ private lemma exists_box_imp_mem [T.Of LogicCKB]
       ProvableBDHilbert.imp_bot_imp_box_bot) h⟩;
   · exact ⟨C, hC, h⟩;
 
-/-- A maximal MP-closed set avoiding `Δ.forbidden` is prime.
-
-- [Pac24, Lemma 16] -/
+/-- A maximal MP-closed set avoiding `Δ.forbidden` is prime. -/
 private lemma prime_of_maximal [T.Of LogicCKB]
   (hmax : Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ ∀ B ∈ CKBTheory.forbidden Δ, B ∉ Y) Y)
   (h : A ⋎ B ∈ Y) : A ∈ Y ∨ B ∈ Y := by
-  by_contra hc;
+  by_contra! hc;
   obtain ⟨hTY, hmdpY, havoid⟩ := hmax.prop;
   have hlogY : Y.Of LogicCKB := ⟨(T.subset (L := LogicCKB)).trans hTY⟩;
-  obtain ⟨C, hC, h₁⟩ := exists_box_imp_mem hmax fun hA => hc (Or.inl hA);
-  obtain ⟨D, hD, h₂⟩ := exists_box_imp_mem hmax fun hB => hc (Or.inr hB);
-  have h₃ : C ⋎ D ∈ Δ.1 :=
-    prebox_subset_of_avoid havoid (BDTheory.box_or_mem (𝔸 := ∅) (T := Y) h₁ h₂ h);
-  exact (Δ.1.prime h₃).elim hC hD;
+  obtain ⟨C, hC, h₁⟩ := exists_box_imp_mem hmax fun hA => hc.1 hA;
+  obtain ⟨D, hD, h₂⟩ := exists_box_imp_mem hmax fun hB => hc.2 hB;
+  apply (Δ.1.prime ?_).elim hC hD;
+  . exact prebox_subset_of_avoid havoid (BDTheory.box_or_mem (𝔸 := ∅) (T := Y) h₁ h₂ h);
 
 end BackwardConfluence
 
 /-- A CKB-theory `Γ` with `◇B ∈ Θ` for every `B ∈ Γ` extends to a CKB-theory `Δ` with
-`□⁻¹Δ ⊆ Θ` and `Θ ⊆ ◇⁻¹Δ`.
-
-- [Pac24, Lemma 16] -/
+`□⁻¹Δ ⊆ Θ` and `Θ ⊆ ◇⁻¹Δ`. -/
 lemma CKBTheory.exists_mRel_extending {Γ Θ : CKBTheory} (hdia : ∀ B ∈ Γ.1, ◇B ∈ Θ.1) :
   ∃ Δ : CKBTheory, Γ.1 ⊆ Δ.1 ∧ □⁻¹Δ.1 ⊆ Θ.1 ∧ Θ.1 ⊆ ◇⁻¹Δ.1 := by
   have hlog : (BDTheory.MdpClosure (Γ.1 ∪ ◇Θ.1)).Of LogicCKB :=
@@ -138,20 +129,25 @@ lemma CKBTheory.exists_mRel_extending {Γ Θ : CKBTheory} (hdia : ∀ B ∈ Γ.1
     · exact hC (mem_of_box_mem_mpClosure hdia hB);
   obtain ⟨Y, hsub, hmax⟩ := exists_maximal_mdpClosed_avoiding havoid;
   obtain ⟨-, hmdpY, havoidY⟩ := hmax.prop;
-  have hlogY : Y.Of LogicCKB := ⟨hlog.subset.trans hsub⟩;
-  have hprime : Y.Prime := ⟨fun h => prime_of_maximal hmax h⟩;
-  have hcons : Y.Consistent := ⟨havoidY ⊥ (Or.inl rfl)⟩;
-  have hckb : Y.CKB := ⟨⟩;
-  exact ⟨⟨Y, hckb⟩,
-    fun B hB => hsub (.base (Or.inl hB)), prebox_subset_of_avoid havoidY,
-    fun B hB => hsub (.base (Or.inr ⟨B, hB, rfl⟩))⟩;
+  use ⟨Y, {
+    prime := prime_of_maximal hmax,
+    consistent := havoidY ⊥ (Or.inl rfl),
+    subset := hlog.subset.trans hsub
+  }⟩;
+  and_intros;
+  . intro B hB;
+    exact hsub (.base (Or.inl hB));
+  . exact prebox_subset_of_avoid havoidY;
+  . intro B hB;
+    exact hsub (.base (Or.inr ⟨B, hB, rfl⟩));
 
 /-- - [Pac24, Lemma 16] -/
 instance : CKBcanonicalModel.BackwardConfluent where
   backward_confluent {Γ Δ Δ₁} := by
     rintro ⟨MΓΔ, -⟩ IΔΔ₁;
-    exact CKBTheory.exists_mRel_extending fun B hB =>
-      IΔΔ₁ (MΓΔ (BDTheory.box_dia_mem (T := Γ.1) hB));
+    exact CKBTheory.exists_mRel_extending $ by
+      intro B hB;
+      exact IΔΔ₁ (MΓΔ (BDTheory.box_dia_mem (T := Γ.1) hB));
 
 instance : CKBcanonicalModel.ForwardConfluent :=
   Model.forwardConfluent_iff_backwardConfluent_of_symmetricMRel.mpr inferInstance
@@ -171,11 +167,11 @@ private abbrev CKBTheory.diaForbidden (Γ : CKBTheory) : BDTheory := {C | ◇C �
 private lemma prime_of_maximal_dia [T.Of LogicCKB]
   (hmax : Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ ∀ B ∈ CKBTheory.diaForbidden Γ, B ∉ Y) Y)
   (h : A ⋎ B ∈ Y) : A ∈ Y ∨ B ∈ Y := by
-  by_contra hc;
+  by_contra! hc;
   obtain ⟨hTY, hmdpY, havoid⟩ := hmax.prop;
   have hlogY : Y.Of LogicCKB := ⟨(T.subset (L := LogicCKB)).trans hTY⟩;
-  obtain ⟨C, hC, h₁⟩ := exists_imp_mem_of_maximal (𝔸 := ∅) (T := T) hmax fun hA => hc (Or.inl hA);
-  obtain ⟨D, hD, h₂⟩ := exists_imp_mem_of_maximal (𝔸 := ∅) (T := T) hmax fun hB => hc (Or.inr hB);
+  obtain ⟨C, hC, h₁⟩ := exists_imp_mem_of_maximal (𝔸 := ∅) (T := T) hmax hc.1;
+  obtain ⟨D, hD, h₂⟩ := exists_imp_mem_of_maximal (𝔸 := ∅) (T := T) hmax hc.2;
   have h₃ : (A 🡒 C ⋎ D) ∈ Y :=
     Y.mdp (BDTheory.provable_mem (𝔸 := ∅)
       (ProvableBDHilbert.imp_comp_left ProvableBDHilbert.orIntro₁)) h₁;
@@ -185,9 +181,7 @@ private lemma prime_of_maximal_dia [T.Of LogicCKB]
   have h₅ : C ⋎ D ∈ Y := BDTheory.or_elim_mem (𝔸 := ∅) h₃ h₄ h;
   exact havoid (C ⋎ D) (fun hmem => (BDTheory.dia_or_mem hmem).elim hC hD) h₅;
 
-/-- A CKB-theory containing `◇A` has a `⊏`-successor containing `A`.
-
-- [Pac24, Lemma 19] -/
+/-- A CKB-theory containing `◇A` has a `⊏`-successor containing `A`. -/
 private lemma exists_mRel_of_dia_mem (h : ◇A ∈ Γ.1) :
   ∃ Δ : CKBTheory, □⁻¹Γ.1 ⊆ Δ.1 ∧ Δ.1 ⊆ ◇⁻¹Γ.1 ∧ A ∈ Δ.1 := by
   have hmdpX : BDTheory.Mdp (BDTheory.impSet (□⁻¹Γ.1) A) :=
@@ -209,7 +203,7 @@ private lemma exists_mRel_of_dia_mem (h : ◇A ∈ Γ.1) :
   have hckb : Y.CKB := ⟨⟩;
   have hpredia : Y ⊆ ◇⁻¹Γ.1 := by
     intro B hB;
-    by_contra hc;
+    by_contra! hc;
     exact havoidY B hc hB;
   exact ⟨⟨Y, hckb⟩, hsub.trans hXY, hpredia,
     hXY (BDTheory.self_mem_impSet (𝔸 := ∅))⟩;
@@ -218,7 +212,7 @@ end Diamond
 
 /-- Truth lemma for the canonical model: a CKB-theory forces exactly the formulas it contains.
 
-- [Pac24, Lemma 18, Lemma 19]
+- [Pac24, Lemma 19]
 -/
 theorem truthlemma {Γ : CKBTheory} {A : BDFormula} : Γ ⊩[CKBcanonicalModel] A ↔ A ∈ Γ.1 := by
   induction A generalizing Γ with
@@ -230,31 +224,35 @@ theorem truthlemma {Γ : CKBTheory} {A : BDFormula} : Γ ⊩[CKBcanonicalModel] 
       exact BDTheory.and_mem (𝔸 := ∅) (ihA.mp hA) (ihB.mp hB);
     · intro h;
       constructor;
-      . exact ihA.mpr (Γ.1.mdp (Γ.1.subset (L := LogicCK) ProvableBDHilbert.andElim₁) h);
-      . exact ihB.mpr (Γ.1.mdp (Γ.1.subset (L := LogicCK) ProvableBDHilbert.andElim₂) h);
+      . exact ihA.mpr (Γ.1.mdp (Γ.1.subset (L := LogicCK) .andElim₁) h);
+      . exact ihB.mpr (Γ.1.mdp (Γ.1.subset (L := LogicCK) .andElim₂) h);
   | or A B ihA ihB =>
     constructor;
     · rintro (hA | hB);
-      · exact Γ.1.mdp (Γ.1.subset (L := LogicCK) ProvableBDHilbert.orIntro₁) (ihA.mp hA);
-      · exact Γ.1.mdp (Γ.1.subset (L := LogicCK) ProvableBDHilbert.orIntro₂) (ihB.mp hB);
+      · exact Γ.1.mdp (Γ.1.subset (L := LogicCK) .orIntro₁) (ihA.mp hA);
+      · exact Γ.1.mdp (Γ.1.subset (L := LogicCK) .orIntro₂) (ihB.mp hB);
     · intro h;
       rcases Γ.1.prime h <;> grind;
   | imply A B ihA ihB =>
     constructor;
     · intro h;
-      by_contra hc;
+      by_contra! hc;
       have hsub : Γ.1 ⊆ Γ.1.impSet A := BDTheory.subset_impSet (𝔸 := ∅);
       have hmdp : (Γ.1.impSet A).Mdp := BDTheory.impSet_mdpClosed (𝔸 := ∅);
       have hlog : (Γ.1.impSet A).Of LogicCKB := ⟨(Γ.1.subset (L := LogicCKB)).trans hsub⟩;
       obtain ⟨Δ, hXΔ, hBΔ⟩ := CKBTheory.exists_extending (T := Γ.1.impSet A) (A := B) hc;
-      exact hBΔ <| ihB.mp <| h Δ (hsub.trans hXΔ) <|
-        ihA.mpr <| hXΔ <| BDTheory.self_mem_impSet (𝔸 := ∅);
+      exact hBΔ
+        <| ihB.mp
+        <| h Δ (hsub.trans hXΔ)
+        <| ihA.mpr
+        <| hXΔ
+        <| BDTheory.self_mem_impSet (𝔸 := ∅);
     · intro h;
       exact fun Δ IΓΔ hΔA => ihB.mpr (Δ.1.mdp (IΓΔ h) (ihA.mp hΔA));
   | box A ih =>
     constructor;
     · intro h;
-      by_contra hc;
+      by_contra! hc;
       obtain ⟨Θ, hsub, hAΘ⟩ := CKBTheory.exists_extending (T := □⁻¹Γ.1) (A := A) hc;
       obtain ⟨Δ, IΓΔ, h₁, h₂⟩ := CKBTheory.exists_mRel_extending (Γ := Γ) (Θ := Θ)
         fun B hB => hsub (BDTheory.box_dia_mem (T := Γ.1) hB);
@@ -289,5 +287,10 @@ theorem CKB_IKB_TFAE : List.TFAE [
     obtain ⟨Γ, -, hAΓ⟩ := CK.CKBTheory.exists_extending (T := LogicCKB) h;
     exact ⟨_, CK.CKBcanonicalModel, inferInstance, fun hM => hAΓ (CK.truthlemma.mp (hM Γ))⟩;
   tfae_finish
+
+/-- - [Pac24, Theorem 13] -/
+theorem eq_CKB_IKB : LogicCKB = LogicIKB := by
+  ext A;
+  apply CKB_IKB_TFAE.out 1 2;
 
 end

@@ -127,11 +127,8 @@ lemma mono_MdpClosure (h : T₁ ⊆ T₂): T₁.MdpClosure ⊆ T₂.MdpClosure :
   | base hA => exact .base (h hA);
   | mdp _ _ ih₁ ih₂ => exact .mdp ih₁ ih₂;
 
-lemma logic_subset_mpClosure [T.Of (logic 𝔸)] : T.MdpClosure.Of (ProvableBDHilbert.logic 𝔸) := by
-  constructor;
-  trans T;
-  . exact T.subset;
-  . exact subset_mpClosure;
+lemma logic_subset_mpClosure [T.Of (logic 𝔸)] : T.MdpClosure.Of (ProvableBDHilbert.logic 𝔸) :=
+  ⟨T.subset.trans subset_mpClosure⟩
 
 /-- Finite characterization of the MP-closure of `T ∪ ◇Y`: every member `A` of the closure is
 already derivable from finitely many `◇B` with `B ∈ Y` together with a single `C ∈ T`. -/
@@ -238,9 +235,9 @@ lemma exists_imp_mem_of_maximal [T.Of (logic 𝔸)]
   obtain ⟨hTY, hmdp, -⟩ := hmax.prop;
   have hlogY : Y.Of (logic 𝔸) := ⟨T.subset.trans hTY⟩;
   have hsub := BDTheory.subset_impSet (𝔸 := 𝔸) (T := Y) (A := A);
-  by_contra hc;
-  exact hA (hmax.le_of_ge ⟨hTY.trans hsub, BDTheory.impSet_mdpClosed (𝔸 := 𝔸),
-    fun B hB hmem => hc ⟨B, hB, hmem⟩⟩ hsub (BDTheory.self_mem_impSet (𝔸 := 𝔸)));
+  by_contra! hc;
+  exact hA (hmax.le_of_ge ⟨hTY.trans hsub, BDTheory.impSet_mdpClosed (𝔸 := 𝔸), hc⟩
+    hsub (BDTheory.self_mem_impSet (𝔸 := 𝔸)));
 
 end Maximal
 
@@ -250,9 +247,7 @@ section CKB
 
 variable {T Y : BDTheory} {A : BDFormula}
 
-/-- If `□A` belongs to the MP-closure of `T ∪ ◇Y`, then `A` belongs to `Y`.
-
-- [Pac24, Lemma 16] -/
+/-- If `□A` belongs to the MP-closure of `T ∪ ◇Y`, then `A` belongs to `Y`. -/
 lemma mem_of_box_mem_mpClosure [T.Of LogicCKB] [T.Mdp] [Y.CKB]
   (hdia : ∀ B ∈ T, ◇B ∈ Y) (h : □A ∈ BDTheory.MdpClosure (T ∪ ◇Y)) : A ∈ Y := by
   obtain ⟨Γ, hΓ, C, hC, d⟩ := BDTheory.exists_finite_char (𝔸 := ∅) h;
@@ -266,9 +261,7 @@ lemma mem_of_box_mem_mpClosure [T.Of LogicCKB] [T.Mdp] [Y.CKB]
     exact BDTheory.box_dia_mem (hΓ B hB);
   exact BDTheory.mem_of_dia_box_mem (Y.mdp (Y.mdp (Y.subset (L := LogicCK) d₁) h₁) (hdia C hC));
 
-/-- The MP-closure of `T ∪ ◇Y` is consistent whenever `Y` is.
-
-- [Pac24, Lemma 16] -/
+/-- The MP-closure of `T ∪ ◇Y` is consistent whenever `Y` is. -/
 lemma bot_not_mem_mpClosure [T.Of LogicCKB] [T.Mdp] [Y.CKB] (hdia : ∀ B ∈ T, ◇B ∈ Y) :
   ⊥ ∉ BDTheory.MdpClosure (T ∪ ◇Y) := fun h =>
   Y.consistent
