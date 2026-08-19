@@ -17,6 +17,7 @@ def counterModel : Model (Fin 3) where
   Fallible' _ := False
   fallible_iRel' := by grind
   fallible_mRel' := by grind
+  fallible_exists_mRel' := by grind
   val x a := match a with
     | 0 => x = 0
     | _ => True

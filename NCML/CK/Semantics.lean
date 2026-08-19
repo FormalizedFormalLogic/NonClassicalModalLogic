@@ -10,7 +10,15 @@ namespace CK
 
 open NCML
 
-/-- - [Pac24, Definition 4] -/
+/--
+`fallible_exists_mRel'` is not part of Pac24's Definition 4, and is added here to close a gap:
+without it a fallible world need not have any `mRel'`-successor, so a fallible world fails to
+force `◇A` and the axiom scheme `efq` (`⊥ 🡒 A`) is not valid. It plays the role of the
+condition `✦Rx` iff `x = ✦` imposed on the single exploding world `✦` in dGSC25.
+
+- [Pac24, Definition 4]
+- [dGSC25, Definition IV.1]
+-/
 structure Model (κ : Type*) where
   iRel' : κ → κ → Prop
   [iRel_preorder : IsPreorder _ iRel']
@@ -18,6 +26,7 @@ structure Model (κ : Type*) where
   Fallible' : κ → Prop
   fallible_iRel' : ∀ {x y}, Fallible' x → iRel' x y → Fallible' y
   fallible_mRel' : ∀ {x y}, Fallible' x → mRel' x y → Fallible' y
+  fallible_exists_mRel' : ∀ {x}, Fallible' x → ∃ y, mRel' x y
   val : κ → Nat → Prop
   val_persistent : ∀ {x y} {a}, val x a → iRel' x y → val y a
   fallible_val : ∀ {x} {a}, Fallible' x → val x a
@@ -51,6 +60,10 @@ lemma fallible_iRel {x y : M.World} (h : M.Fallible x) (Ixy : x ≼ y) : M.Falli
 lemma fallible_mRel {x y : M.World} (h : M.Fallible x) (Mxy : x ⊏ y) : M.Fallible y :=
   M.fallible_mRel' h Mxy
 
+@[grind =>]
+lemma fallible_exists_mRel {x : M.World} (h : M.Fallible x) : ∃ y, x ⊏ y :=
+  M.fallible_exists_mRel' h
+
 variable {x y z : M.World} {A B : BDFormula}
 
 /-- - [Pac24, Definition 4] -/
@@ -81,8 +94,14 @@ lemma Forces.persistent (h : x ⊩[_] A) (Ixy : x ≼ y) : y ⊩[_] A := by
   | _ => grind;
 
 /-- Routine consequence of `Model`'s conditions. -/
-lemma Forces.of_fallible_of_diaFree (hA : A.diaFree) (h : M.Fallible x) : x ⊩[_] A := by
-  induction A generalizing x <;> grind [Model.fallible_val];
+lemma Forces.of_fallible (h : M.Fallible x) : x ⊩[_] A := by
+  induction A generalizing x with
+  | dia A ih =>
+    intro y Ixy;
+    have hy : M.Fallible y := M.fallible_iRel h Ixy;
+    obtain ⟨z, Myz⟩ := M.fallible_exists_mRel hy;
+    exact ⟨z, Myz, ih (M.fallible_mRel hy Myz)⟩;
+  | _ => grind [Model.fallible_val];
 
 def Valid (M : Model κ) (A : BDFormula) := ∀ x : M.World, x ⊩[M] A
 infixl:80 " ⊧ " => Valid
