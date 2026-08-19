@@ -125,6 +125,34 @@ theorem forces_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] 
 lemma valid_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] [M.BackwardConfluent] : M ⊧ ((◇A 🡒 □B) 🡒 □(A 🡒 B)) := fun
   _ => forces_FS_of_forwardConfluent_of_backwardConfluent
 
+/--
+- [Pac24, Lemma 14]
+-/
+theorem forces_BDia_of_symmetricMRel_of_forwardConfluent [M.SymmetricMRel] [M.ForwardConfluent] :
+  x ⊩[_] (◇(□A) 🡒 A) := by
+  intro y _ hy;
+  obtain ⟨z, Myz, hz⟩ := Model.dia_iff_forward_of_forwardConfluent.mp hy;
+  exact hz z y (refl z) (symm_mRel Myz);
+
+/--
+- [Pac24, Lemma 14]
+-/
+lemma valid_BDia_of_symmetricMRel_of_forwardConfluent [M.SymmetricMRel] [M.ForwardConfluent] : M ⊧ (◇(□A) 🡒 A) := fun
+  _ => forces_BDia_of_symmetricMRel_of_forwardConfluent
+
+/--
+- [Pac24, Lemma 14]
+-/
+theorem forces_BBox_of_symmetricMRel_of_forwardConfluent [M.SymmetricMRel] [M.ForwardConfluent] :
+  x ⊩[_] (A 🡒 □◇A) := by
+  grind [forward_confluent, symm_mRel];
+
+/--
+- [Pac24, Lemma 14]
+-/
+lemma valid_BBox_of_symmetricMRel_of_forwardConfluent [M.SymmetricMRel] [M.ForwardConfluent] : M ⊧ (A 🡒 □◇A) := fun
+  _ => forces_BBox_of_symmetricMRel_of_forwardConfluent
+
 end Model
 
 end CK
