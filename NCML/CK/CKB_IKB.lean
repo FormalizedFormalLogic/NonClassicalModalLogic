@@ -121,31 +121,36 @@ private lemma prime_of_maximal [T.Of LogicCKB]
 
 end BackwardConfluence
 
-/-- The predecessor of `Δ₁` is a maximal MP-closed extension of the MP-closure of
-`Γ.1 ∪ ◇Δ₁.1` avoiding `Δ₁.forbidden`.
+/-- A CKB-theory `Γ` with `◇B ∈ Θ` for every `B ∈ Γ` extends to a CKB-theory `Δ` with
+`Δ.prebox ⊆ Θ` and `Θ ⊆ Δ.predia`.
 
 - [Pac24, Lemma 16] -/
+lemma CKBTheory.exists_mRel_extending {Γ Θ : CKBTheory} (hdia : ∀ B ∈ Γ.1, ◇B ∈ Θ.1) :
+  ∃ Δ : CKBTheory, Γ.1 ⊆ Δ.1 ∧
+  BDFormulaSet.prebox Δ.1 ⊆ Θ.1 ∧ Θ.1 ⊆ BDFormulaSet.predia Δ.1 := by
+  have hlog : (BDTheory.MdpClosure (Γ.1 ∪ ◇Θ.1)).Of LogicCKB :=
+    ⟨(Γ.1.subset (L := LogicCKB)).trans
+      (Set.subset_union_left.trans BDTheory.subset_mpClosure)⟩;
+  have havoid : ∀ B ∈ CKBTheory.forbidden Θ, B ∉ BDTheory.MdpClosure (Γ.1 ∪ ◇Θ.1) := by
+    rintro B (rfl | ⟨C, hC, rfl⟩) hB;
+    · exact bot_not_mem_mpClosure hdia hB;
+    · exact hC (mem_of_box_mem_mpClosure hdia hB);
+  obtain ⟨Y, hsub, hmax⟩ := exists_maximal_mdpClosed_avoiding havoid;
+  obtain ⟨-, hmdpY, havoidY⟩ := hmax.prop;
+  have hlogY : Y.Of LogicCKB := ⟨hlog.subset.trans hsub⟩;
+  have hprime : Y.Prime := ⟨fun h => prime_of_maximal hmax h⟩;
+  have hcons : Y.Consistent := ⟨havoidY ⊥ (Or.inl rfl)⟩;
+  have hckb : Y.CKB := ⟨⟩;
+  exact ⟨⟨Y, hckb⟩,
+    fun B hB => hsub (.base (Or.inl hB)), prebox_subset_of_avoid havoidY,
+    fun B hB => hsub (.base (Or.inr ⟨B, hB, rfl⟩))⟩;
+
+/-- - [Pac24, Lemma 16] -/
 instance : CKBcanonicalModel.BackwardConfluent where
   backward_confluent {Γ Δ Δ₁} := by
     rintro ⟨MΓΔ, -⟩ IΔΔ₁;
-    have hdia : ∀ B ∈ Γ.1, ◇B ∈ Δ₁.1 := fun B hB =>
+    exact CKBTheory.exists_mRel_extending fun B hB =>
       IΔΔ₁ (MΓΔ (BDTheory.box_dia_mem (T := Γ.1) hB));
-    have hlog : (BDTheory.MdpClosure (Γ.1 ∪ ◇Δ₁.1)).Of LogicCKB :=
-      ⟨(Γ.1.subset (L := LogicCKB)).trans
-        (Set.subset_union_left.trans BDTheory.subset_mpClosure)⟩;
-    have havoid : ∀ B ∈ CKBTheory.forbidden Δ₁, B ∉ BDTheory.MdpClosure (Γ.1 ∪ ◇Δ₁.1) := by
-      rintro B (rfl | ⟨C, hC, rfl⟩) hB;
-      · exact bot_not_mem_mpClosure hdia hB;
-      · exact hC (mem_of_box_mem_mpClosure hdia hB);
-    obtain ⟨Y, hsub, hmax⟩ := exists_maximal_mdpClosed_avoiding havoid;
-    obtain ⟨-, hmdpY, havoidY⟩ := hmax.prop;
-    have hlogY : Y.Of LogicCKB := ⟨hlog.subset.trans hsub⟩;
-    have hprime : Y.Prime := ⟨fun h => prime_of_maximal hmax h⟩;
-    have hcons : Y.Consistent := ⟨havoidY ⊥ (Or.inl rfl)⟩;
-    have hckb : Y.CKB := ⟨⟩;
-    exact ⟨⟨Y, hckb⟩,
-      fun B hB => hsub (.base (Or.inl hB)), prebox_subset_of_avoid havoidY,
-      fun B hB => hsub (.base (Or.inr ⟨B, hB, rfl⟩))⟩;
 
 instance : CKBcanonicalModel.ForwardConfluent :=
   Model.forwardConfluent_iff_backwardConfluent_of_symmetricMRel.mpr inferInstance
@@ -153,6 +158,24 @@ instance : CKBcanonicalModel.ForwardConfluent :=
 /-- - [Pac24, Lemma 17] -/
 instance : CKBcanonicalModel.IsIKB where
   not_fallible _ h := h.elim
+
+section Box
+
+variable {Γ : CKBTheory} {A : BDFormula}
+
+/-- A CKB-theory `Γ` with `□A ∉ Γ` extends to a CKB-theory `Δ` having a `⊏`-successor `Θ` with
+`A ∉ Θ`.
+
+- [Pac24, Lemma 18] -/
+private lemma exists_mRel_of_box_not_mem (h : □A ∉ Γ.1) :
+  ∃ Δ Θ : CKBTheory, Γ.1 ⊆ Δ.1 ∧
+  (BDFormulaSet.prebox Δ.1 ⊆ Θ.1 ∧ Θ.1 ⊆ BDFormulaSet.predia Δ.1) ∧ A ∉ Θ.1 := by
+  obtain ⟨Θ, hsub, hAΘ⟩ := CKBTheory.exists_extending (T := BDFormulaSet.prebox Γ.1) (A := A) h;
+  obtain ⟨Δ, h₁, h₂, h₃⟩ := CKBTheory.exists_mRel_extending (Γ := Γ) (Θ := Θ)
+    fun B hB => hsub (BDTheory.box_dia_mem (T := Γ.1) hB);
+  exact ⟨Δ, Θ, h₁, ⟨h₂, h₃⟩, hAΘ⟩;
+
+end Box
 
 section Diamond
 
@@ -247,7 +270,14 @@ theorem truthlemma {Γ : CKBTheory} {A : BDFormula} : Γ ⊩[CKBcanonicalModel] 
         ihA.mpr <| hXΔ <| BDTheory.self_mem_impSet (𝔸 := ∅);
     · intro h;
       exact fun Δ IΓΔ hΔA => ihB.mpr (Δ.1.mdp (IΓΔ h) (ihA.mp hΔA));
-  | box A ih => sorry
+  | box A ih =>
+    constructor;
+    · intro h;
+      by_contra hc;
+      obtain ⟨Δ, Θ, IΓΔ, MΔΘ, hΘA⟩ := exists_mRel_of_box_not_mem hc;
+      exact hΘA (ih.mp (h Δ Θ IΓΔ MΔΘ));
+    · intro h Δ Θ IΓΔ MΔΘ;
+      exact ih.mpr (MΔΘ.1 (IΓΔ h));
   | dia A ih =>
     constructor;
     · intro h;
