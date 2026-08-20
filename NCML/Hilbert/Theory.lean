@@ -270,8 +270,8 @@ lemma exists_imp_mem_of_maximal
     ⟨hTY.trans hsub, BDTheory.impSet_mdpClosed (𝔸 := 𝔸), ⟨hlogY.subset.trans hsub⟩, hc⟩
     hsub (BDTheory.self_mem_impSet (𝔸 := 𝔸)));
 
-/-- A set `Z` of formulas is ⋎-directed (over `𝔸`) if every two members are subsumed by a common
-member's disjunction. -/
+/-- A set `Z` of formulas is ⋎-directed (over `𝔸`) if every two members' disjunction is subsumed
+by a common member of `Z`. -/
 def OrDirected (𝔸 : Set BDFormula) (Z : BDFormulaSet) : Prop :=
   ∀ C ∈ Z, ∀ D ∈ Z, ∃ E ∈ Z, ⊢ᴴ[CK;𝔸] C ⋎ D 🡒 E
 
