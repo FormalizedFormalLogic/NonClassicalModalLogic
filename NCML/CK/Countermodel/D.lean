@@ -26,7 +26,7 @@ def counterModel : Model (Fin 2) where
 instance : counterModel.SerialMRel where
   serial_mRel x := ⟨x, le_refl x⟩
 
-theorem counterModel_not_forces : (0 : counterModel.World) ⊮[_] ∼◇⊥ := by
+lemma counterModel_not_forces : (0 : counterModel.World) ⊮[_] ∼◇⊥ := by
   intro h;
   have h₁ : (0 : counterModel.World) ⊩[_] ◇⊥ := fun y _ => ⟨1, Fin.le_last y, rfl⟩;
   have h₂ : (0 : Fin 2) = 1 := h 0 rfl h₁;
@@ -35,12 +35,12 @@ theorem counterModel_not_forces : (0 : counterModel.World) ⊮[_] ∼◇⊥ := b
 end D
 
 theorem exists_serialMRel_not_forces_N :
-    ∃ (κ : Type) (M : Model κ), M.SerialMRel ∧ ∃ x : M.World, x ⊮[_] ∼◇⊥ :=
+  ∃ (κ : Type) (M : Model κ), M.SerialMRel ∧ ∃ x : M.World, x ⊮[_] ∼◇⊥ :=
   ⟨Fin 2, D.counterModel, inferInstance, 0, D.counterModel_not_forces⟩
 
 end CK
 
-theorem LogicCKD.not_provable_N : (∼◇⊥) ∉ LogicCKD := by
-  sorry
+theorem LogicCKD.not_provable_N : (∼◇⊥) ∉ LogicCKD :=
+  fun h => CK.D.counterModel_not_forces (CK.Model.valid_of_mem_LogicCKD h 0)
 
 end
