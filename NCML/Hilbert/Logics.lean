@@ -123,7 +123,8 @@ theorem provable_PDia : (◇⊤) ∈ LogicCKD := mdp (provable_D (A := ⊤)) (ne
 theorem subset_CKTDia : LogicCKD ⊆ LogicCKTDia := fun _ =>
   provable_of_provable_axioms (fun _ hB => by obtain ⟨_, rfl⟩ := hB; exact LogicCKTDia.provable_D)
 
-theorem eq_logic_diaTop : LogicCKD = ProvableBDHilbert.logic {◇⊤} :=
+/-- `D` and `PDia` are interderivable over `CK`. -/
+theorem eq_CKPDia : LogicCKD = LogicCKPDia :=
   Set.Subset.antisymm
     (fun _ =>
       provable_of_provable_axioms
