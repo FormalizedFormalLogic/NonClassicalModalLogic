@@ -40,6 +40,12 @@ theorem LogicCK.subset_CKTBox : LogicCK ⊆ LogicCKTBox := .logic_monotone (by g
 theorem LogicCK.subset_CKTDia : LogicCK ⊆ LogicCKTDia := .logic_monotone (by grind)
 theorem LogicCK.subset_CKD : LogicCK ⊆ LogicCKD := .logic_monotone (by grind)
 
+theorem ProvableBDHilbert.provable_D_of_diaTop
+    {𝔸 : Set BDFormula} {A : BDFormula} (h : ⊢ᴴ[CK;𝔸] (◇⊤ : BDFormula)) :
+    ⊢ᴴ[CK;𝔸] □A 🡒 ◇A :=
+  ProvableBDHilbert.mdp_ctx (ProvableBDHilbert.imp_trans (ProvableBDHilbert.box_mono
+    ProvableBDHilbert.imply₁) ProvableBDHilbert.kDia) (ProvableBDHilbert.dhyp h)
+
 
 namespace LogicCKB
 
