@@ -26,7 +26,8 @@ export ReturningMRel (returning_mRel)
 
 instance [M.ReturningMRel] : M.ReflexiveMComp where
   reflexive_mComp x := by
-    sorry
+    obtain ⟨y, Ixy, Myx⟩ := returning_mRel x;
+    exact Or.inr ⟨y, x, Ixy, Myx, refl x⟩;
 
 theorem valid_TBox_of_reflexiveMComp [M.ReflexiveMComp] : M ⊧ (□A 🡒 A) := by
   sorry
