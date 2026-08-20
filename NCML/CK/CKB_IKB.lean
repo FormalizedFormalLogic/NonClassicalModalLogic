@@ -144,7 +144,7 @@ instance : CKBcanonicalModel.BackwardConfluent where
       fun B hB => IT₁U (MTT₁ (BDTheory.box_dia_mem (T := T.1) hB));
 
 instance : CKBcanonicalModel.ForwardConfluent :=
-  Model.forwardConfluent_iff_backwardConfluent_of_symmetricMRel.mpr inferInstance
+  Frame.forwardConfluent_iff_backwardConfluent_of_symmetricMRel.mpr inferInstance
 
 /-- - [Pac24, Lemma 17] -/
 instance : CKBcanonicalModel.IsIKB where
