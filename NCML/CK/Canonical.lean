@@ -98,7 +98,13 @@ lemma forb_eq_empty_of_bot_mem (h : ⊥ ∈ w.th) : w.forb = ∅ := by
     (by rw [th_eq_univ_of_bot_mem h]; trivial);
 
 /-- `univ 𝔸` is the only pair containing `⊥`. -/
-lemma eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w = univ 𝔸 := sorry
+lemma eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w = univ 𝔸 := by
+  have h₁ := th_eq_univ_of_bot_mem h;
+  have h₂ := forb_eq_empty_of_bot_mem h;
+  cases w;
+  subst h₁;
+  subst h₂;
+  rfl;
 
 end CanonicalPair
 
