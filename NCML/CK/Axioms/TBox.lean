@@ -61,16 +61,27 @@ lemma valid_TBox_of_reflexiveMComp [F.ReflexiveMComp] : F ⊧ (□A 🡒 A) :=
 
 lemma reflexiveMComp_of_valid_TBox (h : F ⊧ (□(#0) 🡒 #0)) : F.ReflexiveMComp where
   reflexive_mComp w := by
+    let M : Model κ := {
+      toFrame := F,
+      val := fun x _ => (∃ u v, w ≼ u ∧ u ⊏ v ∧ v ≼ x) ∨ F.Fallible x,
+      val_persistent := by
+        rintro x y a (⟨u, v, Iwu, Muv, Ivx⟩ | hx) Ixy;
+        . left;
+          exact ⟨u, v, Iwu, Muv, Trans.trans Ivx Ixy⟩;
+        . right;
+          exact F.fallible_iRel hx Ixy;
+      fallible_val := by
+        rintro x a hx;
+        right;
+        exact hx;
+    }
+    have hwBoxA : w ⊩[M] □(#0) := fun y z Iwy Myz => Or.inl ⟨y, z, Iwy, Myz, refl z⟩;
     obtain ⟨u, v, Iwu, Muv, Ivw⟩ | hw :=
-      h (fun x _ => (∃ u v, w ≼ u ∧ u ⊏ v ∧ v ≼ x) ∨ F.Fallible x)
-        (by
-          rintro x y a (⟨u, v, Iwu, Muv, Ivx⟩ | hx) Ixy
-          · exact Or.inl ⟨u, v, Iwu, Muv, Trans.trans Ivx Ixy⟩
-          · exact Or.inr (F.fallible_iRel hx Ixy))
-        (by rintro x a hx; exact Or.inr hx)
-        w w (refl w) (fun y z Iwy Myz => Or.inl ⟨y, z, Iwy, Myz, refl z⟩)
-    · exact Or.inr ⟨u, v, Iwu, Muv, Ivw⟩
-    · exact Or.inl hw
+      h M.val M.val_persistent M.fallible_val w w (refl w) hwBoxA;
+    . right;
+      exact ⟨u, v, Iwu, Muv, Ivw⟩;
+    . left;
+      exact hw;
 
 /-- `T□` defines the frames on which `≼ ∘ ⊏ ∘ ≼` is reflexive away from the fallible worlds. -/
 theorem reflexiveMComp_TFAE : List.TFAE [
@@ -78,7 +89,7 @@ theorem reflexiveMComp_TFAE : List.TFAE [
   ∀ A : BDFormula, F ⊧ (□A 🡒 A),
   F ⊧ (□(#0) 🡒 #0),
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_TBox_of_reflexiveMComp
+  tfae_have 1 → 2 := by intro h A; exact valid_TBox_of_reflexiveMComp;
   tfae_have 2 → 3 := fun h => h _
   tfae_have 3 → 1 := reflexiveMComp_of_valid_TBox
   tfae_finish
@@ -87,11 +98,13 @@ end Frame
 
 variable {L : BDLogic} [L.CK]
 
-lemma returningMRel_canonicalModel (hTBox : ∀ {A}, (□A 🡒 A) ∈ L) :
-  (canonicalModel L).ReturningMRel where
-  returning_mRel P :=
-    ⟨P.erase, CanonicalPair.iRel_erase,
-      fun _ hA => P.theory.mdp (P.theory.subset (L := L) hTBox) hA, by simp⟩
+lemma returningMRel_canonicalModel (hTBox : ∀ {A}, (□A 🡒 A) ∈ L) : (canonicalModel L).ReturningMRel where
+  returning_mRel P := ⟨
+    P.erase,
+    CanonicalPair.iRel_erase,
+    fun _ hA => P.theory.mdp (P.theory.subset (L := L) hTBox) hA,
+    by simp
+  ⟩
 
 end CK
 
@@ -106,8 +119,11 @@ theorem LogicCKTBox_TFAE {A : BDFormula} : List.TFAE [
     contrapose!;
     intro h;
     obtain ⟨P, h₁⟩ := CK.exists_not_forces_of_not_mem h;
-    exact ⟨_, (CK.canonicalModel LogicCKTBox).toFrame, CK.returningMRel_canonicalModel (by grind),
-      fun hF => h₁ (CK.Model.valid_of_toFrame_valid hF P)⟩;
+    refine ⟨_, (CK.canonicalModel LogicCKTBox).toFrame, ?_⟩;
+    and_intros;
+    . exact CK.returningMRel_canonicalModel (by grind);
+    . by_contra! hF;
+      exact h₁ $ CK.Model.valid_of_toFrame_valid hF P;
   tfae_finish
 
 end

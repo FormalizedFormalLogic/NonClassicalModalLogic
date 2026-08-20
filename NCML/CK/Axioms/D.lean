@@ -58,15 +58,26 @@ lemma valid_PDia_of_serialMRel [F.SerialMRel] : F ⊧ ◇⊤ :=
 
 lemma serialMRel_of_valid_D (h : F ⊧ (□(#0) 🡒 ◇(#0))) : F.SerialMRel where
   serial_mRel x := by
-    obtain ⟨z, Mxz, -⟩ :=
-      h (fun _ _ => True) (by intros; trivial) (by intros; trivial)
-        x x (refl x) (by intro y z _ _; trivial) x (refl x)
-    exact ⟨z, Mxz⟩
+    let M : Model κ := {
+      toFrame := F,
+      val := fun _ _ => True,
+      val_persistent := by intros; trivial,
+      fallible_val := by intros; trivial,
+    }
+    have hxBoxA : x ⊩[M] □(#0) := by intro y z _ _; trivial;
+    obtain ⟨z, Mxz, -⟩ := h M.val M.val_persistent M.fallible_val x x (refl x) hxBoxA x (refl x);
+    exact ⟨z, Mxz⟩;
 
 lemma serialMRel_of_valid_PDia (h : F ⊧ ◇⊤) : F.SerialMRel where
   serial_mRel x := by
-    obtain ⟨z, Mxz, -⟩ := h (fun _ _ => True) (by intros; trivial) (by intros; trivial) x x (refl x)
-    exact ⟨z, Mxz⟩
+    let M : Model κ := {
+      toFrame := F,
+      val := fun _ _ => True,
+      val_persistent := by intros; trivial,
+      fallible_val := by intros; trivial,
+    }
+    obtain ⟨z, Mxz, -⟩ := h M.val M.val_persistent M.fallible_val x x (refl x);
+    exact ⟨z, Mxz⟩;
 
 /-- `D` defines the frames whose `⊏` is serial. -/
 theorem serialMRel_TFAE : List.TFAE [
@@ -75,10 +86,10 @@ theorem serialMRel_TFAE : List.TFAE [
   F ⊧ (□(#0) 🡒 ◇(#0)),
   F ⊧ ◇⊤,
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_D_of_serialMRel
+  tfae_have 1 → 2 := by intro h A; exact valid_D_of_serialMRel;
   tfae_have 2 → 3 := fun h => h _
   tfae_have 3 → 1 := serialMRel_of_valid_D
-  tfae_have 1 → 4 := by intro h; exact valid_PDia_of_serialMRel
+  tfae_have 1 → 4 := by intro h; exact valid_PDia_of_serialMRel;
   tfae_have 4 → 1 := serialMRel_of_valid_PDia
   tfae_finish
 
@@ -109,8 +120,11 @@ theorem LogicCKD_TFAE {A : BDFormula} : List.TFAE [
     contrapose!;
     intro h;
     obtain ⟨P, h₁⟩ := CK.exists_not_forces_of_not_mem h;
-    exact ⟨_, (CK.canonicalModel LogicCKD).toFrame, CK.serialMRel_canonicalModel (by grind),
-      fun hF => h₁ (CK.Model.valid_of_toFrame_valid hF P)⟩;
+    refine ⟨_, (CK.canonicalModel LogicCKD).toFrame, ?_⟩;
+    and_intros;
+    . exact CK.serialMRel_canonicalModel (by grind);
+    . by_contra! hF;
+      exact h₁ $ CK.Model.valid_of_toFrame_valid hF P;
   tfae_finish
 
 end

@@ -68,14 +68,23 @@ lemma valid_TDia_of_ascendingMRel [F.AscendingMRel] : F ⊧ (A 🡒 ◇A) :=
   fun _ _ _ => Model.valid_TDia_of_ascendingMRel
 
 lemma ascendingMRel_of_valid_TDia (h : F ⊧ (#0 🡒 ◇(#0))) : F.AscendingMRel where
-  ascending_mRel w :=
-    h (fun x _ => w ≼ x ∨ F.Fallible x)
-      (by
-        rintro x y a (Iwx | hx) Ixy
-        · exact Or.inl (Trans.trans Iwx Ixy)
-        · exact Or.inr (F.fallible_iRel hx Ixy))
-      (by rintro x a hx; exact Or.inr hx)
-      w w (refl w) (Or.inl (refl w)) w (refl w)
+  ascending_mRel w := by
+    let M : Model κ := {
+      toFrame := F,
+      val := fun x _ => w ≼ x ∨ F.Fallible x,
+      val_persistent := by
+        rintro x y a (Iwx | hx) Ixy;
+        . left;
+          exact Trans.trans Iwx Ixy;
+        . right;
+          exact F.fallible_iRel hx Ixy;
+      fallible_val := by
+        rintro x a hx;
+        right;
+        exact hx;
+    }
+    have hwA : w ⊩[M] (#0) := Or.inl (refl w);
+    exact h M.val M.val_persistent M.fallible_val w w (refl w) hwA w (refl w);
 
 /-- `T◇` defines the frames whose `⊏` is ascending. -/
 theorem ascendingMRel_TFAE : List.TFAE [
@@ -83,7 +92,7 @@ theorem ascendingMRel_TFAE : List.TFAE [
   ∀ A : BDFormula, F ⊧ (A 🡒 ◇A),
   F ⊧ (#0 🡒 ◇(#0)),
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_TDia_of_ascendingMRel
+  tfae_have 1 → 2 := by intro h A; exact valid_TDia_of_ascendingMRel;
   tfae_have 2 → 3 := fun h => h _
   tfae_have 3 → 1 := ascendingMRel_of_valid_TDia
   tfae_finish
@@ -109,10 +118,12 @@ lemma strictlyAscendingMRel_canonicalModel (hTDia : ∀ {A}, (A 🡒 ◇A) ∈ L
       ⟨(P.theory.subset (L := L)).trans Set.subset_union_left⟩;
     obtain ⟨P₁, h₁, -, havoid⟩ :=
       CanonicalPair.exists_avoiding (L := L) (T := BDTheory.mdpClosure (P.theory ∪ □⁻¹P.theory))
-        orDirected_disjSet (avoid_disjSet_mdpClosure hTDia P);
+      orDirected_disjSet (avoid_disjSet_mdpClosure hTDia P);
     have h₂ : P.theory ∪ □⁻¹P.theory ⊆ P₁.theory := BDTheory.subset_mdpClosure.trans h₁;
-    exact ⟨P₁, CanonicalPair.mRel_of_avoid_disjSet (Set.subset_union_right.trans h₂) havoid,
-      Set.subset_union_left.trans h₂⟩;
+    use P₁;
+    constructor;
+    . exact CanonicalPair.mRel_of_avoid_disjSet (Set.subset_union_right.trans h₂) havoid;
+    . exact Set.subset_union_left.trans h₂;
 
 end CK
 
@@ -127,9 +138,11 @@ theorem LogicCKTDia_TFAE {A : BDFormula} : List.TFAE [
     contrapose!;
     intro h;
     obtain ⟨P, h₁⟩ := CK.exists_not_forces_of_not_mem h;
-    exact ⟨_, (CK.canonicalModel LogicCKTDia).toFrame,
-      CK.strictlyAscendingMRel_canonicalModel (by grind),
-      fun hF => h₁ (CK.Model.valid_of_toFrame_valid hF P)⟩;
+    refine ⟨_, (CK.canonicalModel LogicCKTDia).toFrame, ?_⟩;
+    and_intros;
+    . exact CK.strictlyAscendingMRel_canonicalModel (by grind);
+    . by_contra! hF;
+      exact h₁ $ CK.Model.valid_of_toFrame_valid hF P;
   tfae_finish
 
 end
