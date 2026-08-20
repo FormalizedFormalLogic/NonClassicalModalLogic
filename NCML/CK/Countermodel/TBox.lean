@@ -62,7 +62,7 @@ theorem LogicCKTBox.not_provable_PDia : (◇⊤ : BDFormula) ∉ LogicCKTBox :=
 theorem LogicCKTBox.not_provable_D : (□⊤ 🡒 ◇⊤ : BDFormula) ∉ LogicCKTBox :=
   fun h => CK.TBox.counterModel_not_forces_D (CK.Model.valid_of_mem_LogicCKTBox h 0)
 
-theorem LogicCKTBox.not_provable_N : (∼◇⊥) ∉ LogicCKTBox := by
-  sorry
+theorem LogicCKTBox.not_provable_N : (∼◇⊥) ∉ LogicCKTBox :=
+  fun h => CK.D.counterModel_not_forces (CK.Model.valid_of_mem_LogicCKTBox h 0)
 
 end
