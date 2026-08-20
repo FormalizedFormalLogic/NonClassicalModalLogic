@@ -13,6 +13,8 @@ Human contributors need not follow this document to the letter — treat it as a
 - **Use `lemma`, not `theorem`, for auxiliary results.** Reserve `theorem` for the headline results a
   reader would look up: the formalized counterparts of a source's numbered theorems, and the main entry
   points of a file's API. Closure lemmas, derived rules, combinators and technical bridges are `lemma`.
+  Most files should end up with zero or one `theorem`; when a declaration's status is unclear, use
+  `lemma`.
 - Omit type annotations that are trivially inferred from context.
 - Do not introduce implicit variables ad hoc in lemma statements. Declare them with `variable` in a `section`, and cut a new `section` when the context changes, rather than keeping one giant file-wide block.
 
@@ -79,6 +81,19 @@ exact step1.trans <| step2.trans <| step3.trans step4
 
 🤖 **Do not bundle lemmas into a `structure … : Prop` for convenience.** It is justified only when three or more properties must travel together as the hypothesis of a mutual or nested induction; otherwise state separate lemmas.
 
+🤖 **Do not introduce disjunctions with `Or.inl` / `Or.inr`.** Use the `left` / `right` tactics, let `tauto`, `grind` or `simp` discharge the goal, or restructure so that the disjunction never has to be introduced by hand. A term-mode `Or.inl` is acceptable only where it is plainly the clearest thing to write.
+
+```lean
+-- Avoid:
+exact Or.inr ⟨y, z, Ixy, Myz, Izx⟩
+
+-- Prefer:
+right;
+exact ⟨y, z, Ixy, Myz, Izx⟩
+```
+
+🤖 **`open` the namespaces you would otherwise spell out repeatedly.** Writing `Model.Forces.persistent` and `Model.Forces.of_fallible` throughout a file is noise; `open Model.Forces` at the top and then `persistent` / `of_fallible` reads better and is shorter. The same goes for `Model`, `ProvableBDHilbert`, and `BDFormula`. Place the `open` lines where the surrounding files place theirs, and stop short of the point where an unqualified name becomes ambiguous or misleading to a reader.
+
 **When proving several equivalences at once with `List.TFAE`, do not refer to them by index** (`foo_TFAE.out 1 0`) from other proofs: the indices break as soon as the list is reordered. Cut the individual implications out as named lemmas instead.
 
 ### Trailing semicolons
@@ -112,10 +127,11 @@ Modal logic:
 | lists / finite sets of formulas | `Γ`, `Δ` |
 | theories | `T`, `T₁`, `U` |
 | sets of formulas not meant as theories | `X`, `Y`, `Z` |
+| pair-canonical-model worlds (`CanonicalPair L`) | `P`, `Q` / `P₁`, `P₂` |
 
-Never use Greek letters (`φ`, `ψ`) or late-alphabet capitals (`P`, `Q`) for modal formulas — those namespaces are taken. `Γ` and `Δ` are for lists and finite sets only: a theory is `T`, and a set of formulas that is not yet known to be one is `X`, `Y` or `Z`. Within a proof, introduce formulas in order (`A`, `B`, `C`), without skipping letters.
+Never use Greek letters (`φ`, `ψ`) or late-alphabet capitals (`P`, `Q`) for modal formulas — those namespaces are taken: `P`/`Q` name the worlds of a pair canonical model (`CanonicalPair L`), spelled `P₁`, `P₂`, … when more than two are in scope. `Γ` and `Δ` are for lists and finite sets only: a theory is `T`, and a set of formulas that is not yet known to be one is `X`, `Y` or `Z`. Within a proof, introduce formulas in order (`A`, `B`, `C`), without skipping letters.
 
-Kripke semantics: worlds are `x`, `y`, `z`, `w`, `v`, `u`. When introducing several world variables, use subscripted names (`x₁`, `x₂`, `y₁`, `y₂`, …) rather than primed variants (`x'`, `x''`). When building one model out of another, index the new model by `M.World` rather than reintroducing a `κ : Type u`.
+Kripke semantics: worlds are `x`, `y`, `z`, `w`, `v`, `u`. When introducing several world variables, use subscripted names (`x₁`, `x₂`, `y₁`, `y₂`, …) rather than primed variants (`x'`, `x''`). When building one model out of another, index the new model by `M.World` rather than reintroducing a `κ : Type u`. This applies to the worlds of a general `Model κ`; a pair canonical model's worlds are `CanonicalPair L`-typed and use `P`/`Q` instead (see above).
 
 Name a hypothesis witnessing a binary relation `R x y` after the relation's leading letter plus the two endpoints it relates: an `iRel x y` hypothesis is named `Ixy`, an `mRel x y` hypothesis is named `Mxy` (e.g. `Ix₁x₂ : x₁ ≼ x₂`, `Mx₂y₂ : x₂ ⊏ y₂`). Avoid generic names such as `h`, `h1`, `h2`, `hxy`.
 
@@ -146,7 +162,7 @@ lemma sup_le_of_forall_le
 
 All comments and docstrings are written in English.
 
-🤖 Keep comments minimal. A docstring says what the declaration is, and nothing else — one line wherever possible. It does not give the proof strategy, the motivation, a comparison with the literature, or a justification for a design choice; if the name already says it, drop the docstring entirely. Reasons of that kind belong in the pull request, not in the source. Do not annotate individual `have`s with comments restating them. An inline comment is justified only for what the code cannot express (an elaboration pitfall, why a natural alternative fails), in about one line. Long "Implementation notes" sections are unwanted; if the design needs that much explanation, restructure the proof instead. A proof sketch inside the proof body is warranted only when it will genuinely help someone writing a neighbouring proof.
+🤖 Keep comments minimal. A docstring says what the declaration is, and nothing else — one line wherever possible. It does not give the proof strategy, the motivation, a comparison with the literature, or a justification for a design choice; if the name already says it, drop the docstring entirely. Reasons of that kind belong in the pull request, not in the source. Do not annotate individual `have`s with comments restating them. An inline comment is justified only for what the code cannot express (an elaboration pitfall, why a natural alternative fails), in about one line. Long "Implementation notes" sections are unwanted; if the design needs that much explanation, restructure the proof instead. A proof sketch inside the proof body is warranted only when it will genuinely help someone writing a neighbouring proof. Most declarations need no docstring at all: the default is to omit one, and add it back only where it earns its place.
 
 Module docstrings must be placed before `@[expose] public section`.
 
@@ -185,6 +201,8 @@ These remain welcome, and are neither why nor how in this sense: the citation li
 ### Naming imported from the literature
 
 Write the names used in this repository, not the notation of the source paper. The one exception is the docstring of the definition itself, which may record where the alternative name comes from ("also known as `K4.3` in the source").
+
+The same applies to labels: do not carry over tags such as "condition (C)" or "property (\*)" from a paper or a planning document, and do not invent new ones. A condition is referred to by the name of the class or definition that states it.
 
 ### References and citations
 

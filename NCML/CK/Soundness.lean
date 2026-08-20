@@ -12,7 +12,7 @@ variable {κ : Type*} {M : Model κ}
 
 namespace Model
 
-theorem valid_of_mem_logic (h𝔸 : ∀ B ∈ 𝔸, M ⊧ B) (hA : A ∈ ProvableBDHilbert.logic 𝔸) : M ⊧ A := by
+lemma valid_of_mem_logic (h𝔸 : ∀ B ∈ 𝔸, M ⊧ B) (hA : A ∈ ProvableBDHilbert.logic 𝔸) : M ⊧ A := by
   replace hA : ProvableBDHilbert 𝔸 A := hA;
   intro x;
   induction hA generalizing x with
@@ -33,10 +33,10 @@ theorem valid_of_mem_logic (h𝔸 : ∀ B ∈ 𝔸, M ⊧ B) (hA : A ∈ Provabl
   | mdp _ _ ihAB ihA => exact ihAB x x (refl _) (ihA x);
   | _ => grind;
 
-theorem valid_of_mem_LogicCK (hA : A ∈ LogicCK) : M ⊧ A := valid_of_mem_logic (by simp) hA
+lemma valid_of_mem_LogicCK (hA : A ∈ LogicCK) : M ⊧ A := valid_of_mem_logic (by simp) hA
 
 /-- - [Pac24, Lemma 14] -/
-theorem valid_of_mem_LogicCKB [M.IsCKB] (hA : A ∈ LogicCKB) : M ⊧ A :=
+lemma valid_of_mem_LogicCKB [M.IsCKB] (hA : A ∈ LogicCKB) : M ⊧ A :=
   valid_of_mem_logic (by
     rintro B (⟨C, rfl⟩ | ⟨C, rfl⟩);
     · exact valid_BBox_of_symmetricMRel_of_forwardConfluent;
@@ -44,7 +44,7 @@ theorem valid_of_mem_LogicCKB [M.IsCKB] (hA : A ∈ LogicCKB) : M ⊧ A :=
   ) hA
 
 /-- - [Pac24, Lemma 14] -/
-theorem valid_of_mem_LogicIKB [M.IsIKB] (hA : A ∈ LogicIKB) : M ⊧ A :=
+lemma valid_of_mem_LogicIKB [M.IsIKB] (hA : A ∈ LogicIKB) : M ⊧ A :=
   valid_of_mem_logic (by
     rintro B ((((⟨C, D, rfl⟩ | ⟨C, D, rfl⟩) | rfl) | ⟨C, rfl⟩) | ⟨C, rfl⟩);
     · exact valid_FS_of_forwardConfluent_of_backwardConfluent;

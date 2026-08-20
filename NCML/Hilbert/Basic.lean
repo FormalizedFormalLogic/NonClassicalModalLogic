@@ -1,6 +1,7 @@
 module
 
 public import NCML.Formula
+public import NCML.Logic.BD.Basic
 public import Mathlib.Tactic
 
 @[expose] public section
@@ -52,7 +53,7 @@ lemma mdp : (⊢ᴴ[CK;𝔸] A 🡒 B) → (⊢ᴴ[CK;𝔸] A) → (⊢ᴴ[CK;�
 lemma nec : (⊢ᴴ[CK;𝔸] A) → (⊢ᴴ[CK;𝔸] □A) :=
   fun ⟨h⟩ => ⟨ProofBDHilbert.nec h⟩
 
-lemma imp_trans (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 C :=
+@[grind <=] lemma imp_trans (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 C :=
   mdp (mdp imply₂ (mdp imply₁ h₂)) h₁
 
 @[grind .] lemma imp_id : ⊢ᴴ[CK;𝔸] A 🡒 A := mdp (mdp imply₂ (imply₁ (B := A 🡒 A))) (imply₁ (B := A))
@@ -72,10 +73,18 @@ lemma imp_comp_left (h : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] (A 🡒 B) 
 lemma imp_comp_right (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] (B 🡒 C) 🡒 (A 🡒 C) :=
   mdp_ctx (imp_trans imply₁ imply₂) (dhyp h)
 
-lemma and_intro_ctx (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] A 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 B ⋏ C :=
+@[grind <=] lemma and_intro_ctx (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] A 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 B ⋏ C :=
   mdp_ctx (imp_trans h₁ andIntro) h₂
 
-lemma box_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] □A 🡒 □B := mdp kBox (nec h)
+lemma imp_swap : ⊢ᴴ[CK;𝔸] (A 🡒 B 🡒 C) 🡒 (B 🡒 A 🡒 C) :=
+  mdp_ctx₂ (imp_trans imply₂ imply₁) (dhyp imply₁)
+
+@[grind <=] lemma or_imp (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 C) (h₂ : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] A ⋎ B 🡒 C :=
+  mdp (mdp orElim h₁) h₂
+
+@[grind <=] lemma box_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] □A 🡒 □B := mdp kBox (nec h)
+
+@[grind <=] lemma dia_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] ◇A 🡒 ◇B := mdp kDia (nec h)
 
 @[grind .] lemma box_or_inl : ⊢ᴴ[CK;𝔸] □A 🡒 □(A ⋎ B) := box_mono orIntro₁
 
@@ -88,20 +97,92 @@ lemma imp_bot_imp_box_bot : ⊢ᴴ[CK;𝔸] (A 🡒 ⊥) 🡒 (A 🡒 □⊥) :=
 
 open scoped BDFormulaList
 
-lemma conj_append_left : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₁ := by
+lemma lconj_append_left : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₁ := by
   induction Γ₁ with
   | nil => exact dhyp verum;
   | cons A Γ₁ ih => exact and_intro_ctx andElim₁ (imp_trans andElim₂ ih);
 
-lemma conj_append_right : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₂ := by
+lemma lconj_append_right : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₂ := by
   induction Γ₁ with
   | nil => exact imp_id;
   | cons A Γ₁ ih => exact imp_trans andElim₂ ih;
 
-lemma conj_box : ⊢ᴴ[CK;𝔸] ⋀□Γ 🡒 □⋀Γ := by
+lemma ldisj_append_left : ⊢ᴴ[CK;𝔸] ⋁Γ₁ 🡒 ⋁(Γ₁ ++ Γ₂) := by
+  induction Γ₁ with
+  | nil => exact efq;
+  | cons A Γ₁ ih => exact or_imp orIntro₁ (imp_trans ih orIntro₂);
+
+lemma ldisj_append_right : ⊢ᴴ[CK;𝔸] ⋁Γ₂ 🡒 ⋁(Γ₁ ++ Γ₂) := by
+  induction Γ₁ with
+  | nil => exact imp_id;
+  | cons A Γ₁ ih => exact imp_trans ih orIntro₂;
+
+@[grind <=]
+lemma ldisj_imp (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] ⋁Γ 🡒 C := by
+  induction Γ with
+  | nil => exact efq;
+  | cons A Γ ih => exact or_imp (h A (.head ..)) (ih fun B hB => h B (.tail _ hB));
+
+@[grind <=]
+lemma imp_ldisj (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] A 🡒 ⋁Γ := by
+  induction Γ with
+  | nil => simp at h;
+  | cons B Γ ih =>
+    rcases List.mem_cons.mp h with rfl | hmem
+    · exact orIntro₁;
+    · exact imp_trans (ih hmem) orIntro₂;
+
+lemma lconj_imp (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] ⋀Γ 🡒 A := by
+  induction Γ with
+  | nil => simp at h;
+  | cons B Γ ih =>
+    rcases List.mem_cons.mp h with rfl | hmem
+    · exact andElim₁;
+    · exact imp_trans andElim₂ (ih hmem);
+
+lemma imp_lconj (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] C 🡒 B) : ⊢ᴴ[CK;𝔸] C 🡒 ⋀Γ := by
+  induction Γ with
+  | nil => exact dhyp verum;
+  | cons A Γ ih => exact and_intro_ctx (h A (.head ..)) (ih fun B hB => h B (.tail _ hB));
+
+lemma lconj_box : ⊢ᴴ[CK;𝔸] ⋀□Γ 🡒 □⋀Γ := by
   induction Γ with
   | nil => exact dhyp (nec verum);
   | cons A Γ ih => exact mdp_ctx (imp_trans andElim₁ box_and_intro) (imp_trans andElim₂ ih);
+
+section
+
+open scoped BDFormulaFinset
+
+variable {Γ Γ₁ Γ₂ : BDFormulaFinset}
+
+lemma fconj_imp (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] ⋀Γ 🡒 A :=
+  lconj_imp (Finset.mem_toList.mpr h)
+
+lemma imp_fconj (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] C 🡒 B) : ⊢ᴴ[CK;𝔸] C 🡒 ⋀Γ :=
+  imp_lconj fun B hB => h B (Finset.mem_toList.mp hB)
+
+@[grind <=]
+lemma fdisj_imp (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] ⋁Γ 🡒 C :=
+  ldisj_imp fun B hB => h B (Finset.mem_toList.mp hB)
+
+@[grind <=]
+lemma imp_fdisj (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] A 🡒 ⋁Γ :=
+  imp_ldisj (Finset.mem_toList.mpr h)
+
+lemma fconj_union_left : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ∪ Γ₂) 🡒 ⋀Γ₁ :=
+  imp_fconj fun _ hB => fconj_imp (Finset.mem_union_left _ hB)
+
+lemma fconj_union_right : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ∪ Γ₂) 🡒 ⋀Γ₂ :=
+  imp_fconj fun _ hB => fconj_imp (Finset.mem_union_right _ hB)
+
+lemma fdisj_union_left : ⊢ᴴ[CK;𝔸] ⋁Γ₁ 🡒 ⋁(Γ₁ ∪ Γ₂) :=
+  fdisj_imp fun _ hB => imp_fdisj (Finset.mem_union_left _ hB)
+
+lemma fdisj_union_right : ⊢ᴴ[CK;𝔸] ⋁Γ₂ 🡒 ⋁(Γ₁ ∪ Γ₂) :=
+  fdisj_imp fun _ hB => imp_fdisj (Finset.mem_union_right _ hB)
+
+end
 
 @[induction_eliminator]
 lemma rec
@@ -124,44 +205,33 @@ lemma rec
   rintro A ⟨h⟩;
   induction h with
   | axm hmem => exact axm hmem;
-  | imply₁ => exact imply₁ _;
-  | imply₂ => exact imply₂ _;
-  | andElim₁ => exact andElim₁ _;
-  | andElim₂ => exact andElim₂ _;
-  | andIntro => exact andIntro _;
-  | orIntro₁ => exact orIntro₁ _;
-  | orIntro₂ => exact orIntro₂ _;
-  | orElim => exact orElim _;
-  | efq => exact efq _;
-  | kBox => exact kBox _;
-  | kDia => exact kDia _;
   | mdp h₁ h₂ ih₁ ih₂ => exact mdp ⟨h₁⟩ ⟨h₂⟩ ih₁ ih₂;
   | nec h ih => exact nec ⟨h⟩ ih;
+  | _ => grind
 
-theorem monotone (h : 𝔸₁ ⊆ 𝔸₂) : ⊢ᴴ[CK;𝔸₁] A → ⊢ᴴ[CK;𝔸₂] A := by
+lemma monotone (h : 𝔸₁ ⊆ 𝔸₂) : ⊢ᴴ[CK;𝔸₁] A → ⊢ᴴ[CK;𝔸₂] A := by
   intro p;
   induction p with
-  | axm hmem   => exact axm (h hmem);
-  | imply₁     => exact imply₁;
-  | imply₂     => exact imply₂;
-  | andElim₁   => exact andElim₁;
-  | andElim₂   => exact andElim₂;
-  | andIntro   => exact andIntro;
-  | orIntro₁   => exact orIntro₁;
-  | orIntro₂   => exact orIntro₂;
-  | orElim     => exact orElim;
-  | efq        => exact efq;
-  | kBox       => exact kBox;
-  | kDia       => exact kDia;
-  | mdp _ _ ih₁ ih₂ => exact mdp ih₁ ih₂;
-  | nec _ ih   => exact nec ih;
+  | axm hmem => exact axm (h hmem);
+  | _ => grind
+
+lemma provable_of_provable_axioms
+    (h : ∀ B ∈ 𝔸₁, ⊢ᴴ[CK;𝔸₂] B) : (⊢ᴴ[CK;𝔸₁] A) → ⊢ᴴ[CK;𝔸₂] A := by
+  intro p;
+  induction p with
+  | axm hmem => exact h _ hmem;
+  | _ => grind
 
 abbrev logic (𝔸 : Set BDFormula) : BDLogic := { A | ⊢ᴴ[CK;𝔸] A }
 
 @[simp]
 lemma mem_logic : A ∈ logic 𝔸 ↔ ⊢ᴴ[CK;𝔸] A := Iff.rfl
 
-theorem logic_monotone (h : 𝔸₁ ⊆ 𝔸₂) : logic 𝔸₁ ⊆ logic 𝔸₂ := fun _ => monotone h
+lemma logic_monotone (h : 𝔸₁ ⊆ 𝔸₂) : logic 𝔸₁ ⊆ logic 𝔸₂ := fun _ => monotone h
+
+instance : BDLogic.Mdp (logic 𝔸) := ⟨mdp⟩
+
+instance : BDLogic.Nec (logic 𝔸) := ⟨nec⟩
 
 end ProvableBDHilbert
 

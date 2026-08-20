@@ -43,7 +43,7 @@ instance [M.IsIKB] : M.IsCKB where
 
 
 /-- - [Pac24, Proposition 6] -/
-theorem dia_iff_forward_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] ◇A ↔ ∃ y, x ⊏ y ∧ y ⊩[_] A := by
+lemma dia_iff_forward_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] ◇A ↔ ∃ y, x ⊏ y ∧ y ⊩[_] A := by
   constructor;
   · intro h;
     exact h x (refl x);
@@ -52,7 +52,7 @@ theorem dia_iff_forward_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] ◇A
     exact ⟨y₁, Mx₁y₁, Model.Forces.persistent hyA Iyy₁⟩;
 
 /-- - [Pac24, Proposition 10] -/
-theorem forwardConfluent_iff_backwardConfluent_of_symmetricMRel [M.SymmetricMRel] :
+lemma forwardConfluent_iff_backwardConfluent_of_symmetricMRel [M.SymmetricMRel] :
   M.ForwardConfluent ↔ M.BackwardConfluent := by
   constructor;
   · intro h;
@@ -76,7 +76,7 @@ theorem forwardConfluent_iff_backwardConfluent_of_symmetricMRel [M.SymmetricMRel
 - [dGSC25]
 - [Pac24, Theorem 11]
 -/
-theorem forces_N_of_symmetricMRel [M.SymmetricMRel] : x ⊩[_] ∼◇⊥ := by
+lemma forces_N_of_symmetricMRel [M.SymmetricMRel] : x ⊩[_] ∼◇⊥ := by
   intro y _ hy;
   obtain ⟨z, Myz, hz⟩ := hy y (refl y);
   exact M.fallible_mRel hz (symm_mRel Myz);
@@ -92,7 +92,7 @@ lemma valid_N_of_symmetricMRel [M.SymmetricMRel] : M ⊧ ∼◇⊥ := fun
 - [dGSC25]
 - [Pac24, Theorem 11]
 -/
-theorem forces_DP_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] (◇(A ⋎ B) 🡒 (◇A ⋎ ◇B)) := by
+lemma forces_DP_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] (◇(A ⋎ B) 🡒 (◇A ⋎ ◇B)) := by
   intro y _ hy;
   obtain ⟨z, Myz, hz⟩ := Model.dia_iff_forward_of_forwardConfluent.mp hy;
   rcases hz with hz | hz;
@@ -109,7 +109,7 @@ lemma valid_DP_of_forwardConfluent [M.ForwardConfluent] : M ⊧ (◇(A ⋎ B) �
 - [dGSC25]
 - [Pac24, Theorem 11]
 -/
-theorem forces_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] [M.BackwardConfluent] :
+lemma forces_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] [M.BackwardConfluent] :
   x ⊩[_] ((◇A 🡒 □B) 🡒 □(A 🡒 B)) := by
   intro y Ixy hy v u Iyv Mvu w Iuw hwA;
   obtain ⟨v₁, Ivv₁, Mv₁w⟩ := backward_confluent Mvu Iuw;

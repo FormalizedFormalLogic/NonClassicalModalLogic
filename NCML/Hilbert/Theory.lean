@@ -34,44 +34,54 @@ export Of (subset)
 attribute [grind =>] mdp prime
 attribute [grind .] consistent
 
-variable {𝔸 : Set BDFormula} {T : BDTheory} {A B C D : BDFormula}
+variable {L : BDLogic} {T : BDTheory} {A B C D : BDFormula}
 
-instance logic_mdp : Mdp (logic 𝔸) := ⟨ProvableBDHilbert.mdp⟩
+instance logic_mdp [BDLogic.Mdp L] : Mdp L := ⟨BDLogic.mdp⟩
 
-instance logic_of : Of (logic 𝔸) (logic 𝔸) := ⟨subset_rfl⟩
+instance of_self : Of T T := ⟨subset_rfl⟩
 
-lemma provable_mem [T.Of (logic 𝔸)] (h : ⊢ᴴ[CK;𝔸] A) : A ∈ T :=
-  subset (L := (ProvableBDHilbert.logic 𝔸)) h
+-- Not an instance: the logic `L` behind `T.Of L` cannot be recovered from the goal.
+lemma of_logicCK [L.CK] [T.Of L] : T.Of LogicCK :=
+  ⟨(BDLogic.logicCK_subset (L := L)).trans (subset (L := L) (T := T))⟩
 
-lemma and_mem [T.Of (logic 𝔸)] [T.Mdp] (hA : A ∈ T) (hB : B ∈ T) : A ⋏ B ∈ T :=
-  mdp (mdp (provable_mem (𝔸 := 𝔸) andIntro) hA) hB
+lemma provable_mem [T.Of LogicCK] (h : A ∈ LogicCK) : A ∈ T := subset (L := LogicCK) h
 
-lemma conj_mem [T.Of (logic 𝔸)] [T.Mdp]
-  {Γ : BDFormulaList} (h : ∀ A ∈ Γ, A ∈ T) : ⋀Γ ∈ T := by
+lemma and_mem [T.Of LogicCK] [T.Mdp] (hA : A ∈ T) (hB : B ∈ T) : A ⋏ B ∈ T :=
+  mdp (mdp (provable_mem andIntro) hA) hB
+
+lemma lconj_mem [T.Of LogicCK] [T.Mdp] {Γ : BDFormulaList} (h : ∀ A ∈ Γ, A ∈ T) : ⋀Γ ∈ T := by
   induction Γ with
-  | nil => exact provable_mem (𝔸 := 𝔸) verum;
+  | nil => exact provable_mem verum;
   | cons A Γ ih =>
-    apply and_mem (𝔸 := 𝔸);
+    apply and_mem;
     . simp_all;
     . exact ih (by grind);
 
-lemma or_elim_mem [T.Of (logic 𝔸)] [T.Mdp]
+lemma or_elim_mem [T.Of LogicCK] [T.Mdp]
   (hAC : (A 🡒 C) ∈ T) (hBC : (B 🡒 C) ∈ T) (hAB : (A ⋎ B) ∈ T) : C ∈ T :=
-  mdp (mdp (mdp (provable_mem (𝔸 := 𝔸) orElim) hAC) hBC) hAB
+  mdp (mdp (mdp (provable_mem orElim) hAC) hBC) hAB
 
-lemma box_or_mem [T.Of (logic 𝔸)] [T.Mdp]
-  (h₁ : (A 🡒 □C) ∈ T) (h₂ : (B 🡒 □D) ∈ T) (h : (A ⋎ B) ∈ T) : □(C ⋎ D) ∈ T := by
-  exact
-    or_elim_mem (𝔸 := 𝔸)
-    (mdp (provable_mem (𝔸 := 𝔸) (imp_comp_left box_or_inl)) h₁)
-    (mdp (provable_mem (𝔸 := 𝔸) (imp_comp_left box_or_inr)) h₂)
-    h;
+lemma box_or_mem [T.Of LogicCK] [T.Mdp]
+  (h₁ : (A 🡒 □C) ∈ T) (h₂ : (B 🡒 □D) ∈ T) (h : (A ⋎ B) ∈ T) : □(C ⋎ D) ∈ T :=
+  or_elim_mem
+    (mdp (provable_mem (imp_comp_left box_or_inl)) h₁)
+    (mdp (provable_mem (imp_comp_left box_or_inr)) h₂)
+    h
+
+lemma eq_univ_of_bot_mem [T.Of LogicCK] [T.Mdp] (h : ⊥ ∈ T) : T = Set.univ :=
+  Set.eq_univ_of_forall fun _ => mdp (T := T) (provable_mem efq) h
+
+instance prebox_mdp [T.Of LogicCK] [T.Mdp] : Mdp (□⁻¹T) :=
+  ⟨fun hAB hA => mdp (T := T) (mdp (T := T) (provable_mem kBox) hAB) hA⟩
+
+instance prebox_of [L.Nec] [T.Of L] : Of L (□⁻¹T) :=
+  ⟨fun _ hA => subset (L := L) (T := T) (BDLogic.nec hA)⟩
 
 section CKB
 
 class CKB (T : BDTheory) extends T.Mdp, T.Prime, T.Consistent, T.Of LogicCKB where
 
-instance [T.Of LogicCKB] : T.Of LogicCK := ⟨LogicCK.subset_CKB.trans (subset (L := LogicCKB))⟩
+instance [T.Of LogicCKB] : T.Of LogicCK := of_logicCK (L := LogicCKB)
 
 lemma box_dia_mem [T.CKB] (hA : A ∈ T) : □◇A ∈ T := by
   apply mdp ?_ hA;
@@ -85,12 +95,6 @@ lemma mem_of_dia_box_mem [T.CKB] (h : ◇(□A) ∈ T) : A ∈ T := by
   apply ProvableBDHilbert.axm;
   grind;
 
-instance prebox_mdp [T.Of LogicCK] [T.Mdp] : Mdp (□⁻¹T) :=
-  ⟨fun hAB hA => mdp (T := T) (mdp (T := T) (provable_mem (𝔸 := ∅) kBox) hAB) hA⟩
-
-instance prebox_of [T.Of LogicCKB] : Of LogicCKB (□⁻¹T) :=
-  ⟨fun _ hA => T.subset (L := LogicCKB) (nec hA)⟩
-
 lemma dia_or_mem [T.CKB] (h : ◇(A ⋎ B) ∈ T) : ◇A ∈ T ∨ ◇B ∈ T :=
   prime (mdp (T.subset (L := LogicCKB) LogicCKB.provable_DP) h)
 
@@ -98,6 +102,8 @@ lemma dia_bot_not_mem [T.CKB] : ◇(⊥ : BDFormula) ∉ T :=
   fun h => T.consistent (mdp (T.subset (L := LogicCKB) LogicCKB.provable_N) h)
 
 end CKB
+
+instance [T.Of LogicCKTDia] : T.Of LogicCK := of_logicCK (L := LogicCKTDia)
 
 end BDTheory
 
@@ -111,7 +117,7 @@ inductive BDTheory.mdpClosure (T : BDTheory) : BDTheory
 
 namespace BDTheory
 
-variable {T T₁ T₂ : BDTheory} {X Y : BDFormulaSet} {𝔸 : Set BDFormula} {A : BDFormula}
+variable {T T₁ T₂ : BDTheory} {X Y : BDFormulaSet} {L : BDLogic} {A : BDFormula}
 
 lemma subset_mdpClosure : T ⊆ T.mdpClosure := fun _ => mdpClosure.base
 
@@ -124,14 +130,14 @@ lemma mono_mdpClosure (h : T₁ ⊆ T₂): T₁.mdpClosure ⊆ T₂.mdpClosure :
   | base hA => exact .base (h hA);
   | mdp _ _ ih₁ ih₂ => exact .mdp ih₁ ih₂;
 
-lemma logic_subset_mdpClosure [T.Of (logic 𝔸)] : T.mdpClosure.Of (ProvableBDHilbert.logic 𝔸) :=
-  ⟨T.subset.trans subset_mdpClosure⟩
+instance mdpClosure_of [T.Of L] : T.mdpClosure.Of L :=
+  ⟨(subset (L := L) (T := T)).trans subset_mdpClosure⟩
 
 /-- Finite characterization of the MP-closure of `T ∪ ◇Y`: every member `A` of the closure is
 already derivable from finitely many `◇B` with `B ∈ Y` together with a single `C ∈ T`. -/
-lemma exists_finite_char [T.Of (logic 𝔸)] [T.Mdp] (h : A ∈ mdpClosure (T ∪ ◇Y)) :
+lemma exists_finite_char [T.Of LogicCK] [T.Mdp] (h : A ∈ mdpClosure (T ∪ ◇Y)) :
   ∃ Γ : BDFormulaList, (∀ B ∈ Γ, B ∈ Y) ∧
-  ∃ C ∈ T, ⊢ᴴ[CK;𝔸] (⋀◇Γ 🡒 C 🡒 A) := by
+  ∃ C ∈ T, (⋀◇Γ 🡒 C 🡒 A) ∈ LogicCK := by
   induction h with
   | base hA =>
     rcases hA with hA | ⟨B, hB, rfl⟩;
@@ -144,7 +150,7 @@ lemma exists_finite_char [T.Of (logic 𝔸)] [T.Mdp] (h : A ∈ mdpClosure (T �
       . grind;
       . use ⊤;
         constructor;
-        . exact provable_mem (𝔸 := 𝔸) verum;
+        . exact provable_mem verum;
         . exact imp_trans andElim₁ imply₁;
   | mdp _ _ ih₁ ih₂ =>
     obtain ⟨Γ₁, hΓ₁, C₁, hC₁, d₁⟩ := ih₁;
@@ -154,13 +160,32 @@ lemma exists_finite_char [T.Of (logic 𝔸)] [T.Mdp] (h : A ∈ mdpClosure (T �
     . grind;
     . use C₁ ⋏ C₂;
       constructor;
-      . exact and_mem (𝔸 := 𝔸) hC₁ hC₂;
+      . exact and_mem hC₁ hC₂;
       . rw [dia_append];
-        have t₁ := imp_trans (conj_append_left (Γ₁ := ◇Γ₁) (Γ₂ := ◇Γ₂)) d₁;
-        have t₂ := imp_trans (conj_append_right (Γ₁ := ◇Γ₁) (Γ₂ := ◇Γ₂)) d₂;
+        have t₁ := imp_trans (lconj_append_left (Γ₁ := ◇Γ₁) (Γ₂ := ◇Γ₂)) d₁;
+        have t₂ := imp_trans (lconj_append_right (Γ₁ := ◇Γ₁) (Γ₂ := ◇Γ₂)) d₂;
         exact mdp_ctx₂
           (imp_trans t₁ (imp_comp_right andElim₁))
           (imp_trans t₂ (imp_comp_right andElim₂));
+
+/-- Finite characterization of the MP-closure of a union `T₁ ∪ T₂`: every member `A` of the
+closure is entailed from a single `D ∈ T₁` and a single `E ∈ T₂`. -/
+lemma mdpClosure_union_finite_char [T₁.Of LogicCK] [T₁.Mdp] [T₂.Of LogicCK] [T₂.Mdp]
+  (h : A ∈ mdpClosure (T₁ ∪ T₂)) : ∃ D ∈ T₁, ∃ E ∈ T₂, (D 🡒 E 🡒 A) ∈ LogicCK := by
+  induction h with
+  | base hA =>
+    rcases hA with hA | hA;
+    · exact ⟨_, hA, ⊤, provable_mem verum, imply₁⟩;
+    · exact ⟨⊤, provable_mem verum, _, hA, dhyp imp_id⟩;
+  | mdp _ _ ih₁ ih₂ =>
+    obtain ⟨D₁, hD₁, E₁, hE₁, d₁⟩ := ih₁;
+    obtain ⟨D₂, hD₂, E₂, hE₂, d₂⟩ := ih₂;
+    refine ⟨D₁ ⋏ D₂, ?_, E₁ ⋏ E₂, ?_, ?_⟩;
+    . exact and_mem hD₁ hD₂
+    . exact and_mem hE₁ hE₂
+    . exact mdp_ctx₂
+              (imp_trans (imp_trans andElim₁ d₁) (imp_comp_right andElim₁))
+              (imp_trans (imp_trans andElim₂ d₂) (imp_comp_right andElim₂));
 
 end BDTheory
 
@@ -186,25 +211,20 @@ lemma mem_impSet {T : BDTheory} {A B} : B ∈ T.impSet A ↔ (A 🡒 B) ∈ T :=
 
 section
 
-variable {L : BDLogic} {𝔸 : Set BDFormula} {T : BDTheory} {A : BDFormula}
+variable {L : BDLogic} {T : BDTheory} {A : BDFormula}
 
--- `(T := T)` is required here and in `impSet_mdpClosed`: otherwise `mdp` resolves against
+-- `(T := T)` is required here and in `impSet_mdp`: otherwise `mdp` resolves against
 -- `T.impSet A` instead of `T`.
-lemma subset_impSet [T.Of (logic 𝔸)] [T.Mdp] : T ⊆ T.impSet A :=
-  fun _ hB => mdp (T := T) (provable_mem (𝔸 := 𝔸) imply₁) hB
+lemma subset_impSet [T.Of LogicCK] [T.Mdp] : T ⊆ T.impSet A :=
+  fun _ hB => mdp (T := T) (provable_mem imply₁) hB
 
-lemma self_mem_impSet [T.Of (logic 𝔸)] : A ∈ T.impSet A := by
-  show (A 🡒 A) ∈ T;
-  exact provable_mem (𝔸 := 𝔸) imp_id;
+lemma self_mem_impSet [T.Of LogicCK] : A ∈ T.impSet A := provable_mem (T := T) imp_id
 
--- Not an instance: the axiom set `𝔸` behind `T.Of (logic 𝔸)` cannot be recovered from the goal.
-lemma impSet_mdpClosed [T.Of (logic 𝔸)] [T.Mdp] : (T.impSet A).Mdp :=
-  ⟨fun hBC hB => mdp (T := T) (mdp (T := T) (provable_mem (𝔸 := 𝔸) imply₂) hBC) hB⟩
-
-instance impSet_mdp [T.Of LogicCK] [T.Mdp] : (T.impSet A).Mdp := impSet_mdpClosed (𝔸 := ∅)
+instance impSet_mdp [T.Of LogicCK] [T.Mdp] : (T.impSet A).Mdp :=
+  ⟨fun hBC hB => mdp (T := T) (mdp (T := T) (provable_mem imply₂) hBC) hB⟩
 
 instance impSet_of [T.Of LogicCK] [T.Mdp] [T.Of L] : (T.impSet A).Of L :=
-  ⟨subset.trans (subset_impSet (𝔸 := ∅))⟩
+  ⟨subset.trans subset_impSet⟩
 
 end
 
@@ -214,7 +234,7 @@ end BDTheory
 
 section Maximal
 
-variable {L : BDLogic} {𝔸 : Set BDFormula} {T Y Z : BDTheory} {A : BDFormula}
+variable {L : BDLogic} {T Y Z : BDTheory} {A B : BDFormula}
 
 /-- Every MP-closed theory `T` of `L` disjoint from `Z` extends to a maximal MP-closed theory of
 `L` still disjoint from `Z`. -/
@@ -232,18 +252,100 @@ lemma exists_maximal_mdpClosed_avoiding [T.Mdp] [T.Of L] (hdisj : ∀ A ∈ Z, A
 
 /-- If `Y` is maximal among the MP-closed extensions of `T` avoiding `Z`, then every `A ∉ Y` is
 refuted by some forbidden formula: `A 🡒 B ∈ Y` for some `B ∈ Z`. -/
-lemma exists_imp_mem_of_maximal
-  (hmax : Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ Y.Of (logic 𝔸) ∧ ∀ B ∈ Z, B ∉ Y) Y)
+lemma exists_imp_mem_of_maximal [L.CK]
+  (hmax : Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ Y.Of L ∧ ∀ B ∈ Z, B ∉ Y) Y)
   (hA : A ∉ Y) :
   ∃ B ∈ Z, (A 🡒 B) ∈ Y := by
   obtain ⟨hTY, hmdpY, hlogY, -⟩ := hmax.prop;
-  have hsub := BDTheory.subset_impSet (𝔸 := 𝔸) (T := Y) (A := A);
+  have := BDTheory.of_logicCK (L := L) (T := Y);
+  have hsub := BDTheory.subset_impSet (T := Y) (A := A);
   by_contra! hc;
   exact hA (hmax.le_of_ge
-    ⟨hTY.trans hsub, BDTheory.impSet_mdpClosed (𝔸 := 𝔸), ⟨hlogY.subset.trans hsub⟩, hc⟩
-    hsub (BDTheory.self_mem_impSet (𝔸 := 𝔸)));
+    ⟨hTY.trans hsub, BDTheory.impSet_mdp, ⟨hlogY.subset.trans hsub⟩, hc⟩
+    hsub BDTheory.self_mem_impSet);
+
+/-- A set `Z` of formulas is ⋎-directed (over `L`) if every two members' disjunction is subsumed
+by a common member of `Z`. -/
+def OrDirected (L : BDLogic) (Z : BDFormulaSet) : Prop :=
+  ∀ C ∈ Z, ∀ D ∈ Z, ∃ E ∈ Z, (C ⋎ D 🡒 E) ∈ L
+
+/-- A maximal MP-closed extension of `T` avoiding an ⋎-directed `Z` is prime. -/
+lemma prime_of_maximal_avoiding_orDirected [L.CK] (hdir : OrDirected L Z)
+  (hmax : Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ Y.Of L ∧ ∀ B ∈ Z, B ∉ Y) Y)
+  (h : A ⋎ B ∈ Y) : A ∈ Y ∨ B ∈ Y := by
+  by_contra! hc;
+  obtain ⟨-, hmdpY, hlogY, havoid⟩ := hmax.prop;
+  have := BDTheory.of_logicCK (L := L) (T := Y);
+  obtain ⟨C, hC, h₁⟩ := exists_imp_mem_of_maximal hmax hc.1;
+  obtain ⟨D, hD, h₂⟩ := exists_imp_mem_of_maximal hmax hc.2;
+  have h₃ : (A 🡒 C ⋎ D) ∈ Y := Y.mdp (BDTheory.provable_mem (imp_comp_left orIntro₁)) h₁;
+  have h₄ : (B 🡒 C ⋎ D) ∈ Y := Y.mdp (BDTheory.provable_mem (imp_comp_left orIntro₂)) h₂;
+  have h₅ : C ⋎ D ∈ Y := BDTheory.or_elim_mem h₃ h₄ h;
+  obtain ⟨E, hE, hCD⟩ := hdir C hC D hD;
+  exact havoid E hE (Y.mdp (hlogY.subset hCD) h₅);
+
+/-- General prime Lindenbaum lemma: an MP-closed theory of `L` disjoint from an ⋎-directed `Z`
+extends to a prime MP-closed theory of `L` still disjoint from `Z`. -/
+lemma exists_prime_mdpClosed_avoiding [L.CK] [T.Mdp] [T.Of L]
+  (hdir : OrDirected L Z) (hdisj : ∀ B ∈ Z, B ∉ T) :
+  ∃ Y : BDTheory, T ⊆ Y ∧ Y.Mdp ∧ Y.Prime ∧ Y.Of L ∧ ∀ B ∈ Z, B ∉ Y := by
+  obtain ⟨Y, hTY, hmax⟩ := exists_maximal_mdpClosed_avoiding (L := L) hdisj;
+  obtain ⟨-, hmdpY, hlogY, havoid⟩ := hmax.prop;
+  exact ⟨Y, hTY, hmdpY, ⟨prime_of_maximal_avoiding_orDirected hdir hmax⟩, hlogY, havoid⟩;
 
 end Maximal
+
+/-! ## Disjunctive avoid sets -/
+
+section Disj
+
+/-- The disjunctions of nonempty finite sublists of `Θ`. -/
+def disjSet (Θ : BDFormulaSet) : BDFormulaSet :=
+  { B | ∃ K : BDFormulaList, K ≠ [] ∧ (∀ A ∈ K, A ∈ Θ) ∧ B = ⋁K }
+
+/-- The `◇`-images of `disjSet Θ`. -/
+def diaDisjSet (Θ : BDFormulaSet) : BDFormulaSet := ◇(disjSet Θ)
+
+variable {L : BDLogic} [L.CK] {B : BDFormula}
+
+lemma orDirected_singleton : OrDirected L {B} := by
+  rintro C rfl D rfl;
+  exact ⟨D, rfl, BDLogic.logicCK_subset (or_imp imp_id imp_id)⟩;
+
+variable {Θ : BDFormulaSet}
+
+lemma orDirected_disjSet : OrDirected L (disjSet Θ) := by
+  rintro C ⟨K₁, hK₁ne, hK₁sub, rfl⟩ D ⟨K₂, hK₂ne, hK₂sub, rfl⟩;
+  refine ⟨⋁(K₁ ++ K₂), ⟨K₁ ++ K₂, by simp [hK₁ne], ?_, rfl⟩,
+    BDLogic.logicCK_subset (or_imp ldisj_append_left ldisj_append_right)⟩;
+  intro A hA;
+  rcases List.mem_append.mp hA with hA | hA;
+  · exact hK₁sub A hA;
+  · exact hK₂sub A hA;
+
+@[simp]
+lemma disjSet_empty : disjSet (∅ : BDFormulaSet) = ∅ := by
+  ext B;
+  simp only [Set.mem_empty_iff_false, iff_false];
+  rintro ⟨K, hne, hsub, rfl⟩;
+  cases K with
+  | nil => exact hne rfl;
+  | cons C K => exact hsub C (by simp);
+
+@[simp]
+lemma diaDisjSet_empty : diaDisjSet (∅ : BDFormulaSet) = ∅ := by
+  simp [diaDisjSet, BDFormulaSet.dia];
+
+lemma orDirected_diaDisjSet : OrDirected L (diaDisjSet Θ) := by
+  rintro C ⟨B₁, ⟨K₁, hK₁ne, hK₁sub, rfl⟩, rfl⟩ D ⟨B₂, ⟨K₂, hK₂ne, hK₂sub, rfl⟩, rfl⟩;
+  refine ⟨◇(⋁(K₁ ++ K₂)), ⟨⋁(K₁ ++ K₂), ⟨K₁ ++ K₂, by simp [hK₁ne], ?_, rfl⟩, rfl⟩,
+    BDLogic.logicCK_subset (or_imp (dia_mono ldisj_append_left) (dia_mono ldisj_append_right))⟩;
+  intro A hA;
+  rcases List.mem_append.mp hA with hA | hA;
+  · exact hK₁sub A hA;
+  · exact hK₂sub A hA;
+
+end Disj
 
 /-! ## CKB-specific consequences of the MP-closure -/
 
@@ -254,11 +356,11 @@ variable {T U : BDTheory} {A : BDFormula}
 /-- If `□A` belongs to the MP-closure of `T ∪ ◇U`, then `A` belongs to `U`. -/
 lemma mem_of_box_mem_mdpClosure [T.Of LogicCKB] [T.Mdp] [U.CKB]
   (hdia : ∀ B ∈ T, ◇B ∈ U) (h : □A ∈ BDTheory.mdpClosure (T ∪ ◇U)) : A ∈ U := by
-  obtain ⟨Γ, hΓ, C, hC, d⟩ := BDTheory.exists_finite_char (𝔸 := ∅) h;
+  obtain ⟨Γ, hΓ, C, hC, d⟩ := BDTheory.exists_finite_char h;
   have d₁ : (⋀□◇Γ 🡒 ◇C 🡒 ◇(□A)) ∈ LogicCK :=
-    imp_trans (imp_trans conj_box (mdp kBox (nec d))) kDia;
+    imp_trans (imp_trans lconj_box (mdp kBox (nec d))) kDia;
   have h₁ : ⋀□◇Γ ∈ U := by
-    apply BDTheory.conj_mem (𝔸 := ∅);
+    apply BDTheory.lconj_mem;
     intro B hB;
     simp at hB;
     obtain ⟨B, hB, rfl⟩ := hB;

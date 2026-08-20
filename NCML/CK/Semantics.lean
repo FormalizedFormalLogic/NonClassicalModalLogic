@@ -68,8 +68,10 @@ def Forces (M : Model κ) (x : M.World) : BDFormula → Prop
   | A 🡒 B => ∀ y, x ≼ y → M.Forces y A → M.Forces y B
   | □A    => ∀ y z, x ≼ y → y ⊏ z → M.Forces z A
   | ◇A    => ∀ y, x ≼ y → ∃ z, y ⊏ z ∧ M.Forces z A
-
 notation:80 x:81 " ⊩[" M "] " A:81 => Forces M x A
+
+abbrev NotForces (M : Model κ) (x : M.World) (A : BDFormula) : Prop := ¬ M.Forces x A
+notation:80 x:81 " ⊮[" M "] " A:81 => NotForces M x A
 
 @[grind =>]
 lemma Forces.persistent (h : x ⊩[_] A) (Ixy : x ≼ y) : y ⊩[_] A := by
@@ -94,6 +96,9 @@ lemma Forces.of_fallible (h : M.Fallible x) : x ⊩[_] A := by
     obtain ⟨z, Myz⟩ := M.fallible_exists_mRel hy;
     exact ⟨z, Myz, ih (M.fallible_mRel hy Myz)⟩;
   | _ => grind [Model.fallible_val];
+
+@[simp, grind .]
+lemma forces_top : x ⊩[_] (⊤ : BDFormula) := fun _ _ h => h
 
 def Valid (M : Model κ) (A : BDFormula) := ∀ x : M.World, x ⊩[M] A
 infixl:80 " ⊧ " => Valid
