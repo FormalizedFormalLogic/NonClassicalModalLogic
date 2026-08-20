@@ -68,12 +68,9 @@ def Forces (M : Model κ) (x : M.World) : BDFormula → Prop
   | A 🡒 B => ∀ y, x ≼ y → M.Forces y A → M.Forces y B
   | □A    => ∀ y z, x ≼ y → y ⊏ z → M.Forces z A
   | ◇A    => ∀ y, x ≼ y → ∃ z, y ⊏ z ∧ M.Forces z A
-
 notation:80 x:81 " ⊩[" M "] " A:81 => Forces M x A
 
-/-- Negation of `Forces`. -/
 abbrev NotForces (M : Model κ) (x : M.World) (A : BDFormula) : Prop := ¬ M.Forces x A
-
 notation:80 x:81 " ⊮[" M "] " A:81 => NotForces M x A
 
 @[grind =>]

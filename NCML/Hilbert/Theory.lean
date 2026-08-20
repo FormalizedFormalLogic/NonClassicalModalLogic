@@ -185,9 +185,12 @@ lemma mdpClosure_union_finite_char [T₁.Of (logic 𝔸)] [T₁.Mdp] [T₂.Of (l
   | mdp _ _ ih₁ ih₂ =>
     obtain ⟨D₁, hD₁, E₁, hE₁, d₁⟩ := ih₁;
     obtain ⟨D₂, hD₂, E₂, hE₂, d₂⟩ := ih₂;
-    exact ⟨D₁ ⋏ D₂, and_mem (𝔸 := 𝔸) hD₁ hD₂, E₁ ⋏ E₂, and_mem (𝔸 := 𝔸) hE₁ hE₂,
-      mdp_ctx₂ (imp_trans (imp_trans andElim₁ d₁) (imp_comp_right andElim₁))
-               (imp_trans (imp_trans andElim₂ d₂) (imp_comp_right andElim₂))⟩;
+    refine ⟨D₁ ⋏ D₂, ?_, E₁ ⋏ E₂, ?_, ?_⟩;
+    . exact and_mem (𝔸 := 𝔸) hD₁ hD₂
+    . exact and_mem (𝔸 := 𝔸) hE₁ hE₂
+    . exact mdp_ctx₂
+              (imp_trans (imp_trans andElim₁ d₁) (imp_comp_right andElim₁))
+              (imp_trans (imp_trans andElim₂ d₂) (imp_comp_right andElim₂));
 
 end BDTheory
 

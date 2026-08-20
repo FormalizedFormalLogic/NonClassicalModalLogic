@@ -105,7 +105,7 @@ open ProvableBDHilbert
 
 theorem provable_TDia : (A 🡒 ◇A) ∈ LogicCKTDia := axm (by grind)
 
-theorem provable_PDia : (◇⊤) ∈ LogicCKTDia := mdp (provable_TDia (A := ⊤)) verum
+theorem provable_PDia : (◇⊤) ∈ LogicCKTDia := mdp provable_TDia verum
 
 theorem provable_D : (□A 🡒 ◇A) ∈ LogicCKTDia := provable_D_of_PDia provable_PDia
 
@@ -116,21 +116,27 @@ namespace LogicCKD
 
 open ProvableBDHilbert
 
-theorem provable_D : (□A 🡒 ◇A) ∈ LogicCKD := axm (by grind)
+theorem provable_D : □A 🡒 ◇A ∈ LogicCKD := axm (by grind)
 
-theorem provable_PDia : (◇⊤) ∈ LogicCKD := mdp (provable_D (A := ⊤)) (nec verum)
+theorem provable_PDia : ◇⊤ ∈ LogicCKD := mdp (provable_D) (nec verum)
 
-theorem subset_CKTDia : LogicCKD ⊆ LogicCKTDia := fun _ =>
-  provable_of_provable_axioms (fun _ hB => by obtain ⟨_, rfl⟩ := hB; exact LogicCKTDia.provable_D)
+theorem subset_CKTDia : LogicCKD ⊆ LogicCKTDia := by
+  intro A;
+  apply provable_of_provable_axioms;
+  rintro _ ⟨B, rfl⟩;
+  exact LogicCKTDia.provable_D;
 
 /-- `D` and `PDia` are interderivable over `CK`. -/
-theorem eq_CKPDia : LogicCKD = LogicCKPDia :=
-  Set.Subset.antisymm
-    (fun _ =>
-      provable_of_provable_axioms
-        (fun _ hB => by obtain ⟨_, rfl⟩ := hB; exact provable_D_of_PDia (axm rfl)))
-    (fun _ =>
-      provable_of_provable_axioms (fun _ hB => by rw [hB]; exact provable_PDia))
+theorem eq_CKPDia : LogicCKD = LogicCKPDia := by
+  apply Set.Subset.antisymm;
+  . intro;
+    apply provable_of_provable_axioms;
+    rintro _ ⟨B, rfl⟩;
+    exact provable_D_of_PDia (axm rfl)
+  . intro;
+    apply provable_of_provable_axioms;
+    rintro B rfl;
+    apply provable_PDia;
 
 end LogicCKD
 
