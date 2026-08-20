@@ -330,6 +330,14 @@ lemma orDirected_disjSet : OrDirected 𝔸 (disjSet Θ) := by
   · exact hK₁sub A hA;
   · exact hK₂sub A hA;
 
+/-- The disjunctions over the empty set: none. -/
+@[simp]
+lemma disjSet_empty : disjSet (∅ : BDFormulaSet) = ∅ := sorry
+
+/-- The `◇`-disjunctions over the empty set: none. -/
+@[simp]
+lemma diaDisjSet_empty : diaDisjSet (∅ : BDFormulaSet) = ∅ := sorry
+
 /-- `diaDisjSet Θ` is ⋎-directed, via `dia_mono` and the same list append as `disjSet`. -/
 lemma orDirected_diaDisjSet : OrDirected 𝔸 (diaDisjSet Θ) := by
   rintro C ⟨B₁, ⟨K₁, hK₁ne, hK₁sub, rfl⟩, rfl⟩ D ⟨B₂, ⟨K₂, hK₂ne, hK₂sub, rfl⟩, rfl⟩;
