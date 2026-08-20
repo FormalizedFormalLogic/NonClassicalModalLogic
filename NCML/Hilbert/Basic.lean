@@ -78,6 +78,9 @@ lemma and_intro_ctx (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] A 
 lemma imp_swap : ⊢ᴴ[CK;𝔸] (A 🡒 B 🡒 C) 🡒 (B 🡒 A 🡒 C) :=
   mdp_ctx₂ (imp_trans imply₂ imply₁) (dhyp imply₁)
 
+lemma or_imp (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 C) (h₂ : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] A ⋎ B 🡒 C :=
+  mdp (mdp orElim h₁) h₂
+
 lemma box_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] □A 🡒 □B := mdp kBox (nec h)
 
 @[grind .] lemma box_or_inl : ⊢ᴴ[CK;𝔸] □A 🡒 □(A ⋎ B) := box_mono orIntro₁
