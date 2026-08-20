@@ -34,7 +34,9 @@ lemma counterModel_not_ascendingMRel : ¬ counterModel.AscendingMRel := by
   simp_all [counterModel, Model.iRel, Model.mRel, Model.Fallible];
 
 lemma counterModel_not_forces : (0 : counterModel.World) ⊮[_] (#0 🡒 ◇(#0)) := by
-  sorry
+  intro h;
+  obtain ⟨z, Mz, hz⟩ := h 0 rfl rfl 0 rfl;
+  simp_all [counterModel, Model.mRel, Model.Forces];
 
 end TDia
 
