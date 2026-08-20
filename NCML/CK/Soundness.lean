@@ -40,7 +40,7 @@ lemma valid_of_mem_LogicCKB [M.IsCKB] (hA : A ∈ LogicCKB) : M ⊧ A :=
   valid_of_mem_logic (by
     rintro B (⟨C, rfl⟩ | ⟨C, rfl⟩);
     · exact valid_BBox_of_symmetricMRel_of_forwardConfluent;
-    · exact valid_BDia_of_symmetricMRel_of_forwardConfluent;
+    · exact valid_BDia_of_symmetricMRel;
   ) hA
 
 /-- - [Pac24, Lemma 14] -/
@@ -51,7 +51,7 @@ lemma valid_of_mem_LogicIKB [M.IsIKB] (hA : A ∈ LogicIKB) : M ⊧ A :=
     · exact valid_DP_of_forwardConfluent;
     · exact valid_N_of_symmetricMRel;
     · exact valid_BBox_of_symmetricMRel_of_forwardConfluent;
-    · exact valid_BDia_of_symmetricMRel_of_forwardConfluent;
+    · exact valid_BDia_of_symmetricMRel;
   ) hA
 
 end Model

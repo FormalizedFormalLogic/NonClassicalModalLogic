@@ -131,10 +131,10 @@ lemma forces_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] [M
 lemma valid_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] [M.BackwardConfluent] : M ⊧ ((◇A 🡒 □B) 🡒 □(A 🡒 B)) := fun
   _ => forces_FS_of_forwardConfluent_of_backwardConfluent
 
-lemma valid_BDia_of_symmetricMRel_of_forwardConfluent [M.SymmetricMRel] [M.ForwardConfluent] : M ⊧ (◇(□A) 🡒 A) := by
+lemma valid_BDia_of_symmetricMRel [M.SymmetricMRel] : M ⊧ (◇(□A) 🡒 A) := by
   intro x y _ hy;
-  obtain ⟨z, Myz, hz⟩ := Model.dia_iff_forward_of_forwardConfluent.mp hy;
-  exact hz z y (refl z) (symm_mRel Myz);
+  obtain ⟨z, Mxy, hz⟩ := hy y (refl y);
+  exact hz z y (refl z) (symm_mRel Mxy);
 
 lemma valid_BBox_of_symmetricMRel_of_forwardConfluent [M.SymmetricMRel] [M.ForwardConfluent] : M ⊧ (A 🡒 □◇A) := by
   intro x;
