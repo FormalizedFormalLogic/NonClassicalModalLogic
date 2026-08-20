@@ -8,10 +8,10 @@ public import Mathlib.Tactic
 
 namespace CK
 
-/--
-- [Pac24, Definition 4]
--/
-structure Model (κ : Type*) where
+variable {κ : Type*}
+
+/-- - [Pac24, Definition 4] -/
+structure Frame (κ : Type*) where
   iRel' : κ → κ → Prop
   [iRel_preorder : IsPreorder _ iRel']
   mRel' : κ → κ → Prop
@@ -19,62 +19,85 @@ structure Model (κ : Type*) where
   fallible_iRel' : ∀ {x y}, Fallible' x → iRel' x y → Fallible' y
   fallible_mRel' : ∀ {x y}, Fallible' x → mRel' x y → Fallible' y
   fallible_exists_mRel' : ∀ {x}, Fallible' x → ∃ y, mRel' x y
-  val : κ → Nat → Prop
-  val_persistent : ∀ {x y} {a}, val x a → iRel' x y → val y a
-  fallible_val : ∀ {x} {a}, Fallible' x → val x a
+
+namespace Frame
+
+variable {F : Frame κ}
+
+abbrev World (_ : Frame κ) := κ
+
+abbrev iRel : F.World → F.World → Prop := F.iRel'
+infixl:80 " ≼ " => Frame.iRel
+
+abbrev mRel : F.World → F.World → Prop := F.mRel'
+infixl:80 " ⊏ " => Frame.mRel
+
+instance : IsPreorder F.World F.iRel := F.iRel_preorder
+instance : IsTrans F.World F.iRel := inferInstance
+
+variable {x y : F.World}
+
+abbrev Fallible : F.World → Prop := F.Fallible'
+
+@[grind =>]
+lemma fallible_iRel (h : F.Fallible x) (Ixy : x ≼ y) : F.Fallible y :=
+  F.fallible_iRel' h Ixy
+
+@[grind =>]
+lemma fallible_mRel {x y : F.World} (h : F.Fallible x) (Mxy : x ⊏ y) : F.Fallible y :=
+  F.fallible_mRel' h Mxy
+
+@[grind =>]
+lemma fallible_exists_mRel {x : F.World} (h : F.Fallible x) : ∃ y, x ⊏ y :=
+  F.fallible_exists_mRel' h
+
+end Frame
+
+/-- - [Pac24, Definition 4] -/
+structure Model (κ : Type*) extends Frame κ where
+  val : toFrame.World → Nat → Prop
+  val_persistent : ∀ {x y} {a}, val x a → x ≼ y → val y a
+  fallible_val : ∀ {x} {a}, toFrame.Fallible x → val x a
 
 attribute [grind =>] Model.val_persistent
 
 namespace Model
 
-variable {κ : Type*}
-
-abbrev World (_ : Model κ) := κ
-
-abbrev iRel {M : Model κ} : M.World → M.World → Prop := M.iRel'
-infixl:80 " ≼ " => Model.iRel
-
-abbrev mRel {M : Model κ} : M.World → M.World → Prop := M.mRel'
-infixl:80 " ⊏ " => Model.mRel
-
-variable {M : Model κ}
-
-instance : IsPreorder M.World M.iRel := M.iRel_preorder
-instance : IsTrans M.World M.iRel := inferInstance
-
-abbrev Fallible {M : Model κ} : M.World → Prop := M.Fallible'
+variable {M : Model κ} {x y : M.World}
 
 @[grind =>]
-lemma fallible_iRel {x y : M.World} (h : M.Fallible x) (Ixy : x ≼ y) : M.Fallible y :=
-  M.fallible_iRel' h Ixy
+lemma fallible_iRel (h : M.Fallible x) (Ixy : x ≼ y) : M.Fallible y := M.fallible_iRel' h Ixy
 
 @[grind =>]
-lemma fallible_mRel {x y : M.World} (h : M.Fallible x) (Mxy : x ⊏ y) : M.Fallible y :=
-  M.fallible_mRel' h Mxy
+lemma fallible_mRel (h : M.Fallible x) (Mxy : x ⊏ y) : M.Fallible y := M.fallible_mRel' h Mxy
 
 @[grind =>]
-lemma fallible_exists_mRel {x : M.World} (h : M.Fallible x) : ∃ y, x ⊏ y :=
-  M.fallible_exists_mRel' h
+lemma fallible_exists_mRel (h : M.Fallible x) : ∃ y, x ⊏ y := M.fallible_exists_mRel' h
 
-variable {x y z : M.World} {A B : BDFormula}
+end Model
+
+variable {M : Model κ} {x y z : M.World} {A B : BDFormula}
 
 /-- - [Pac24, Definition 4] -/
 @[grind]
 def Forces (M : Model κ) (x : M.World) : BDFormula → Prop
   | #a    => M.val x a
   | ⊥     => M.Fallible x
-  | A ⋏ B => M.Forces x A ∧ M.Forces x B
-  | A ⋎ B => M.Forces x A ∨ M.Forces x B
-  | A 🡒 B => ∀ y, x ≼ y → M.Forces y A → M.Forces y B
-  | □A    => ∀ y z, x ≼ y → y ⊏ z → M.Forces z A
-  | ◇A    => ∀ y, x ≼ y → ∃ z, y ⊏ z ∧ M.Forces z A
+  | A ⋏ B => Forces M x A ∧ Forces M x B
+  | A ⋎ B => Forces M x A ∨ Forces M x B
+  | A 🡒 B => ∀ y, x ≼ y → Forces M y A → Forces M y B
+  | □A    => ∀ y z, x ≼ y → y ⊏ z → Forces M z A
+  | ◇A    => ∀ y, x ≼ y → ∃ z, y ⊏ z ∧ Forces M z A
 notation:80 x:81 " ⊩[" M "] " A:81 => Forces M x A
 
-abbrev NotForces (M : Model κ) (x : M.World) (A : BDFormula) : Prop := ¬ M.Forces x A
+abbrev NotForces (M : Model κ) (x : M.World) (A : BDFormula) : Prop := ¬(Forces M x A)
 notation:80 x:81 " ⊮[" M "] " A:81 => NotForces M x A
 
+@[simp, grind .]
+lemma forces_top : x ⊩[_] ⊤ := fun _ _ h => h
+
 @[grind =>]
-lemma Forces.persistent (h : x ⊩[_] A) (Ixy : x ≼ y) : y ⊩[_] A := by
+lemma forces_persistent (h : x ⊩[_] A) (Ixy : x ≼ y) : y ⊩[_] A := by
   induction A generalizing y with
   | imply A B _ _ =>
     intro y₁ Iyy₁ hy₁A;
@@ -88,7 +111,7 @@ lemma Forces.persistent (h : x ⊩[_] A) (Ixy : x ≼ y) : y ⊩[_] A := by
   | _ => grind;
 
 @[grind =>]
-lemma Forces.of_fallible (h : M.Fallible x) : x ⊩[_] A := by
+lemma forces_of_fallible (h : M.Fallible x) : x ⊩[_] A := by
   induction A generalizing x with
   | dia A ih =>
     intro y Ixy;
@@ -97,13 +120,17 @@ lemma Forces.of_fallible (h : M.Fallible x) : x ⊩[_] A := by
     exact ⟨z, Myz, ih (M.fallible_mRel hy Myz)⟩;
   | _ => grind [Model.fallible_val];
 
-@[simp, grind .]
-lemma forces_top : x ⊩[_] (⊤ : BDFormula) := fun _ _ h => h
+def Model.Valid (M : Model κ) (A : BDFormula) := ∀ x : M.World, x ⊩[M] A
+infixl:80 " ⊧ " => Model.Valid
 
-def Valid (M : Model κ) (A : BDFormula) := ∀ x : M.World, x ⊩[M] A
-infixl:80 " ⊧ " => Valid
+/-- A formula is valid on a frame when it is valid on every model built over that frame. -/
+def Frame.Valid (F : Frame κ) (A : BDFormula) : Prop :=
+  ∀ val val_persistent fallible_val, (Model.mk F val val_persistent fallible_val) ⊧ A
+infixl:80 " ⊧ " => Frame.Valid
 
-end Model
+/-- A model validates every formula valid on its underlying frame. -/
+lemma Model.valid_of_toFrame_valid {M : Model κ} {A : BDFormula} (h : M.toFrame ⊧ A) : M ⊧ A :=
+  h M.val M.val_persistent M.fallible_val
 
 end CK
 
