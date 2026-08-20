@@ -67,6 +67,10 @@ lemma box_or_mem [T.Of (logic 𝔸)] [T.Mdp]
     (mdp (provable_mem (𝔸 := 𝔸) (imp_comp_left box_or_inr)) h₂)
     h;
 
+/-- An mdp-closed theory of `logic 𝔸` containing `⊥` is the whole formula set. -/
+lemma eq_univ_of_bot_mem [T.Of (logic 𝔸)] [T.Mdp] (h : ⊥ ∈ T) : T = Set.univ :=
+  Set.eq_univ_of_forall fun _ => mdp (T := T) (provable_mem (𝔸 := 𝔸) efq) h
+
 section CKB
 
 class CKB (T : BDTheory) extends T.Mdp, T.Prime, T.Consistent, T.Of LogicCKB where
