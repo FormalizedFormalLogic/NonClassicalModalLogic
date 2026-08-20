@@ -35,6 +35,17 @@ abbrev LogicCKD : BDLogic := ProvableBDHilbert.logic { □A 🡒 ◇A | (A) }
 
 abbrev LogicCKPDia : BDLogic := ProvableBDHilbert.logic { ◇⊤ }
 
+namespace BDLogic
+
+class CK (L : BDLogic) : Prop where
+  logicCK_subset : LogicCK ⊆ L
+export CK (logicCK_subset)
+
+instance {𝔸 : Set BDFormula} : CK (ProvableBDHilbert.logic 𝔸) :=
+  ⟨ProvableBDHilbert.logic_monotone (Set.empty_subset 𝔸)⟩
+
+end BDLogic
+
 lemma LogicCK.subset_CKB : LogicCK ⊆ LogicCKB := .logic_monotone (by grind)
 lemma LogicCK.subset_IK : LogicCK ⊆ LogicIK := .logic_monotone (by grind)
 lemma LogicIK.subset_IKB : LogicIK ⊆ LogicIKB := .logic_monotone (by grind)

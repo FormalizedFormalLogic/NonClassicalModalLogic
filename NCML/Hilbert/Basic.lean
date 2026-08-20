@@ -228,6 +228,10 @@ lemma mem_logic : A ∈ logic 𝔸 ↔ ⊢ᴴ[CK;𝔸] A := Iff.rfl
 
 lemma logic_monotone (h : 𝔸₁ ⊆ 𝔸₂) : logic 𝔸₁ ⊆ logic 𝔸₂ := fun _ => monotone h
 
+instance : BDLogic.Mdp (logic 𝔸) := ⟨mdp⟩
+
+instance : BDLogic.Nec (logic 𝔸) := ⟨nec⟩
+
 end ProvableBDHilbert
 
 end
