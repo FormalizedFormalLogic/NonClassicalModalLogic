@@ -54,13 +54,27 @@ theorem valid_of_mem_LogicCKTDia [M.AscendingMRel] (hA : A ∈ LogicCKTDia) : M 
 
 end Model
 
-/-- Every `⋁K` over the forbidden formulas of a `CK + T◇`-pair `w` stays outside the MP-closure
-of `w.th ∪ □⁻¹w.th`. -/
-private lemma avoid_disjSet_mdpClosure {w : CanonicalPair { A 🡒 ◇A | (A) }} :
-  ∀ C ∈ disjSet w.forb, C ∉ BDTheory.mdpClosure (w.th ∪ □⁻¹w.th) := sorry
+/-- If the logic proves `T◇`, no disjunction over the forbidden formulas of a pair `w` lies in the
+MP-closure of `w.th ∪ □⁻¹w.th`. -/
+private lemma avoid_disjSet_mdpClosure {𝔸 : Set BDFormula}
+  (h𝔸 : ∀ A : BDFormula, (A 🡒 ◇A) ∈ logic 𝔸) (w : CanonicalPair 𝔸) :
+  ∀ C ∈ disjSet w.forb, C ∉ BDTheory.mdpClosure (w.th ∪ □⁻¹w.th) := by
+  have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
+  rintro C ⟨K, hne, hsub, rfl⟩ hmem;
+  obtain ⟨D, hD, E, hE, hDE⟩ := BDTheory.mdpClosure_union_finite_char (𝔸 := 𝔸) hmem;
+  have h₁ : □(D 🡒 ⋁K) ∈ w.th :=
+    w.th.mdp (BDTheory.provable_mem (box_mono (mdp imp_swap hDE))) hE;
+  have h₂ : (◇D 🡒 ◇(⋁K)) ∈ w.th := w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) kDia) h₁;
+  have h₃ : ◇D ∈ w.th := w.th.mdp (BDTheory.provable_mem (h𝔸 D)) hD;
+  exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (w.th.mdp h₂ h₃);
 
-/-- The canonical model of `CK + T◇` satisfies the strong ascending condition. -/
-instance : (canonicalModel { A 🡒 ◇A | (A) }).StrictlyAscendingMRel := sorry
+/-- The canonical model of a logic proving `T◇` is strictly ascending. -/
+lemma strictlyAscendingMRel_canonicalModel {𝔸 : Set BDFormula}
+  (h𝔸 : ∀ A : BDFormula, (A 🡒 ◇A) ∈ logic 𝔸) :
+  (canonicalModel 𝔸).StrictlyAscendingMRel := sorry
+
+instance : (canonicalModel { A 🡒 ◇A | (A) }).StrictlyAscendingMRel :=
+  strictlyAscendingMRel_canonicalModel fun _ => LogicCKTDia.provable_TDia
 
 end CK
 
