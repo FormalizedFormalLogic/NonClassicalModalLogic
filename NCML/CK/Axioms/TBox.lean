@@ -4,6 +4,8 @@ public import NCML.CK.Canonical
 
 @[expose] public section
 
+open ProvableBDHilbert
+
 namespace CK
 
 open Model.Forces
@@ -43,8 +45,16 @@ theorem valid_of_mem_LogicCKTBox [M.ReflexiveMComp] (hA : A ∈ LogicCKTBox) : M
 
 end Model
 
-/-- The canonical model of `CK + T□` satisfies the strong reflexivity condition. -/
-instance : (canonicalModel { □A 🡒 A | (A) }).ReturningMRel := sorry
+/-- The canonical model of a logic proving `T□` has an `≼`-successor with an `⊏`-edge back to
+every pair. -/
+lemma returningMRel_canonicalModel {𝔸 : Set BDFormula} (h𝔸 : ∀ A : BDFormula, (□A 🡒 A) ∈ logic 𝔸) :
+  (canonicalModel 𝔸).ReturningMRel where
+  returning_mRel w :=
+    ⟨w.erase, CanonicalPair.iRel_erase,
+      fun _ hA => w.th.mdp (BDTheory.provable_mem (h𝔸 _)) hA, by simp⟩
+
+instance : (canonicalModel { □A 🡒 A | (A) }).ReturningMRel :=
+  returningMRel_canonicalModel fun _ => LogicCKTBox.provable_TBox
 
 end CK
 
