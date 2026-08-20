@@ -92,6 +92,10 @@ lemma mem_of_dia_box_mem [T.CKB] (h : ◇(□A) ∈ T) : A ∈ T := by
 instance prebox_mdp [T.Of LogicCK] [T.Mdp] : Mdp (□⁻¹T) :=
   ⟨fun hAB hA => mdp (T := T) (mdp (T := T) (provable_mem (𝔸 := ∅) kBox) hAB) hA⟩
 
+-- Not an instance: the axiom set `𝔸` behind `T.Of (logic 𝔸)` cannot be recovered from the goal.
+lemma prebox_of' [T.Of (logic 𝔸)] : Of (logic 𝔸) (□⁻¹T) :=
+  ⟨fun _ hA => T.subset (L := logic 𝔸) (nec hA)⟩
+
 instance prebox_of [T.Of LogicCKB] : Of LogicCKB (□⁻¹T) :=
   ⟨fun _ hA => T.subset (L := LogicCKB) (nec hA)⟩
 
