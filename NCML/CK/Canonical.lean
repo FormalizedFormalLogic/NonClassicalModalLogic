@@ -222,7 +222,50 @@ lemma exists_iRel_of_dia_not_mem (h : ◇A ∉ w.th) :
 - [MdP05, Lemma 3]
 -/
 theorem truthlemma : w ⊩[canonicalModel 𝔸] A ↔ A ∈ w.th := by
-  sorry
+  induction A generalizing w with
+  | atom a => exact Iff.rfl;
+  | falsum => exact Iff.rfl;
+  | and A B ihA ihB =>
+    constructor;
+    · rintro ⟨hA, hB⟩;
+      exact BDTheory.and_mem (𝔸 := 𝔸) (ihA.mp hA) (ihB.mp hB);
+    · intro h;
+      constructor;
+      . exact ihA.mpr (w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) andElim₁) h);
+      . exact ihB.mpr (w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) andElim₂) h);
+  | or A B ihA ihB =>
+    constructor;
+    · rintro (hA | hB);
+      · exact w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) orIntro₁) (ihA.mp hA);
+      · exact w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) orIntro₂) (ihB.mp hB);
+    · intro h;
+      rcases w.th.prime h <;> grind;
+  | imply A B ihA ihB =>
+    constructor;
+    · intro h;
+      by_contra! hc;
+      obtain ⟨v, Iwv, hAv, hBv⟩ := exists_iRel_of_imply_not_mem hc;
+      exact hBv (ihB.mp (h v Iwv (ihA.mpr hAv)));
+    · intro h v Iwv hvA;
+      exact ihB.mpr (v.th.mdp (Iwv h) (ihA.mp hvA));
+  | box A ih =>
+    constructor;
+    · intro h;
+      by_contra! hc;
+      obtain ⟨v, Mwv, hAv⟩ := exists_mRel_of_box_not_mem hc;
+      exact hAv (ih.mp (h w.erase v iRel_erase Mwv));
+    · intro h v u Iwv Mvu;
+      exact ih.mpr (Mvu.1 (Iwv h));
+  | dia A ih =>
+    constructor;
+    · intro h;
+      by_contra! hc;
+      obtain ⟨v, Iwv, hblock⟩ := exists_iRel_of_dia_not_mem hc;
+      obtain ⟨u, Mvu, hAu⟩ := h v Iwv;
+      exact hblock u Mvu (ih.mp hAu);
+    · intro h v Iwv;
+      obtain ⟨u, Mvu, hAu⟩ := exists_mRel_of_dia_mem (Iwv h);
+      exact ⟨u, Mvu, ih.mpr hAu⟩;
 
 end CanonicalPair
 
