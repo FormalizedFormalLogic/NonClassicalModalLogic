@@ -1,6 +1,7 @@
 module
 
 public import NCML.CK.Semantics
+public import NCML.CK.Soundness
 public import NCML.Hilbert.Theory
 
 @[expose] public section
@@ -216,8 +217,37 @@ lemma exists_iRel_of_dia_not_mem (h : ◇A ∉ w.th) :
       orDirected_diaDisjSet (avoid_diaDisjSet_of_dia_not_mem h);
   exact ⟨⟨Y, {A}, hmdp, hprime, hof, havoid⟩, hXY, fun _ Mvu => Mvu.2 A rfl⟩;
 
+/-- Truth lemma for the pair canonical model: a pair forces exactly the formulas of its theory.
+
+- [MdP05, Lemma 3]
+-/
+theorem truthlemma : w ⊩[canonicalModel 𝔸] A ↔ A ∈ w.th := by
+  sorry
+
 end CanonicalPair
 
+section
+
+variable {𝔸 : Set BDFormula} {A : BDFormula}
+
+/-- Model existence: a formula outside `logic 𝔸` is refuted at some pair of the canonical model.
+
+- [MdP05, Theorem 2]
+-/
+theorem exists_not_forces_of_not_mem (h : A ∉ logic 𝔸) :
+  ∃ w : CanonicalPair 𝔸, ¬(w ⊩[canonicalModel 𝔸] A) := by
+  sorry
+
+end
+
 end CK
+
+/-- Completeness of `CK` for the class of all CK-models.
+
+- [MdP05, Theorem 1]
+-/
+theorem LogicCK.iff_valid {A : BDFormula} :
+  A ∈ LogicCK ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, M ⊧ A := by
+  sorry
 
 end
