@@ -48,7 +48,7 @@ lemma returningMRel_canonicalModel (hTBox : ∀ {A}, (□A 🡒 A) ∈ L) :
   (canonicalModel L).ReturningMRel where
   returning_mRel w :=
     ⟨w.erase, CanonicalPair.iRel_erase,
-      fun _ hA => w.th.mdp (w.th.subset (L := L) hTBox) hA, by simp⟩
+      fun _ hA => w.theory.mdp (w.theory.subset (L := L) hTBox) hA, by simp⟩
 
 end CK
 

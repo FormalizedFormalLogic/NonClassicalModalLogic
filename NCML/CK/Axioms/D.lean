@@ -41,12 +41,12 @@ variable {L : BDLogic} [L.Nec] [L.CK]
 
 lemma serialMRel_canonicalModel (hD : ∀ {A}, (□A 🡒 ◇A) ∈ L) : (canonicalModel L).SerialMRel where
   serial_mRel w := by
-    have h : ∀ C ∈ disjSet w.forb, C ∉ □⁻¹w.th := by
+    have h : ∀ C ∈ disjSet w.forbidden, C ∉ □⁻¹w.theory := by
       rintro C ⟨K, hne, hsub, rfl⟩ hmem;
       exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩
-        (w.th.mdp (w.th.subset (L := L) hD) hmem);
+        (w.theory.mdp (w.theory.subset (L := L) hD) hmem);
     obtain ⟨v, hXv, -, havoid⟩ :=
-      CanonicalPair.exists_avoiding (L := L) (T := □⁻¹w.th) orDirected_disjSet h;
+      CanonicalPair.exists_avoiding (L := L) (T := □⁻¹w.theory) orDirected_disjSet h;
     exact ⟨v, CanonicalPair.mRel_of_avoid_disjSet hXv havoid⟩;
 
 end CK

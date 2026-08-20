@@ -54,24 +54,24 @@ end Model
 variable {L : BDLogic} [L.CK]
 
 private lemma avoid_disjSet_mdpClosure (hTDia : ∀ {A}, (A 🡒 ◇A) ∈ L) (w : CanonicalPair L) :
-  ∀ C ∈ disjSet w.forb, C ∉ BDTheory.mdpClosure (w.th ∪ □⁻¹w.th) := by
+  ∀ C ∈ disjSet w.forbidden, C ∉ BDTheory.mdpClosure (w.theory ∪ □⁻¹w.theory) := by
   rintro C ⟨K, hne, hsub, rfl⟩ hmem;
   obtain ⟨D, hD, E, hE, hDE⟩ := BDTheory.mdpClosure_union_finite_char hmem;
-  have h₁ : □(D 🡒 ⋁K) ∈ w.th :=
-    w.th.mdp (BDTheory.provable_mem (box_mono (mdp imp_swap hDE))) hE;
-  have h₂ : (◇D 🡒 ◇(⋁K)) ∈ w.th := w.th.mdp (BDTheory.provable_mem kDia) h₁;
-  have h₃ : ◇D ∈ w.th := w.th.mdp (w.th.subset (L := L) hTDia) hD;
-  exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (w.th.mdp h₂ h₃);
+  have h₁ : □(D 🡒 ⋁K) ∈ w.theory :=
+    w.theory.mdp (BDTheory.provable_mem (box_mono (mdp imp_swap hDE))) hE;
+  have h₂ : (◇D 🡒 ◇(⋁K)) ∈ w.theory := w.theory.mdp (BDTheory.provable_mem kDia) h₁;
+  have h₃ : ◇D ∈ w.theory := w.theory.mdp (w.theory.subset (L := L) hTDia) hD;
+  exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (w.theory.mdp h₂ h₃);
 
 lemma strictlyAscendingMRel_canonicalModel [L.Nec] (hTDia : ∀ {A}, (A 🡒 ◇A) ∈ L) :
   (canonicalModel L).StrictlyAscendingMRel where
   strictly_ascending_mRel w := by
-    have : BDTheory.Of L (w.th ∪ □⁻¹w.th) :=
-      ⟨(w.th.subset (L := L)).trans Set.subset_union_left⟩;
+    have : BDTheory.Of L (w.theory ∪ □⁻¹w.theory) :=
+      ⟨(w.theory.subset (L := L)).trans Set.subset_union_left⟩;
     obtain ⟨v, hXv, -, havoid⟩ :=
-      CanonicalPair.exists_avoiding (L := L) (T := BDTheory.mdpClosure (w.th ∪ □⁻¹w.th))
+      CanonicalPair.exists_avoiding (L := L) (T := BDTheory.mdpClosure (w.theory ∪ □⁻¹w.theory))
         orDirected_disjSet (avoid_disjSet_mdpClosure hTDia w);
-    have h₁ : w.th ∪ □⁻¹w.th ⊆ v.th := BDTheory.subset_mdpClosure.trans hXv;
+    have h₁ : w.theory ∪ □⁻¹w.theory ⊆ v.theory := BDTheory.subset_mdpClosure.trans hXv;
     exact ⟨v, CanonicalPair.mRel_of_avoid_disjSet (Set.subset_union_right.trans h₁) havoid,
       Set.subset_union_left.trans h₁⟩;
 
