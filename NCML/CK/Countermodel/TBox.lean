@@ -34,7 +34,9 @@ lemma counterModel_not_serialMRel : ¬ counterModel.SerialMRel := by
   simp_all [counterModel, Model.mRel];
 
 lemma counterModel_not_forces_PDia : (0 : counterModel.World) ⊮[_] (◇⊤ : BDFormula) := by
-  sorry
+  intro h;
+  obtain ⟨z, Mz, -⟩ := h 0 (le_refl 0);
+  simp_all [counterModel, Model.mRel];
 
 lemma counterModel_not_forces_D : (0 : counterModel.World) ⊮[_] (□⊤ 🡒 ◇⊤ : BDFormula) := by
   sorry
