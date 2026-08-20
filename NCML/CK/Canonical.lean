@@ -191,7 +191,13 @@ lemma exists_mRel_of_dia_mem (h : ◇A ∈ w.th) :
 
 /-- A pair `(T, Θ)` missing `◇A` avoids the `◇`-disjunctions over `{A}`. -/
 private lemma avoid_diaDisjSet_of_dia_not_mem (h : ◇A ∉ w.th) :
-  ∀ C ∈ diaDisjSet {A}, C ∉ w.th := sorry
+  ∀ C ∈ diaDisjSet {A}, C ∉ w.th := by
+  rintro C ⟨D, ⟨K, hne, hsub, rfl⟩, rfl⟩ hmem;
+  have h₁ : ⊢ᴴ[CK;𝔸] ◇(⋁K) 🡒 ◇A := dia_mono (ldisj_imp (by
+    intro B hB;
+    obtain rfl : B = A := hsub B hB;
+    exact imp_id));
+  exact h (w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) h₁) hmem);
 
 /-- A pair missing `◇A` has an `≼`-extension none of whose `⊏`-successors contains `A`. -/
 lemma exists_iRel_of_dia_not_mem (h : ◇A ∉ w.th) :
