@@ -29,7 +29,9 @@ instance : counterModel.ReturningMRel where
   returning_mRel x := ⟨1, Fin.le_last x, rfl⟩
 
 lemma counterModel_not_serialMRel : ¬ counterModel.SerialMRel := by
-  sorry
+  rintro ⟨h⟩;
+  obtain ⟨y, My⟩ := h 0;
+  simp_all [counterModel, Model.mRel];
 
 lemma counterModel_not_forces_PDia : (0 : counterModel.World) ⊮[_] (◇⊤ : BDFormula) := by
   sorry
