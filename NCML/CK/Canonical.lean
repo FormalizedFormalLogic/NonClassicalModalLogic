@@ -118,11 +118,14 @@ def canonicalModel (𝔸 : Set BDFormula) : Model (CanonicalPair 𝔸) where
   mRel' w v := □⁻¹w.th ⊆ v.th ∧ ∀ B ∈ w.forb, B ∉ v.th
   Fallible' w := ⊥ ∈ w.th
   fallible_iRel' h Iwv := Iwv h
-  fallible_mRel' := sorry
-  fallible_exists_mRel' := sorry
+  fallible_mRel' h Mwv := Mwv.1 (by rw [CanonicalPair.th_eq_univ_of_bot_mem h]; trivial)
+  fallible_exists_mRel' h :=
+    ⟨CanonicalPair.univ 𝔸, Set.subset_univ _, by
+      rw [CanonicalPair.forb_eq_empty_of_bot_mem h];
+      simp⟩
   val w a := (#a) ∈ w.th
   val_persistent h Iwv := Iwv h
-  fallible_val := sorry
+  fallible_val h := by rw [CanonicalPair.th_eq_univ_of_bot_mem h]; trivial
 
 namespace CanonicalPair
 
