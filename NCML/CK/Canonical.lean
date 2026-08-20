@@ -29,9 +29,9 @@ nonempty finite disjunctions is possible in `th`.
 structure CanonicalPair (L : BDLogic) where
   th : BDTheory
   forb : BDFormulaSet
-  mdp : th.Mdp
-  prime : th.Prime
-  of : th.Of L
+  [mdp : th.Mdp]
+  [prime : th.Prime]
+  [of : th.Of L]
   avoid : ∀ B ∈ diaDisjSet forb, B ∉ th
 
 namespace CanonicalPair
@@ -71,18 +71,15 @@ lemma exists_avoiding [L.CK] {T : BDTheory} {Z : BDFormulaSet} [T.Mdp] [T.Of L]
   (hdir : OrDirected L Z) (hdisj : ∀ C ∈ Z, C ∉ T) :
   ∃ v : CanonicalPair L, T ⊆ v.th ∧ v.forb = ∅ ∧ ∀ C ∈ Z, C ∉ v.th := by
   obtain ⟨Y, hTY, hmdp, hprime, hof, havoid⟩ := exists_prime_mdpClosed_avoiding hdir hdisj;
-  have := hmdp;
-  have := hprime;
-  have := hof;
   exact ⟨ofTheory L Y, hTY, rfl, havoid⟩;
 
 /-- The pair of the set of all formulas and the empty set of forbidden formulas. -/
 def univ (L : BDLogic) : CanonicalPair L where
   th := Set.univ
   forb := ∅
-  mdp := ⟨fun _ _ => trivial⟩
-  prime := ⟨fun _ => Or.inl trivial⟩
-  of := ⟨fun _ _ => trivial⟩
+  mdp := ⟨by tauto⟩
+  prime := ⟨by tauto⟩
+  of := ⟨by tauto⟩
   avoid := by simp
 
 @[simp] lemma univ_th : (univ L).th = Set.univ := rfl
@@ -97,7 +94,7 @@ lemma forb_eq_empty_of_bot_mem (h : ⊥ ∈ w.th) : w.forb = ∅ := by
   ext B;
   simp only [Set.mem_empty_iff_false, iff_false];
   intro hB;
-  exact w.avoid (◇(⋁[B])) ⟨⋁[B], ⟨[B], by simp, by simpa using hB, rfl⟩, rfl⟩
+  exact w.avoid (◇(⋁[B])) ⟨⋁[B], ⟨[B], by simp, by grind, rfl⟩, rfl⟩
     (by rw [th_eq_univ_of_bot_mem h]; trivial);
 
 lemma eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w = univ L := by
@@ -197,7 +194,7 @@ lemma exists_iRel_of_dia_not_mem (h : ◇A ∉ w.th) :
   obtain ⟨Y, hXY, hmdp, hprime, hof, havoid⟩ :=
     exists_prime_mdpClosed_avoiding (L := L) (T := w.th) (Z := diaDisjSet {A})
       orDirected_diaDisjSet (avoid_diaDisjSet_of_dia_not_mem h);
-  exact ⟨⟨Y, {A}, hmdp, hprime, hof, havoid⟩, hXY, fun _ Mvu => Mvu.2 A rfl⟩;
+  exact ⟨⟨Y, {A}, havoid⟩, hXY, fun _ Mvu => Mvu.2 A rfl⟩;
 
 /-- - [MdP05, Lemma 3] -/
 lemma truthlemma [L.Nec] : w ⊩[canonicalModel L] A ↔ A ∈ w.th := by
