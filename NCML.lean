@@ -7,6 +7,9 @@ public import NCML.CK.CKB_IKB
 public import NCML.CK.Canonical
 public import NCML.CK.Confluence
 public import NCML.CK.Countermodel.BBox
+public import NCML.CK.Countermodel.D
+public import NCML.CK.Countermodel.TBox
+public import NCML.CK.Countermodel.TDia
 public import NCML.CK.Semantics
 public import NCML.CK.Soundness
 public import NCML.Formula
