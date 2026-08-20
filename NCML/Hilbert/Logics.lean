@@ -96,6 +96,8 @@ theorem provable_TDia : (A 🡒 ◇A) ∈ LogicCKTDia := axm (by grind)
 
 theorem provable_diaTop : (◇⊤) ∈ LogicCKTDia := mdp (provable_TDia (A := ⊤)) verum
 
+theorem provable_D : (□A 🡒 ◇A) ∈ LogicCKTDia := provable_D_of_diaTop provable_diaTop
+
 end LogicCKTDia
 
 end
