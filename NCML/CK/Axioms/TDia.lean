@@ -31,7 +31,8 @@ instance [M.StrictlyAscendingMRel] : M.AscendingMRel where
 
 instance [M.AscendingMRel] : M.SerialMRel where
   serial_mRel x := by
-    sorry
+    obtain ⟨z, Mxz, _⟩ := ascending_mRel x;
+    exact ⟨z, Mxz⟩;
 
 theorem valid_TDia_of_ascendingMRel [M.AscendingMRel] : M ⊧ (A 🡒 ◇A) := by
   sorry
