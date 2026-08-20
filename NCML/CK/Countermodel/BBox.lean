@@ -1,6 +1,6 @@
 module
 
-public import NCML.CK.Confluence
+public import NCML.CK.Axioms.BBox
 
 @[expose] public section
 
@@ -33,6 +33,12 @@ lemma counterModel_not_forwardConfluent : ¬ counterModel.ForwardConfluent := by
   simp only [counterModel, Frame.mRel] at M2y₁;
   omega;
 
+lemma counterModel_not_symmetricMComp : ¬ counterModel.SymmetricMComp := by
+  rintro ⟨h⟩;
+  obtain ⟨v, M2v, -⟩ := h (x := 0) (z := 1) (u := 2) (by tauto) (by tauto);
+  simp only [counterModel, Frame.mRel] at M2v;
+  omega;
+
 lemma counterModel_not_forces :
     (0 : counterModel.World) ⊮[_] (#0 🡒 □◇(#0)) := by
   intro h;
@@ -51,6 +57,10 @@ end BBox
 theorem exists_symmetricMRel_not_forces_bBox :
     ∃ (κ : Type) (M : Model κ), M.SymmetricMRel ∧ ∃ x : M.World, x ⊮[_] (#0 🡒 □◇(#0)) :=
   ⟨Fin 3, BBox.counterModel, inferInstance, 0, BBox.counterModel_not_forces⟩
+
+theorem exists_symmetricMRel_not_symmetricMComp :
+    ∃ (κ : Type) (F : Frame κ), F.SymmetricMRel ∧ ¬ F.SymmetricMComp :=
+  ⟨Fin 3, BBox.counterModel.toFrame, inferInstance, BBox.counterModel_not_symmetricMComp⟩
 
 end CK
 
