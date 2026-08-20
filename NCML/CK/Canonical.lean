@@ -22,7 +22,8 @@ namespace BDTheory
 variable {𝔸 : Set BDFormula} {T : BDTheory}
 
 /-- Every theory of `logic 𝔸` is a theory of `LogicCK`. -/
-lemma of_logicCK [T.Of (logic 𝔸)] : T.Of LogicCK := sorry
+lemma of_logicCK [T.Of (logic 𝔸)] : T.Of LogicCK :=
+  ⟨(logic_monotone (Set.empty_subset 𝔸)).trans (subset (L := logic 𝔸))⟩
 
 end BDTheory
 
