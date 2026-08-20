@@ -13,6 +13,8 @@ Human contributors need not follow this document to the letter — treat it as a
 - **Use `lemma`, not `theorem`, for auxiliary results.** Reserve `theorem` for the headline results a
   reader would look up: the formalized counterparts of a source's numbered theorems, and the main entry
   points of a file's API. Closure lemmas, derived rules, combinators and technical bridges are `lemma`.
+  Most files should end up with zero or one `theorem`; when a declaration's status is unclear, use
+  `lemma`.
 - Omit type annotations that are trivially inferred from context.
 - Do not introduce implicit variables ad hoc in lemma statements. Declare them with `variable` in a `section`, and cut a new `section` when the context changes, rather than keeping one giant file-wide block.
 
