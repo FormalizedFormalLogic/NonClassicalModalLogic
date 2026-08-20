@@ -29,3 +29,6 @@ $skill-installer install https://github.com/cameronfreer/lean4-skills/tree/main/
 Invoke it as `$lean4`, or let Codex activate it automatically for Lean 4
 tasks. Restart Codex if the installed skill is not yet available. Codex reads
 the `lean-lsp` configuration from `.codex/config.toml`.
+
+Before contributing, always read [`contribute/index.md`](contribute/index.md).
+Keep Lefthook configured to run the required checks before pushing.

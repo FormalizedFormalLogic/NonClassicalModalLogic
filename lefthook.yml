@@ -1,0 +1,4 @@
+pre-push:
+  commands:
+    mk-all:
+      run: just mk-all
