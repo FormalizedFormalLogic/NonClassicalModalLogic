@@ -279,7 +279,10 @@ variable {𝔸 : Set BDFormula} {A : BDFormula}
 -/
 theorem exists_not_forces_of_not_mem (h : A ∉ logic 𝔸) :
   ∃ w : CanonicalPair 𝔸, ¬(w ⊩[canonicalModel 𝔸] A) := by
-  sorry
+  obtain ⟨w, -, -, havoid⟩ :=
+    CanonicalPair.exists_avoiding (𝔸 := 𝔸) (T := logic 𝔸) (Z := {A}) orDirected_singleton
+      (by rintro C rfl; exact h);
+  exact ⟨w, fun hw => havoid A rfl (CanonicalPair.truthlemma.mp hw)⟩;
 
 end
 
