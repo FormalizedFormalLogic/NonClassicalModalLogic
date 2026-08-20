@@ -38,8 +38,21 @@ theorem valid_of_mem_LogicCKPDia [M.SerialMRel] (hA : A ∈ LogicCKPDia) : M ⊧
 
 end Model
 
-/-- The canonical model of `CK + D` has a serial `⊏`. -/
-instance : (canonicalModel { □A 🡒 ◇A | (A) }).SerialMRel := sorry
+/-- The canonical model of a logic proving `D` has a serial `⊏`. -/
+lemma serialMRel_canonicalModel {𝔸 : Set BDFormula} (h𝔸 : ∀ A : BDFormula, (□A 🡒 ◇A) ∈ logic 𝔸) :
+  (canonicalModel 𝔸).SerialMRel where
+  serial_mRel w := by
+    have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
+    have h : ∀ C ∈ disjSet w.forb, C ∉ □⁻¹w.th := by
+      rintro C ⟨K, hne, hsub, rfl⟩ hmem;
+      exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩
+        (w.th.mdp (BDTheory.provable_mem (h𝔸 (⋁K))) hmem);
+    obtain ⟨v, hXv, -, havoid⟩ :=
+      CanonicalPair.exists_avoiding (𝔸 := 𝔸) (T := □⁻¹w.th) orDirected_disjSet h;
+    exact ⟨v, CanonicalPair.mRel_of_avoid_disjSet hXv havoid⟩;
+
+instance : (canonicalModel { □A 🡒 ◇A | (A) }).SerialMRel :=
+  serialMRel_canonicalModel fun _ => LogicCKD.provable_D
 
 end CK
 
