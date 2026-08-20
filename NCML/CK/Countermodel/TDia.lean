@@ -29,7 +29,9 @@ instance : counterModel.SerialMRel where
   serial_mRel _ := ⟨1, rfl⟩
 
 lemma counterModel_not_ascendingMRel : ¬ counterModel.AscendingMRel := by
-  sorry
+  rintro ⟨h⟩;
+  obtain ⟨z, Mz, hz⟩ := h 0;
+  simp_all [counterModel, Model.iRel, Model.mRel, Model.Fallible];
 
 lemma counterModel_not_forces : (0 : counterModel.World) ⊮[_] (#0 🡒 ◇(#0)) := by
   sorry
