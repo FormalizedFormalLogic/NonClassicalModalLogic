@@ -33,18 +33,29 @@ abbrev LogicCKTDia : BDLogic := ProvableBDHilbert.logic { A 🡒 ◇A | (A) }
 
 abbrev LogicCKD : BDLogic := ProvableBDHilbert.logic { □A 🡒 ◇A | (A) }
 
+/-- `PDia := ◇⊤`. -/
+abbrev LogicCKPDia : BDLogic := ProvableBDHilbert.logic { ◇⊤ }
+
 theorem LogicCK.subset_CKB : LogicCK ⊆ LogicCKB := .logic_monotone (by grind)
 theorem LogicCK.subset_IK : LogicCK ⊆ LogicIK := .logic_monotone (by grind)
 theorem LogicIK.subset_IKB : LogicIK ⊆ LogicIKB := .logic_monotone (by grind)
 theorem LogicCK.subset_CKTBox : LogicCK ⊆ LogicCKTBox := .logic_monotone (by grind)
 theorem LogicCK.subset_CKTDia : LogicCK ⊆ LogicCKTDia := .logic_monotone (by grind)
 theorem LogicCK.subset_CKD : LogicCK ⊆ LogicCKD := .logic_monotone (by grind)
+theorem LogicCK.subset_CKPDia : LogicCK ⊆ LogicCKPDia := .logic_monotone (by grind)
 
 theorem ProvableBDHilbert.provable_D_of_diaTop
     {𝔸 : Set BDFormula} {A : BDFormula} (h : ⊢ᴴ[CK;𝔸] (◇⊤ : BDFormula)) :
     ⊢ᴴ[CK;𝔸] □A 🡒 ◇A :=
   ProvableBDHilbert.mdp_ctx (ProvableBDHilbert.imp_trans (ProvableBDHilbert.box_mono
     ProvableBDHilbert.imply₁) ProvableBDHilbert.kDia) (ProvableBDHilbert.dhyp h)
+
+
+namespace LogicCKPDia
+
+theorem provable_PDia : (◇⊤) ∈ LogicCKPDia := ProvableBDHilbert.axm rfl
+
+end LogicCKPDia
 
 
 namespace LogicCKB
