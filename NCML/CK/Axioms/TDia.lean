@@ -16,14 +16,14 @@ variable {A : BDFormula}
 
 namespace Model
 
-/-- Condition (C): every world has an `⊏`-successor that is either an
-`≼`-successor of the source or fallible. -/
+/-- Every world has an `⊏`-successor that is either an `≼`-successor of the source or
+fallible. -/
 class AscendingMRel (M : Model κ) : Prop where
   ascending_mRel : ∀ x : M.World, ∃ z, x ⊏ z ∧ (x ≼ z ∨ M.Fallible z)
 
 export AscendingMRel (ascending_mRel)
 
-/-- Condition (C′): every world has an `≼`-successor with an `⊏`-edge back to it. -/
+/-- Every world has an `≼`-successor with an `⊏`-edge back to it. -/
 class StrictlyAscendingMRel (M : Model κ) : Prop where
   strictly_ascending_mRel : ∀ x : M.World, ∃ z, x ⊏ z ∧ x ≼ z
 
@@ -89,10 +89,7 @@ instance : (canonicalModel { A 🡒 ◇A | (A) }).StrictlyAscendingMRel :=
 end CK
 
 /-- The model characterization of `CK + T◇`: a formula is a theorem of `CK + T◇` exactly when it is
-valid on every ascending CK-model, equivalently on every strictly ascending one.
-
-- [Pac24, Problem in §4]
--/
+valid on every ascending CK-model, equivalently on every strictly ascending one. -/
 theorem LogicCKTDia_TFAE {A : BDFormula} : List.TFAE [
   A ∈ LogicCKTDia,
   ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.AscendingMRel] → M ⊧ A,

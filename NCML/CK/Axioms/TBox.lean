@@ -15,14 +15,14 @@ variable {A : BDFormula}
 
 namespace Model
 
-/-- Condition (refl°): every world is fallible or lies in the composite
-relation `R° := ≼ ∘ ⊏ ∘ ≼` to itself. -/
+/-- Every world is fallible or reachable from itself by an `≼`-edge, then an `⊏`-edge, then
+an `≼`-edge. -/
 class ReflexiveMComp (M : Model κ) : Prop where
   reflexive_mComp : ∀ x : M.World, M.Fallible x ∨ ∃ y z, x ≼ y ∧ y ⊏ z ∧ z ≼ x
 
 export ReflexiveMComp (reflexive_mComp)
 
-/-- Condition (refl°⁺): every world has an `≼`-successor with an `⊏`-edge back to it. -/
+/-- Every world has an `≼`-successor with an `⊏`-edge back to it. -/
 class ReturningMRel (M : Model κ) : Prop where
   returning_mRel : ∀ x : M.World, ∃ y, x ≼ y ∧ y ⊏ x
 
@@ -60,10 +60,7 @@ end CK
 
 /-- The model characterization of `CK + T□`: a formula is a theorem of `CK + T□` exactly when it is
 valid on every CK-model whose `≼ ∘ ⊏ ∘ ≼` is reflexive up to fallibility, equivalently on every
-CK-model in which every world has an `≼`-successor with an `⊏`-edge back to it.
-
-- [Pac24, Problem in §4]
--/
+CK-model in which every world has an `≼`-successor with an `⊏`-edge back to it. -/
 theorem LogicCKTBox_TFAE {A : BDFormula} : List.TFAE [
   A ∈ LogicCKTBox,
   ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.ReflexiveMComp] → M ⊧ A,

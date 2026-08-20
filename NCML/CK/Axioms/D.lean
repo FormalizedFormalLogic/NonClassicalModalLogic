@@ -57,10 +57,7 @@ instance : (canonicalModel { □A 🡒 ◇A | (A) }).SerialMRel :=
 end CK
 
 /-- The model characterization of `CK + D`: a formula is a theorem of `CK + D` exactly when it is
-valid on every CK-model with a serial `⊏`.
-
-- [Pac24, Problem in §4]
--/
+valid on every CK-model with a serial `⊏`. -/
 theorem LogicCKD.mem_iff_valid {A : BDFormula} :
   A ∈ LogicCKD ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.SerialMRel] → M ⊧ A := by
   constructor;
@@ -72,10 +69,7 @@ theorem LogicCKD.mem_iff_valid {A : BDFormula} :
     exact ⟨_, CK.canonicalModel _, inferInstance, fun hM => hw (hM w)⟩;
 
 /-- The model characterization of `CK + PDia`: a formula is a theorem of `CK + PDia` exactly when
-it is valid on every CK-model with a serial `⊏`.
-
-- [Pac24, Problem in §4]
--/
+it is valid on every CK-model with a serial `⊏`. -/
 theorem LogicCKPDia.mem_iff_valid {A : BDFormula} :
   A ∈ LogicCKPDia ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.SerialMRel] → M ⊧ A := by
   rw [← LogicCKD.eq_CKPDia];
