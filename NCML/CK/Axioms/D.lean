@@ -77,6 +77,8 @@ it is valid on every CK-model with a serial `⊏`.
 - [Pac24, Problem in §4]
 -/
 theorem LogicCKPDia.mem_iff_valid {A : BDFormula} :
-  A ∈ LogicCKPDia ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.SerialMRel] → M ⊧ A := sorry
+  A ∈ LogicCKPDia ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.SerialMRel] → M ⊧ A := by
+  rw [← LogicCKD.eq_CKPDia];
+  exact LogicCKD.mem_iff_valid;
 
 end
