@@ -289,6 +289,15 @@ lemma prime_of_maximal_avoiding_orDirected (hdir : OrDirected 𝔸 Z)
   obtain ⟨E, hE, hCD⟩ := hdir C hC D hD;
   exact havoid E hE (Y.mdp (BDTheory.provable_mem (𝔸 := 𝔸) hCD) h₅);
 
+/-- General prime Lindenbaum lemma: an MP-closed theory of `logic 𝔸` disjoint from an
+⋎-directed `Z` extends to a prime MP-closed theory of `logic 𝔸` still disjoint from `Z`. -/
+lemma exists_prime_mdpClosed_avoiding [T.Mdp] [T.Of (logic 𝔸)]
+  (hdir : OrDirected 𝔸 Z) (hdisj : ∀ B ∈ Z, B ∉ T) :
+  ∃ Y : BDTheory, T ⊆ Y ∧ Y.Mdp ∧ Y.Prime ∧ Y.Of (logic 𝔸) ∧ ∀ B ∈ Z, B ∉ Y := by
+  obtain ⟨Y, hTY, hmax⟩ := exists_maximal_mdpClosed_avoiding (L := logic 𝔸) hdisj;
+  obtain ⟨-, hmdpY, hlogY, havoid⟩ := hmax.prop;
+  exact ⟨Y, hTY, hmdpY, ⟨prime_of_maximal_avoiding_orDirected hdir hmax⟩, hlogY, havoid⟩;
+
 end Maximal
 
 /-! ## CKB-specific consequences of the MP-closure -/
