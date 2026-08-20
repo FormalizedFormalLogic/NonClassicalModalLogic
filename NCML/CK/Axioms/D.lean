@@ -62,7 +62,14 @@ valid on every CK-model with a serial `⊏`.
 - [Pac24, Problem in §4]
 -/
 theorem LogicCKD.mem_iff_valid {A : BDFormula} :
-  A ∈ LogicCKD ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.SerialMRel] → M ⊧ A := sorry
+  A ∈ LogicCKD ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.SerialMRel] → M ⊧ A := by
+  constructor;
+  · intro h _ M _;
+    exact CK.Model.valid_of_mem_LogicCKD h;
+  · contrapose!;
+    intro h;
+    obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
+    exact ⟨_, CK.canonicalModel _, inferInstance, fun hM => hw (hM w)⟩;
 
 /-- The model characterization of `CK + PDia`: a formula is a theorem of `CK + PDia` exactly when
 it is valid on every CK-model with a serial `⊏`.
