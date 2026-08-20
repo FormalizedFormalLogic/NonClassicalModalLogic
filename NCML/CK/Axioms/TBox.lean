@@ -62,9 +62,9 @@ theorem LogicCKTBox_TFAE {A : BDFormula} : List.TFAE [
   tfae_have 3 → 1 := by
     contrapose!;
     intro h;
-    obtain ⟨P, hw⟩ := CK.exists_not_forces_of_not_mem h;
+    obtain ⟨P, h₁⟩ := CK.exists_not_forces_of_not_mem h;
     exact ⟨_, CK.canonicalModel LogicCKTBox, CK.returningMRel_canonicalModel (by grind),
-      fun hM => hw (hM P)⟩;
+      fun hM => h₁ (hM P)⟩;
   tfae_finish
 
 end

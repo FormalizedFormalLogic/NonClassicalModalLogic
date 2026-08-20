@@ -45,9 +45,9 @@ lemma serialMRel_canonicalModel (hD : ∀ {A}, (□A 🡒 ◇A) ∈ L) : (canoni
       rintro C ⟨K, hne, hsub, rfl⟩ hmem;
       exact P.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩
         (P.theory.mdp (P.theory.subset (L := L) hD) hmem);
-    obtain ⟨P₁, hXv, -, havoid⟩ :=
+    obtain ⟨P₁, h₁, -, havoid⟩ :=
       CanonicalPair.exists_avoiding (L := L) (T := □⁻¹P.theory) orDirected_disjSet h;
-    exact ⟨P₁, CanonicalPair.mRel_of_avoid_disjSet hXv havoid⟩;
+    exact ⟨P₁, CanonicalPair.mRel_of_avoid_disjSet h₁ havoid⟩;
 
 end CK
 
@@ -61,9 +61,9 @@ theorem LogicCKD_TFAE {A : BDFormula} : List.TFAE [
   tfae_have 3 → 1 := by
     contrapose!;
     intro h;
-    obtain ⟨P, hw⟩ := CK.exists_not_forces_of_not_mem h;
+    obtain ⟨P, h₁⟩ := CK.exists_not_forces_of_not_mem h;
     exact ⟨_, CK.canonicalModel LogicCKD, CK.serialMRel_canonicalModel (by grind),
-      fun hM => hw (hM P)⟩;
+      fun hM => h₁ (hM P)⟩;
   tfae_finish
 
 end
