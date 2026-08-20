@@ -71,6 +71,11 @@ def Forces (M : Model κ) (x : M.World) : BDFormula → Prop
 
 notation:80 x:81 " ⊩[" M "] " A:81 => Forces M x A
 
+/-- Negation of `Forces`. -/
+abbrev NotForces (M : Model κ) (x : M.World) (A : BDFormula) : Prop := ¬ M.Forces x A
+
+notation:80 x:81 " ⊮[" M "] " A:81 => NotForces M x A
+
 @[grind =>]
 lemma Forces.persistent (h : x ⊩[_] A) (Ixy : x ≼ y) : y ⊩[_] A := by
   induction A generalizing y with
