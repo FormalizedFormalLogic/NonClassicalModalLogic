@@ -131,6 +131,11 @@ def conj (Γ : BDFormulaList) : BDFormula := Γ.foldr (· ⋏ ·) ⊤
 
 @[inherit_doc] scoped prefix:90 "⋀" => BDFormulaList.conj
 
+/-- Disjunction of a list of formulas, right-folded with `⊥` as the base case. -/
+def disj (Γ : BDFormulaList) : BDFormula := Γ.foldr (· ⋎ ·) ⊥
+
+@[inherit_doc] scoped prefix:90 "⋁" => BDFormulaList.disj
+
 /-- The image of `Γ` under `□`. -/
 def box (Γ : BDFormulaList) : BDFormulaList := Γ.map (□·)
 
@@ -145,6 +150,10 @@ variable {Γ Γ₁ Γ₂ : BDFormulaList} {A : BDFormula}
 @[simp] lemma conj_nil : ⋀([] : BDFormulaList) = ⊤ := rfl
 
 @[simp] lemma conj_cons (A : BDFormula) (Γ : BDFormulaList) : ⋀(A :: Γ) = A ⋏ ⋀Γ := rfl
+
+@[simp] lemma disj_nil : ⋁([] : BDFormulaList) = ⊥ := rfl
+
+@[simp] lemma disj_cons (A : BDFormula) (Γ : BDFormulaList) : ⋁(A :: Γ) = A ⋎ ⋁Γ := rfl
 
 @[simp, grind =] lemma mem_box_iff : A ∈ □Γ ↔ ∃ B ∈ Γ, □B = A := List.mem_map
 
