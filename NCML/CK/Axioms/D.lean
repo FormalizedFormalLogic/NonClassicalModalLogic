@@ -37,7 +37,7 @@ lemma valid_of_mem_LogicCKPDia [M.SerialMRel] (hA : A ∈ LogicCKPDia) : M ⊧ A
 
 end Model
 
-variable {L : BDLogic} [L.Nec] [L.CK]
+variable {L : BDLogic} [L.CK]
 
 lemma serialMRel_canonicalModel (hD : ∀ {A}, (□A 🡒 ◇A) ∈ L) : (canonicalModel L).SerialMRel where
   serial_mRel w := by

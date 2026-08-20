@@ -152,7 +152,7 @@ lemma exists_iRel_of_imply_not_mem (h : (A 🡒 B) ∉ w.theory) :
       (by rintro C rfl; exact h);
   exact ⟨v, BDTheory.subset_impSet.trans hXv, hXv BDTheory.self_mem_impSet, havoid B rfl⟩;
 
-lemma exists_mRel_of_box_not_mem [L.Nec] (h : □A ∉ w.theory) :
+lemma exists_mRel_of_box_not_mem (h : □A ∉ w.theory) :
   ∃ v : CanonicalPair L, (canonicalModel L).mRel w.erase v ∧ A ∉ v.theory := by
   obtain ⟨v, hXv, -, havoid⟩ :=
     exists_avoiding (L := L) (T := □⁻¹w.theory) (Z := {A}) orDirected_singleton
@@ -172,7 +172,7 @@ private lemma avoid_disjSet_of_dia_mem (h : ◇A ∈ w.theory) :
   have h₁ : (◇A 🡒 ◇(⋁K)) ∈ w.theory := w.theory.mdp (BDTheory.provable_mem kDia) hmem;
   exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (w.theory.mdp h₁ h);
 
-lemma exists_mRel_of_dia_mem [L.Nec] (h : ◇A ∈ w.theory) :
+lemma exists_mRel_of_dia_mem (h : ◇A ∈ w.theory) :
   ∃ v : CanonicalPair L, (canonicalModel L).mRel w v ∧ A ∈ v.theory := by
   obtain ⟨v, hXv, -, havoid⟩ :=
     exists_avoiding (L := L) (T := BDTheory.impSet (□⁻¹w.theory) A) (Z := disjSet w.forbidden)
@@ -198,7 +198,7 @@ lemma exists_iRel_of_dia_not_mem (h : ◇A ∉ w.theory) :
   exact ⟨⟨Y, {A}, havoid⟩, hXY, fun _ Mvu => Mvu.2 A rfl⟩;
 
 /-- - [MdP05, Lemma 3] -/
-lemma truthlemma [L.Nec] : w ⊩[canonicalModel L] A ↔ A ∈ w.theory := by
+lemma truthlemma : w ⊩[canonicalModel L] A ↔ A ∈ w.theory := by
   induction A generalizing w with
   | atom a => exact Iff.rfl;
   | falsum => exact Iff.rfl;
@@ -248,7 +248,7 @@ end CanonicalPair
 
 section
 
-variable {L : BDLogic} [L.Mdp] [L.Nec] [L.CK] {A : BDFormula}
+variable {L : BDLogic} [L.CK] {A : BDFormula}
 
 /-- - [MdP05, Theorem 2] -/
 lemma exists_not_forces_of_not_mem (h : A ∉ L) :

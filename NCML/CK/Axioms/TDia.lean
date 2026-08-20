@@ -63,7 +63,7 @@ private lemma avoid_disjSet_mdpClosure (hTDia : ∀ {A}, (A 🡒 ◇A) ∈ L) (w
   have h₃ : ◇D ∈ w.theory := w.theory.mdp (w.theory.subset (L := L) hTDia) hD;
   exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (w.theory.mdp h₂ h₃);
 
-lemma strictlyAscendingMRel_canonicalModel [L.Nec] (hTDia : ∀ {A}, (A 🡒 ◇A) ∈ L) :
+lemma strictlyAscendingMRel_canonicalModel (hTDia : ∀ {A}, (A 🡒 ◇A) ∈ L) :
   (canonicalModel L).StrictlyAscendingMRel where
   strictly_ascending_mRel w := by
     have : BDTheory.Of L (w.theory ∪ □⁻¹w.theory) :=

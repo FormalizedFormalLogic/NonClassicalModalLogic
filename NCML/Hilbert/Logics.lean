@@ -37,12 +37,12 @@ abbrev LogicCKPDia : BDLogic := ProvableBDHilbert.logic { ◇⊤ }
 
 namespace BDLogic
 
-class CK (L : BDLogic) : Prop where
+class CK (L : BDLogic) : Prop extends Mdp L, Nec L where
   logicCK_subset : LogicCK ⊆ L
 export CK (logicCK_subset)
 
-instance {𝔸 : Set BDFormula} : CK (ProvableBDHilbert.logic 𝔸) :=
-  ⟨ProvableBDHilbert.logic_monotone (Set.empty_subset 𝔸)⟩
+instance {𝔸 : Set BDFormula} : CK (ProvableBDHilbert.logic 𝔸) where
+  logicCK_subset := ProvableBDHilbert.logic_monotone (Set.empty_subset 𝔸)
 
 end BDLogic
 
