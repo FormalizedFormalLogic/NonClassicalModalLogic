@@ -9,9 +9,9 @@ public import NCML.Hilbert.Theory
 /-!
 # The pair canonical model
 
-For an axiom set `𝔸`, the canonical model whose worlds are the pairs `(T, Θ)` of a prime
-MP-closed theory `T` of `logic 𝔸` and a set `Θ` of formulas omitted by every `⊏`-successor, its
-truth lemma, and the completeness of `CK` for the class of all CK-models.
+For a logic `L`, the canonical model whose worlds are the pairs `(T, Θ)` of a prime MP-closed
+theory `T` of `L` and a set `Θ` of formulas omitted by every `⊏`-successor, its truth lemma, and
+the completeness of `CK` for the class of all CK-models.
 
 - [MdP05, Definition 3, Lemma 3, Theorem 1]
 -/
@@ -19,46 +19,35 @@ truth lemma, and the completeness of `CK` for the class of all CK-models.
 open BDFormula ProvableBDHilbert
 open scoped BDFormulaSet BDFormulaList
 
-namespace BDTheory
-
-variable {𝔸 : Set BDFormula} {T : BDTheory}
-
-lemma of_logicCK [T.Of (logic 𝔸)] : T.Of LogicCK :=
-  ⟨(logic_monotone (Set.empty_subset 𝔸)).trans (subset (L := logic 𝔸))⟩
-
-end BDTheory
-
-
 namespace CK
 
-/-- A pair of a prime MP-closed theory `th` of `logic 𝔸` and a set `forb` of formulas none of
-whose nonempty finite disjunctions is possible in `th`.
+/-- A pair of a prime MP-closed theory `th` of `L` and a set `forb` of formulas none of whose
+nonempty finite disjunctions is possible in `th`.
 
 - [MdP05, Definition 2]
 -/
-structure CanonicalPair (𝔸 : Set BDFormula) where
+structure CanonicalPair (L : BDLogic) where
   th : BDTheory
   forb : BDFormulaSet
   mdp : th.Mdp
   prime : th.Prime
-  of : th.Of (logic 𝔸)
+  of : th.Of L
   avoid : ∀ B ∈ diaDisjSet forb, B ∉ th
 
 namespace CanonicalPair
 
-variable {𝔸 : Set BDFormula} {w : CanonicalPair 𝔸}
+variable {L : BDLogic} {w : CanonicalPair L}
 
 instance : w.th.Mdp := w.mdp
 
 instance : w.th.Prime := w.prime
 
-instance : w.th.Of (logic 𝔸) := w.of
+instance : w.th.Of L := w.of
 
-instance : w.th.Of LogicCK := BDTheory.of_logicCK (𝔸 := 𝔸)
+instance [L.CK] : w.th.Of LogicCK := BDTheory.of_logicCK (L := L)
 
-/-- The pair `(T, ∅)` of a prime MP-closed theory `T` of `logic 𝔸`. -/
-def ofTheory (𝔸 : Set BDFormula) (T : BDTheory) [T.Mdp] [T.Prime] [T.Of (logic 𝔸)] :
-  CanonicalPair 𝔸 where
+/-- The pair `(T, ∅)` of a prime MP-closed theory `T` of `L`. -/
+def ofTheory (L : BDLogic) (T : BDTheory) [T.Mdp] [T.Prime] [T.Of L] : CanonicalPair L where
   th := T
   forb := ∅
   mdp := ‹_›
@@ -68,27 +57,27 @@ def ofTheory (𝔸 : Set BDFormula) (T : BDTheory) [T.Mdp] [T.Prime] [T.Of (logi
 
 section
 
-variable (𝔸 : Set BDFormula) (T : BDTheory) [T.Mdp] [T.Prime] [T.Of (logic 𝔸)]
+variable (L : BDLogic) (T : BDTheory) [T.Mdp] [T.Prime] [T.Of L]
 
-@[simp] lemma ofTheory_th : (ofTheory 𝔸 T).th = T := rfl
+@[simp] lemma ofTheory_th : (ofTheory L T).th = T := rfl
 
-@[simp] lemma ofTheory_forb : (ofTheory 𝔸 T).forb = ∅ := rfl
+@[simp] lemma ofTheory_forb : (ofTheory L T).forb = ∅ := rfl
 
 end
 
-/-- An MP-closed theory of `logic 𝔸` disjoint from an ⋎-directed `Z` extends to the theory of a
-pair with no forbidden formulas, still disjoint from `Z`. -/
-lemma exists_avoiding {T : BDTheory} {Z : BDFormulaSet} [T.Mdp] [T.Of (logic 𝔸)]
-  (hdir : OrDirected 𝔸 Z) (hdisj : ∀ C ∈ Z, C ∉ T) :
-  ∃ v : CanonicalPair 𝔸, T ⊆ v.th ∧ v.forb = ∅ ∧ ∀ C ∈ Z, C ∉ v.th := by
+/-- An MP-closed theory of `L` disjoint from an ⋎-directed `Z` extends to the theory of a pair
+with no forbidden formulas, still disjoint from `Z`. -/
+lemma exists_avoiding [L.CK] {T : BDTheory} {Z : BDFormulaSet} [T.Mdp] [T.Of L]
+  (hdir : OrDirected L Z) (hdisj : ∀ C ∈ Z, C ∉ T) :
+  ∃ v : CanonicalPair L, T ⊆ v.th ∧ v.forb = ∅ ∧ ∀ C ∈ Z, C ∉ v.th := by
   obtain ⟨Y, hTY, hmdp, hprime, hof, havoid⟩ := exists_prime_mdpClosed_avoiding hdir hdisj;
   have := hmdp;
   have := hprime;
   have := hof;
-  exact ⟨ofTheory 𝔸 Y, hTY, rfl, havoid⟩;
+  exact ⟨ofTheory L Y, hTY, rfl, havoid⟩;
 
 /-- The pair of the set of all formulas and the empty set of forbidden formulas. -/
-def univ (𝔸 : Set BDFormula) : CanonicalPair 𝔸 where
+def univ (L : BDLogic) : CanonicalPair L where
   th := Set.univ
   forb := ∅
   mdp := ⟨fun _ _ => trivial⟩
@@ -96,12 +85,13 @@ def univ (𝔸 : Set BDFormula) : CanonicalPair 𝔸 where
   of := ⟨fun _ _ => trivial⟩
   avoid := by simp
 
-@[simp] lemma univ_th : (univ 𝔸).th = Set.univ := rfl
+@[simp] lemma univ_th : (univ L).th = Set.univ := rfl
 
-@[simp] lemma univ_forb : (univ 𝔸).forb = ∅ := rfl
+@[simp] lemma univ_forb : (univ L).forb = ∅ := rfl
 
-lemma th_eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w.th = Set.univ :=
-  BDTheory.eq_univ_of_bot_mem (𝔸 := 𝔸) h
+variable [L.CK]
+
+lemma th_eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w.th = Set.univ := BDTheory.eq_univ_of_bot_mem h
 
 lemma forb_eq_empty_of_bot_mem (h : ⊥ ∈ w.th) : w.forb = ∅ := by
   ext B;
@@ -110,7 +100,7 @@ lemma forb_eq_empty_of_bot_mem (h : ⊥ ∈ w.th) : w.forb = ∅ := by
   exact w.avoid (◇(⋁[B])) ⟨⋁[B], ⟨[B], by simp, by simpa using hB, rfl⟩, rfl⟩
     (by rw [th_eq_univ_of_bot_mem h]; trivial);
 
-lemma eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w = univ 𝔸 := by
+lemma eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w = univ L := by
   have h₁ := th_eq_univ_of_bot_mem h;
   have h₂ := forb_eq_empty_of_bot_mem h;
   cases w;
@@ -120,11 +110,11 @@ lemma eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w = univ 𝔸 := by
 
 end CanonicalPair
 
-/-- The canonical model of `logic 𝔸`, whose worlds are the pairs of `CanonicalPair 𝔸`.
+/-- The canonical model of `L`, whose worlds are the pairs of `CanonicalPair L`.
 
 - [MdP05, Definition 3, Lemma 3]
 -/
-def canonicalModel (𝔸 : Set BDFormula) : Model (CanonicalPair 𝔸) where
+def canonicalModel (L : BDLogic) [L.CK] : Model (CanonicalPair L) where
   iRel' w v := w.th ⊆ v.th
   iRel_preorder := {
     refl := fun _ => subset_rfl,
@@ -135,7 +125,7 @@ def canonicalModel (𝔸 : Set BDFormula) : Model (CanonicalPair 𝔸) where
   fallible_iRel' h Iwv := Iwv h
   fallible_mRel' h Mwv := Mwv.1 (by rw [CanonicalPair.th_eq_univ_of_bot_mem h]; trivial)
   fallible_exists_mRel' h :=
-    ⟨CanonicalPair.univ 𝔸, Set.subset_univ _, by
+    ⟨CanonicalPair.univ L, Set.subset_univ _, by
       rw [CanonicalPair.forb_eq_empty_of_bot_mem h];
       simp⟩
   val w a := (#a) ∈ w.th
@@ -144,91 +134,89 @@ def canonicalModel (𝔸 : Set BDFormula) : Model (CanonicalPair 𝔸) where
 
 namespace CanonicalPair
 
-variable {𝔸 : Set BDFormula} {A B : BDFormula} {w : CanonicalPair 𝔸}
+variable {L : BDLogic} {A B : BDFormula} {w : CanonicalPair L}
 
 /-- The pair `w` with its forbidden formulas erased. -/
-def erase (w : CanonicalPair 𝔸) : CanonicalPair 𝔸 := ofTheory 𝔸 w.th
+def erase (w : CanonicalPair L) : CanonicalPair L := ofTheory L w.th
 
 @[simp] lemma erase_th : w.erase.th = w.th := rfl
 
 @[simp] lemma erase_forb : w.erase.forb = ∅ := rfl
 
-lemma iRel_erase : (canonicalModel 𝔸).iRel w w.erase := subset_rfl
+variable [L.CK]
+
+lemma iRel_erase : (canonicalModel L).iRel w w.erase := subset_rfl
 
 lemma exists_iRel_of_imply_not_mem (h : (A 🡒 B) ∉ w.th) :
-  ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).iRel w v ∧ A ∈ v.th ∧ B ∉ v.th := by
+  ∃ v : CanonicalPair L, (canonicalModel L).iRel w v ∧ A ∈ v.th ∧ B ∉ v.th := by
   obtain ⟨v, hXv, -, havoid⟩ :=
-    exists_avoiding (𝔸 := 𝔸) (T := w.th.impSet A) (Z := {B}) orDirected_singleton
+    exists_avoiding (L := L) (T := w.th.impSet A) (Z := {B}) orDirected_singleton
       (by rintro C rfl; exact h);
-  exact ⟨v, (BDTheory.subset_impSet (𝔸 := 𝔸)).trans hXv,
-    hXv (BDTheory.self_mem_impSet (𝔸 := 𝔸)), havoid B rfl⟩;
+  exact ⟨v, BDTheory.subset_impSet.trans hXv, hXv BDTheory.self_mem_impSet, havoid B rfl⟩;
 
-lemma exists_mRel_of_box_not_mem (h : □A ∉ w.th) :
-  ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel w.erase v ∧ A ∉ v.th := by
-  have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
+lemma exists_mRel_of_box_not_mem [L.Nec] (h : □A ∉ w.th) :
+  ∃ v : CanonicalPair L, (canonicalModel L).mRel w.erase v ∧ A ∉ v.th := by
   obtain ⟨v, hXv, -, havoid⟩ :=
-    exists_avoiding (𝔸 := 𝔸) (T := □⁻¹w.th) (Z := {A}) orDirected_singleton
+    exists_avoiding (L := L) (T := □⁻¹w.th) (Z := {A}) orDirected_singleton
       (by rintro C rfl; exact h);
   exact ⟨v, ⟨hXv, by simp⟩, havoid A rfl⟩;
 
-lemma mRel_of_avoid_disjSet {v : CanonicalPair 𝔸} (hsub : □⁻¹w.th ⊆ v.th)
-  (havoid : ∀ C ∈ disjSet w.forb, C ∉ v.th) : (canonicalModel 𝔸).mRel w v := by
+lemma mRel_of_avoid_disjSet {v : CanonicalPair L} (hsub : □⁻¹w.th ⊆ v.th)
+  (havoid : ∀ C ∈ disjSet w.forb, C ∉ v.th) : (canonicalModel L).mRel w v := by
   refine ⟨hsub, ?_⟩;
   intro B hB hBv;
   exact havoid (⋁[B]) ⟨[B], by simp, by simpa using hB, rfl⟩
-    (v.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) (imp_ldisj (by simp))) hBv);
+    (v.th.mdp (BDTheory.provable_mem (imp_ldisj (by simp))) hBv);
 
 private lemma avoid_disjSet_of_dia_mem (h : ◇A ∈ w.th) :
   ∀ C ∈ disjSet w.forb, C ∉ BDTheory.impSet (□⁻¹w.th) A := by
   rintro C ⟨K, hne, hsub, rfl⟩ hmem;
-  have h₁ : (◇A 🡒 ◇(⋁K)) ∈ w.th := w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) kDia) hmem;
+  have h₁ : (◇A 🡒 ◇(⋁K)) ∈ w.th := w.th.mdp (BDTheory.provable_mem kDia) hmem;
   exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (w.th.mdp h₁ h);
 
-lemma exists_mRel_of_dia_mem (h : ◇A ∈ w.th) :
-  ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel w v ∧ A ∈ v.th := by
-  have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
-  have := BDTheory.of_logicCK (𝔸 := 𝔸) (T := □⁻¹w.th);
+lemma exists_mRel_of_dia_mem [L.Nec] (h : ◇A ∈ w.th) :
+  ∃ v : CanonicalPair L, (canonicalModel L).mRel w v ∧ A ∈ v.th := by
   obtain ⟨v, hXv, -, havoid⟩ :=
-    exists_avoiding (𝔸 := 𝔸) (T := BDTheory.impSet (□⁻¹w.th) A) (Z := disjSet w.forb)
+    exists_avoiding (L := L) (T := BDTheory.impSet (□⁻¹w.th) A) (Z := disjSet w.forb)
       orDirected_disjSet (avoid_disjSet_of_dia_mem h);
-  exact ⟨v, mRel_of_avoid_disjSet ((BDTheory.subset_impSet (𝔸 := 𝔸)).trans hXv) havoid,
-    hXv (BDTheory.self_mem_impSet (𝔸 := 𝔸))⟩;
+  exact ⟨v, mRel_of_avoid_disjSet (BDTheory.subset_impSet.trans hXv) havoid,
+    hXv BDTheory.self_mem_impSet⟩;
 
 private lemma avoid_diaDisjSet_of_dia_not_mem (h : ◇A ∉ w.th) :
   ∀ C ∈ diaDisjSet {A}, C ∉ w.th := by
   rintro C ⟨D, ⟨K, hne, hsub, rfl⟩, rfl⟩ hmem;
-  have h₁ : ⊢ᴴ[CK;𝔸] ◇(⋁K) 🡒 ◇A := dia_mono (ldisj_imp (by
+  have h₁ : (◇(⋁K) 🡒 ◇A) ∈ LogicCK := dia_mono (ldisj_imp (by
     intro B hB;
     obtain rfl : B = A := hsub B hB;
     exact imp_id));
-  exact h (w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) h₁) hmem);
+  exact h (w.th.mdp (BDTheory.provable_mem h₁) hmem);
 
 lemma exists_iRel_of_dia_not_mem (h : ◇A ∉ w.th) :
-  ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).iRel w v ∧
-  ∀ u : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel v u → A ∉ u.th := by
+  ∃ v : CanonicalPair L, (canonicalModel L).iRel w v ∧
+  ∀ u : CanonicalPair L, (canonicalModel L).mRel v u → A ∉ u.th := by
   obtain ⟨Y, hXY, hmdp, hprime, hof, havoid⟩ :=
-    exists_prime_mdpClosed_avoiding (𝔸 := 𝔸) (T := w.th) (Z := diaDisjSet {A})
+    exists_prime_mdpClosed_avoiding (L := L) (T := w.th) (Z := diaDisjSet {A})
       orDirected_diaDisjSet (avoid_diaDisjSet_of_dia_not_mem h);
   exact ⟨⟨Y, {A}, hmdp, hprime, hof, havoid⟩, hXY, fun _ Mvu => Mvu.2 A rfl⟩;
 
 /-- - [MdP05, Lemma 3] -/
-lemma truthlemma : w ⊩[canonicalModel 𝔸] A ↔ A ∈ w.th := by
+lemma truthlemma [L.Nec] : w ⊩[canonicalModel L] A ↔ A ∈ w.th := by
   induction A generalizing w with
   | atom a => exact Iff.rfl;
   | falsum => exact Iff.rfl;
   | and A B ihA ihB =>
     constructor;
     · rintro ⟨hA, hB⟩;
-      exact BDTheory.and_mem (𝔸 := 𝔸) (ihA.mp hA) (ihB.mp hB);
+      exact BDTheory.and_mem (ihA.mp hA) (ihB.mp hB);
     · intro h;
       constructor;
-      . exact ihA.mpr (w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) andElim₁) h);
-      . exact ihB.mpr (w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) andElim₂) h);
+      . exact ihA.mpr (w.th.mdp (BDTheory.provable_mem andElim₁) h);
+      . exact ihB.mpr (w.th.mdp (BDTheory.provable_mem andElim₂) h);
   | or A B ihA ihB =>
     constructor;
     · rintro (hA | hB);
-      · exact w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) orIntro₁) (ihA.mp hA);
-      · exact w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) orIntro₂) (ihB.mp hB);
+      · exact w.th.mdp (BDTheory.provable_mem orIntro₁) (ihA.mp hA);
+      · exact w.th.mdp (BDTheory.provable_mem orIntro₂) (ihB.mp hB);
     · intro h;
       rcases w.th.prime h <;> grind;
   | imply A B ihA ihB =>
@@ -262,13 +250,13 @@ end CanonicalPair
 
 section
 
-variable {𝔸 : Set BDFormula} {A : BDFormula}
+variable {L : BDLogic} [L.Mdp] [L.Nec] [L.CK] {A : BDFormula}
 
 /-- - [MdP05, Theorem 2] -/
-lemma exists_not_forces_of_not_mem (h : A ∉ logic 𝔸) :
-  ∃ w : CanonicalPair 𝔸, w ⊮[canonicalModel 𝔸] A := by
+lemma exists_not_forces_of_not_mem (h : A ∉ L) :
+  ∃ w : CanonicalPair L, w ⊮[canonicalModel L] A := by
   obtain ⟨w, -, -, havoid⟩ :=
-    CanonicalPair.exists_avoiding (𝔸 := 𝔸) (T := logic 𝔸) (Z := {A}) orDirected_singleton
+    CanonicalPair.exists_avoiding (L := L) (T := L) (Z := {A}) orDirected_singleton
       (by rintro C rfl; exact h);
   exact ⟨w, fun hw => havoid A rfl (CanonicalPair.truthlemma.mp hw)⟩;
 
@@ -284,7 +272,7 @@ theorem LogicCK.mem_iff_valid {A : BDFormula} :
     exact CK.Model.valid_of_mem_LogicCK h;
   · contrapose!;
     intro h;
-    obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem (𝔸 := ∅) h;
-    exact ⟨_, CK.canonicalModel ∅, fun hM => hw (hM w)⟩;
+    obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem (L := LogicCK) h;
+    exact ⟨_, CK.canonicalModel LogicCK, fun hM => hw (hM w)⟩;
 
 end

@@ -41,8 +41,8 @@ lemma exists_extending {T : BDTheory} {A : BDFormula} [T.Of LogicCKB] [T.Mdp] (h
     prime := by
       intro B C hBC;
       by_contra! hc;
-      exact hAY <| BDTheory.or_elim_mem (𝔸 := ∅) (h₁ hc.1) (h₁ hc.2) hBC;
-    consistent := fun h => hAY <| Y.mdp (BDTheory.provable_mem (𝔸 := ∅) .efq) h
+      exact hAY <| BDTheory.or_elim_mem (h₁ hc.1) (h₁ hc.2) hBC;
+    consistent := fun h => hAY <| Y.mdp (BDTheory.provable_mem .efq) h
   }⟩, hTY, hAY⟩;
 
 end CKBTheory
@@ -95,8 +95,8 @@ private lemma exists_box_imp_mem
   ∃ C ∉ U.1, (A 🡒 □C) ∈ Y := by
   obtain ⟨-, hmdpY, hlogY, -⟩ := hmax.prop;
   obtain ⟨C, rfl | ⟨C, hC, rfl⟩, h⟩ := exists_imp_mem_of_maximal hmax hA;
-  · exact ⟨⊥, U.1.consistent, Y.mdp (BDTheory.provable_mem (𝔸 := ∅)
-      ProvableBDHilbert.imp_bot_imp_box_bot) h⟩;
+  · exact ⟨⊥, U.1.consistent,
+      Y.mdp (BDTheory.provable_mem ProvableBDHilbert.imp_bot_imp_box_bot) h⟩;
   · exact ⟨C, hC, h⟩;
 
 /-- A maximal MP-closed set avoiding `U.forbidden` is prime. -/
@@ -109,7 +109,7 @@ private lemma prime_of_maximal
   obtain ⟨C, hC, h₁⟩ := exists_box_imp_mem hmax hc.1;
   obtain ⟨D, hD, h₂⟩ := exists_box_imp_mem hmax hc.2;
   exact (U.1.prime <| prebox_subset_of_avoid havoid <|
-    BDTheory.box_or_mem (𝔸 := ∅) (T := Y) h₁ h₂ h).elim hC hD;
+    BDTheory.box_or_mem (T := Y) h₁ h₂ h).elim hC hD;
 
 end BackwardConfluence
 
@@ -167,12 +167,10 @@ private lemma prime_of_maximal_dia
   obtain ⟨C, hC, h₁⟩ := exists_imp_mem_of_maximal hmax hc.1;
   obtain ⟨D, hD, h₂⟩ := exists_imp_mem_of_maximal hmax hc.2;
   have h₃ : (A 🡒 C ⋎ D) ∈ Y :=
-    Y.mdp (BDTheory.provable_mem (𝔸 := ∅)
-      (ProvableBDHilbert.imp_comp_left ProvableBDHilbert.orIntro₁)) h₁;
+    Y.mdp (BDTheory.provable_mem (ProvableBDHilbert.imp_comp_left ProvableBDHilbert.orIntro₁)) h₁;
   have h₄ : (B 🡒 C ⋎ D) ∈ Y :=
-    Y.mdp (BDTheory.provable_mem (𝔸 := ∅)
-      (ProvableBDHilbert.imp_comp_left ProvableBDHilbert.orIntro₂)) h₂;
-  have h₅ : C ⋎ D ∈ Y := BDTheory.or_elim_mem (𝔸 := ∅) h₃ h₄ h;
+    Y.mdp (BDTheory.provable_mem (ProvableBDHilbert.imp_comp_left ProvableBDHilbert.orIntro₂)) h₂;
+  have h₅ : C ⋎ D ∈ Y := BDTheory.or_elim_mem h₃ h₄ h;
   exact havoid (C ⋎ D) (fun hmem => (BDTheory.dia_or_mem hmem).elim hC hD) h₅;
 
 /-- A CKB-theory containing `◇A` has a `⊏`-successor containing `A`. -/
@@ -190,11 +188,11 @@ private lemma exists_mRel_of_dia_mem (h : ◇A ∈ U.1) :
     consistent := havoidY ⊥ (BDTheory.dia_bot_not_mem (T := U.1))
   }⟩;
   and_intros;
-  . exact (BDTheory.subset_impSet (𝔸 := ∅)).trans hXY;
+  . exact BDTheory.subset_impSet.trans hXY;
   . intro B hB;
     by_contra! hc;
     exact havoidY B hc hB;
-  . exact hXY (BDTheory.self_mem_impSet (𝔸 := ∅));
+  . exact hXY BDTheory.self_mem_impSet;
 
 end Diamond
 
@@ -209,7 +207,7 @@ lemma truthlemma {T : CKBTheory} {A : BDFormula} : T ⊩[CKBcanonicalModel] A �
   | and A B ihA ihB =>
     constructor;
     · rintro ⟨hA, hB⟩;
-      exact BDTheory.and_mem (𝔸 := ∅) (ihA.mp hA) (ihB.mp hB);
+      exact BDTheory.and_mem (ihA.mp hA) (ihB.mp hB);
     · intro h;
       constructor;
       . exact ihA.mpr (T.1.mdp (T.1.subset (L := LogicCK) .andElim₁) h);
@@ -228,10 +226,10 @@ lemma truthlemma {T : CKBTheory} {A : BDFormula} : T ⊩[CKBcanonicalModel] A �
       obtain ⟨T₁, hXT₁, hBT₁⟩ := CKBTheory.exists_extending (T := T.1.impSet A) (A := B) hc;
       exact hBT₁
         <| ihB.mp
-        <| h T₁ ((BDTheory.subset_impSet (𝔸 := ∅)).trans hXT₁)
+        <| h T₁ (BDTheory.subset_impSet.trans hXT₁)
         <| ihA.mpr
         <| hXT₁
-        <| BDTheory.self_mem_impSet (𝔸 := ∅);
+        <| BDTheory.self_mem_impSet;
     · intro h T₁ ITT₁ hT₁A;
       exact ihB.mpr (T₁.1.mdp (ITT₁ h) (ihA.mp hT₁A));
   | box A ih =>

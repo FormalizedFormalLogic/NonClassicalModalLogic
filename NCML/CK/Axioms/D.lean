@@ -37,22 +37,17 @@ lemma valid_of_mem_LogicCKPDia [M.SerialMRel] (hA : A ∈ LogicCKPDia) : M ⊧ A
 
 end Model
 
-variable {𝔸 : Set BDFormula}
+variable {L : BDLogic} [L.Nec] [L.CK]
 
-lemma serialMRel_canonicalModel (h𝔸 : ∀ {A}, (□A 🡒 ◇A) ∈ logic 𝔸) :
-  (canonicalModel 𝔸).SerialMRel where
+lemma serialMRel_canonicalModel (hD : ∀ {A}, (□A 🡒 ◇A) ∈ L) : (canonicalModel L).SerialMRel where
   serial_mRel w := by
-    have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
     have h : ∀ C ∈ disjSet w.forb, C ∉ □⁻¹w.th := by
       rintro C ⟨K, hne, hsub, rfl⟩ hmem;
       exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩
-        (w.th.mdp (BDTheory.provable_mem (h𝔸)) hmem);
+        (w.th.mdp (w.th.subset (L := L) hD) hmem);
     obtain ⟨v, hXv, -, havoid⟩ :=
-      CanonicalPair.exists_avoiding (𝔸 := 𝔸) (T := □⁻¹w.th) orDirected_disjSet h;
+      CanonicalPair.exists_avoiding (L := L) (T := □⁻¹w.th) orDirected_disjSet h;
     exact ⟨v, CanonicalPair.mRel_of_avoid_disjSet hXv havoid⟩;
-
-lemma serialMRel_canonicalModel_of_mem (h : ∀ {A}, □A 🡒 ◇A ∈ 𝔸) : (canonicalModel 𝔸).SerialMRel :=
-  serialMRel_canonicalModel $ by tauto;
 
 end CK
 
@@ -67,7 +62,8 @@ theorem LogicCKD_TFAE {A : BDFormula} : List.TFAE [
     contrapose!;
     intro h;
     obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
-    exact ⟨_, CK.canonicalModel _, CK.serialMRel_canonicalModel_of_mem (by grind), fun hM => hw (hM w)⟩;
+    exact ⟨_, CK.canonicalModel LogicCKD, CK.serialMRel_canonicalModel (by grind),
+      fun hM => hw (hM w)⟩;
   tfae_finish
 
 end

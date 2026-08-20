@@ -42,17 +42,13 @@ lemma valid_of_mem_LogicCKTBox [M.ReflexiveMComp] (hA : A ∈ LogicCKTBox) : M �
 
 end Model
 
-variable {𝔸 : Set BDFormula}
+variable {L : BDLogic} [L.CK]
 
-lemma returningMRel_canonicalModel (h𝔸 : ∀ A : BDFormula, (□A 🡒 A) ∈ logic 𝔸) :
-  (canonicalModel 𝔸).ReturningMRel where
+lemma returningMRel_canonicalModel (hTBox : ∀ {A}, (□A 🡒 A) ∈ L) :
+  (canonicalModel L).ReturningMRel where
   returning_mRel w :=
     ⟨w.erase, CanonicalPair.iRel_erase,
-      fun _ hA => w.th.mdp (BDTheory.provable_mem (h𝔸 _)) hA, by simp⟩
-
-lemma returningMRel_canonicalModel_of_mem (h : ∀ {A}, □A 🡒 A ∈ 𝔸) :
-  (canonicalModel 𝔸).ReturningMRel :=
-  returningMRel_canonicalModel $ by tauto;
+      fun _ hA => w.th.mdp (w.th.subset (L := L) hTBox) hA, by simp⟩
 
 end CK
 
@@ -67,7 +63,7 @@ theorem LogicCKTBox_TFAE {A : BDFormula} : List.TFAE [
     contrapose!;
     intro h;
     obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
-    exact ⟨_, CK.canonicalModel _, CK.returningMRel_canonicalModel_of_mem (by grind),
+    exact ⟨_, CK.canonicalModel LogicCKTBox, CK.returningMRel_canonicalModel (by grind),
       fun hM => hw (hM w)⟩;
   tfae_finish
 
