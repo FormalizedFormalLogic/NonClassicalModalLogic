@@ -167,7 +167,10 @@ lemma exists_mRel_of_box_not_mem (h : □A ∉ w.th) :
 /-- The theory `□⁻¹T` under the assumption `A` avoids the disjunctions over `Θ`, for a pair
 `(T, Θ)` containing `◇A`. -/
 private lemma avoid_disjSet_of_dia_mem (h : ◇A ∈ w.th) :
-  ∀ C ∈ disjSet w.forb, C ∉ BDTheory.impSet (□⁻¹w.th) A := sorry
+  ∀ C ∈ disjSet w.forb, C ∉ BDTheory.impSet (□⁻¹w.th) A := by
+  rintro C ⟨K, hne, hsub, rfl⟩ hmem;
+  have h₁ : (◇A 🡒 ◇(⋁K)) ∈ w.th := w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) kDia) hmem;
+  exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (w.th.mdp h₁ h);
 
 /-- A pair containing `◇A` has a `⊏`-successor containing `A`. -/
 lemma exists_mRel_of_dia_mem (h : ◇A ∈ w.th) :
