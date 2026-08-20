@@ -6,7 +6,7 @@ public import NCML.CK.Confluence
 
 namespace CK
 
-variable {κ : Type*} {M : Model κ}
+variable {κ : Type*}
 variable {A : BDFormula}
 
 namespace Frame
@@ -34,28 +34,13 @@ instance [F.SymmetricMRel] : F.StrictlyReturningMComp where
     intro z Iwz;
     exact ⟨z, w, refl z, symm_mRel Iwz, refl w⟩;
 
-end Frame
-
-namespace Model
-
-open CK.Frame
-
-lemma valid_BDia_of_returningMComp [M.ReturningMComp] : M ⊧ (◇(□A) 🡒 A) := by
-  intro x w _ hw;
+lemma valid_BDia_of_returningMComp [F.ReturningMComp] : F ⊧ (◇(□A) 🡒 A) := by
+  intro val val_persistent fallible_val x w _ hw;
   rcases returning_mComp w with hFallible | ⟨y, Iwy, hy⟩;
   . exact forces_of_fallible hFallible;
   . obtain ⟨z, Iyz, hz⟩ := hw y Iwy;
     obtain ⟨u, v, Izu, Muv, Ivw⟩ := hy z Iyz;
     exact forces_persistent (hz u v Izu Muv) Ivw;
-
-end Model
-
-namespace Frame
-
-variable {F : Frame κ}
-
-lemma valid_BDia_of_returningMComp [F.ReturningMComp] : F ⊧ (◇(□A) 🡒 A) :=
-  fun _ _ _ => Model.valid_BDia_of_returningMComp
 
 lemma returningMComp_of_valid_BDia (h : F ⊧ (◇(□(#0)) 🡒 #0)) : F.ReturningMComp where
   returning_mComp w := by

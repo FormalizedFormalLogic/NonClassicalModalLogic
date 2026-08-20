@@ -6,7 +6,7 @@ public import NCML.CK.Confluence
 
 namespace CK
 
-variable {κ : Type*} {M : Model κ}
+variable {κ : Type*}
 variable {A : BDFormula}
 
 namespace Frame
@@ -33,26 +33,11 @@ instance [F.SymmetricMRel] [F.ForwardConfluent] : F.StrictlySymmetricMComp where
     obtain ⟨v, Ixv, Muv⟩ := forward_confluent (symm_mRel Mxz) Izu;
     exact ⟨v, Muv, Ixv⟩;
 
-end Frame
-
-namespace Model
-
-open CK.Frame
-
-lemma valid_BBox_of_symmetricMComp [M.SymmetricMComp] : M ⊧ (A 🡒 □◇A) := by
-  intro x y Ixy hyA y₁ z Iyy₁ My₁z u Izu;
+lemma valid_BBox_of_symmetricMComp [F.SymmetricMComp] : F ⊧ (A 🡒 □◇A) := by
+  intro val val_persistent fallible_val x y Ixy hyA y₁ z Iyy₁ My₁z u Izu;
   obtain ⟨v, Muv, Iy₁v | hv⟩ := symm_mComp My₁z Izu;
   . exact ⟨v, Muv, forces_persistent hyA (Trans.trans Iyy₁ Iy₁v)⟩;
   . exact ⟨v, Muv, forces_of_fallible hv⟩;
-
-end Model
-
-namespace Frame
-
-variable {F : Frame κ}
-
-lemma valid_BBox_of_symmetricMComp [F.SymmetricMComp] : F ⊧ (A 🡒 □◇A) :=
-  fun _ _ _ => Model.valid_BBox_of_symmetricMComp
 
 lemma symmetricMComp_of_valid_BBox (h : F ⊧ (#0 🡒 □◇(#0))) : F.SymmetricMComp where
   symm_mComp {x z u} Mxz Izu := by
