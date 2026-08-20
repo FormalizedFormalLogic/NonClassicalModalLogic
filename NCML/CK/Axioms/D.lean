@@ -18,7 +18,9 @@ class SerialMRel (M : Model κ) : Prop where
 export SerialMRel (serial_mRel)
 
 theorem forces_D_of_serialMRel [M.SerialMRel] : x ⊩[_] (□A 🡒 ◇A) := by
-  sorry
+  intro y Ixy hyBoxA u Iyu;
+  obtain ⟨z, Muz⟩ := serial_mRel u;
+  exact ⟨z, Muz, hyBoxA u z Iyu Muz⟩;
 
 theorem valid_D_of_serialMRel [M.SerialMRel] : M ⊧ (□A 🡒 ◇A) := fun
   _ => forces_D_of_serialMRel
