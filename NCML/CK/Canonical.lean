@@ -11,7 +11,7 @@ public import NCML.Hilbert.Theory
 For an axiom set `𝔸`, the canonical model whose worlds are the pairs `(T, Θ)` of a prime
 MP-closed theory `T` of `logic 𝔸` and a set `Θ` of formulas omitted by every `⊏`-successor.
 
-- [MdP05]
+- [MdP05, Definition 3]
 -/
 
 open BDFormula ProvableBDHilbert
@@ -31,7 +31,10 @@ end BDTheory
 namespace CK
 
 /-- A pair of a prime MP-closed theory `th` of `logic 𝔸` and a set `forb` of formulas none of
-whose nonempty finite disjunctions is possible in `th`. -/
+whose nonempty finite disjunctions is possible in `th`.
+
+- [MdP05, Definition 2]
+-/
 structure CanonicalPair (𝔸 : Set BDFormula) where
   th : BDTheory
   forb : BDFormulaSet
@@ -96,7 +99,7 @@ def univ (𝔸 : Set BDFormula) : CanonicalPair 𝔸 where
 
 @[simp] lemma univ_forb : (univ 𝔸).forb = ∅ := rfl
 
-/-- A pair containing `⊥` forces every formula. -/
+/-- The theory of a pair containing `⊥` is the set of all formulas. -/
 lemma th_eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w.th = Set.univ :=
   BDTheory.eq_univ_of_bot_mem (𝔸 := 𝔸) h
 
@@ -119,7 +122,10 @@ lemma eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w = univ 𝔸 := by
 
 end CanonicalPair
 
-/-- The canonical model of `logic 𝔸`, whose worlds are the pairs `(T, Θ)`. -/
+/-- The canonical model of `logic 𝔸`, whose worlds are the pairs of `CanonicalPair 𝔸`.
+
+- [MdP05, Definition 3, Lemma 3]
+-/
 def canonicalModel (𝔸 : Set BDFormula) : Model (CanonicalPair 𝔸) where
   iRel' w v := w.th ⊆ v.th
   iRel_preorder := {
@@ -142,7 +148,7 @@ namespace CanonicalPair
 
 variable {𝔸 : Set BDFormula} {A B : BDFormula} {w : CanonicalPair 𝔸}
 
-/-- The pair `w = (T, Θ)` with its forbidden formulas erased. -/
+/-- The pair `w` with its forbidden formulas erased. -/
 def erase (w : CanonicalPair 𝔸) : CanonicalPair 𝔸 := ofTheory 𝔸 w.th
 
 @[simp] lemma erase_th : w.erase.th = w.th := rfl
@@ -169,8 +175,8 @@ lemma exists_mRel_of_box_not_mem (h : □A ∉ w.th) :
       (by rintro C rfl; exact h);
   exact ⟨v, ⟨hXv, by simp⟩, havoid A rfl⟩;
 
-/-- The theory `□⁻¹T` under the assumption `A` avoids the disjunctions over `Θ`, for a pair
-`(T, Θ)` containing `◇A`. -/
+/-- For a pair `w` containing `◇A`, the theory `□⁻¹w.th` under the assumption `A` is disjoint
+from `disjSet w.forb`. -/
 private lemma avoid_disjSet_of_dia_mem (h : ◇A ∈ w.th) :
   ∀ C ∈ disjSet w.forb, C ∉ BDTheory.impSet (□⁻¹w.th) A := by
   rintro C ⟨K, hne, hsub, rfl⟩ hmem;
@@ -191,7 +197,7 @@ lemma exists_mRel_of_dia_mem (h : ◇A ∈ w.th) :
   exact havoid (⋁[B]) ⟨[B], by simp, by simpa using hB, rfl⟩
     (v.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) (imp_ldisj (by simp))) hBv);
 
-/-- A pair `(T, Θ)` missing `◇A` avoids the `◇`-disjunctions over `{A}`. -/
+/-- The theory of a pair missing `◇A` is disjoint from `diaDisjSet {A}`. -/
 private lemma avoid_diaDisjSet_of_dia_not_mem (h : ◇A ∉ w.th) :
   ∀ C ∈ diaDisjSet {A}, C ∉ w.th := by
   rintro C ⟨D, ⟨K, hne, hsub, rfl⟩, rfl⟩ hmem;
