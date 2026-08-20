@@ -35,7 +35,12 @@ instance [M.AscendingMRel] : M.SerialMRel where
     exact ⟨z, Mxz⟩;
 
 theorem valid_TDia_of_ascendingMRel [M.AscendingMRel] : M ⊧ (A 🡒 ◇A) := by
-  sorry
+  intro x y Ixy hyA u Iyu;
+  obtain ⟨z, Muz, hz⟩ := ascending_mRel u;
+  have huA : u ⊩[_] A := Model.Forces.persistent hyA Iyu;
+  rcases hz with Iuz | hzFallible;
+  · exact ⟨z, Muz, Model.Forces.persistent huA Iuz⟩;
+  · exact ⟨z, Muz, Model.Forces.of_fallible hzFallible⟩;
 
 end Model
 
