@@ -77,6 +77,8 @@ open ProvableBDHilbert
 
 theorem provable_TBox : (□A 🡒 A) ∈ LogicCKTBox := axm (by grind)
 
+theorem provable_not_box_bot : (∼□⊥) ∈ LogicCKTBox := provable_TBox (A := ⊥)
+
 end LogicCKTBox
 
 end
