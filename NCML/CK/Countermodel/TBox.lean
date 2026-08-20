@@ -28,17 +28,17 @@ def counterModel : Model (Fin 2) where
 instance : counterModel.ReturningMRel where
   returning_mRel x := ⟨1, Fin.le_last x, rfl⟩
 
-lemma counterModel_not_serialMRel : ¬ counterModel.SerialMRel := by
+lemma counterModel_not_serialMRel : ¬counterModel.SerialMRel := by
   rintro ⟨h⟩;
   obtain ⟨y, My⟩ := h 0;
   simp_all [counterModel, Model.mRel];
 
-lemma counterModel_not_forces_PDia : (0 : counterModel.World) ⊮[_] (◇⊤ : BDFormula) := by
+lemma counterModel_not_forces_PDia : 0 ⊮[counterModel] ◇⊤ := by
   intro h;
   obtain ⟨z, Mz, -⟩ := h 0 (le_refl 0);
   simp_all [counterModel, Model.mRel];
 
-lemma counterModel_not_forces_D : (0 : counterModel.World) ⊮[_] (□⊤ 🡒 ◇⊤ : BDFormula) :=
+lemma counterModel_not_forces_D : 0 ⊮[counterModel] (□⊤ 🡒 ◇⊤) :=
   fun h => counterModel_not_forces_PDia (h 0 (le_refl 0) fun _ _ _ _ => forces_top)
 
 end TBox
@@ -56,13 +56,13 @@ lemma exists_reflexiveMComp_not_forces_N :
 
 end CK
 
-theorem LogicCKTBox.not_provable_PDia : (◇⊤ : BDFormula) ∉ LogicCKTBox :=
+theorem LogicCKTBox.not_provable_PDia : ◇⊤ ∉ LogicCKTBox :=
   fun h => CK.TBox.counterModel_not_forces_PDia (CK.Model.valid_of_mem_LogicCKTBox h 0)
 
-theorem LogicCKTBox.not_provable_D : (□⊤ 🡒 ◇⊤ : BDFormula) ∉ LogicCKTBox :=
+theorem LogicCKTBox.not_provable_D : □⊤ 🡒 ◇⊤ ∉ LogicCKTBox :=
   fun h => CK.TBox.counterModel_not_forces_D (CK.Model.valid_of_mem_LogicCKTBox h 0)
 
-theorem LogicCKTBox.not_provable_N : (∼◇⊥) ∉ LogicCKTBox :=
+theorem LogicCKTBox.not_provable_N : ∼◇⊥ ∉ LogicCKTBox :=
   fun h => CK.D.counterModel_not_forces (CK.Model.valid_of_mem_LogicCKTBox h 0)
 
 end

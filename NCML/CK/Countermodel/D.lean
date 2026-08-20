@@ -14,7 +14,10 @@ namespace D
 
 def counterModel : Model (Fin 2) where
   iRel' x y := x = y
-  iRel_preorder := { refl := by grind, trans := by grind }
+  iRel_preorder := {
+    refl := by grind,
+    trans := by grind
+  }
   mRel' x y := x ≤ y
   Fallible' x := x = 1
   fallible_iRel' := by grind
@@ -27,11 +30,11 @@ def counterModel : Model (Fin 2) where
 instance : counterModel.SerialMRel where
   serial_mRel x := ⟨x, le_refl x⟩
 
-lemma counterModel_not_forces : (0 : counterModel.World) ⊮[_] ∼◇⊥ := by
+lemma counterModel_not_forces : 0 ⊮[counterModel] ∼◇⊥ := by
   intro h;
-  have h₁ : (0 : counterModel.World) ⊩[_] ◇⊥ := fun y _ => ⟨1, Fin.le_last y, rfl⟩;
+  have h₁ : 0 ⊩[counterModel] ◇⊥ := fun y _ => ⟨1, Fin.le_last y, rfl⟩;
   have h₂ : (0 : Fin 2) = 1 := h 0 rfl h₁;
-  simp at h₂;
+  contradiction;
 
 end D
 
