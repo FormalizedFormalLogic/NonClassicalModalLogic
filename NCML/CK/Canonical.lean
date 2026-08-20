@@ -292,8 +292,14 @@ end CK
 
 - [MdP05, Theorem 1]
 -/
-theorem LogicCK.iff_valid {A : BDFormula} :
+theorem LogicCK.mem_iff_valid {A : BDFormula} :
   A ∈ LogicCK ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, M ⊧ A := by
-  sorry
+  constructor;
+  · intro h _ M;
+    exact CK.Model.valid_of_mem_LogicCK h;
+  · contrapose!;
+    intro h;
+    obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem (𝔸 := ∅) h;
+    exact ⟨_, CK.canonicalModel ∅, fun hM => hw (hM w)⟩;
 
 end
