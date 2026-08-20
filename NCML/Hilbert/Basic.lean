@@ -206,56 +206,22 @@ lemma rec
   rintro A ⟨h⟩;
   induction h with
   | axm hmem => exact axm hmem;
-  | imply₁ => exact imply₁ _;
-  | imply₂ => exact imply₂ _;
-  | andElim₁ => exact andElim₁ _;
-  | andElim₂ => exact andElim₂ _;
-  | andIntro => exact andIntro _;
-  | orIntro₁ => exact orIntro₁ _;
-  | orIntro₂ => exact orIntro₂ _;
-  | orElim => exact orElim _;
-  | efq => exact efq _;
-  | kBox => exact kBox _;
-  | kDia => exact kDia _;
   | mdp h₁ h₂ ih₁ ih₂ => exact mdp ⟨h₁⟩ ⟨h₂⟩ ih₁ ih₂;
   | nec h ih => exact nec ⟨h⟩ ih;
+  | _ => grind
 
 theorem monotone (h : 𝔸₁ ⊆ 𝔸₂) : ⊢ᴴ[CK;𝔸₁] A → ⊢ᴴ[CK;𝔸₂] A := by
   intro p;
   induction p with
-  | axm hmem   => exact axm (h hmem);
-  | imply₁     => exact imply₁;
-  | imply₂     => exact imply₂;
-  | andElim₁   => exact andElim₁;
-  | andElim₂   => exact andElim₂;
-  | andIntro   => exact andIntro;
-  | orIntro₁   => exact orIntro₁;
-  | orIntro₂   => exact orIntro₂;
-  | orElim     => exact orElim;
-  | efq        => exact efq;
-  | kBox       => exact kBox;
-  | kDia       => exact kDia;
-  | mdp _ _ ih₁ ih₂ => exact mdp ih₁ ih₂;
-  | nec _ ih   => exact nec ih;
+  | axm hmem => exact axm (h hmem);
+  | _ => grind
 
 theorem provable_of_provable_axioms
     (h : ∀ B ∈ 𝔸₁, ⊢ᴴ[CK;𝔸₂] B) : (⊢ᴴ[CK;𝔸₁] A) → ⊢ᴴ[CK;𝔸₂] A := by
   intro p;
   induction p with
-  | axm hmem   => exact h _ hmem;
-  | imply₁     => exact imply₁;
-  | imply₂     => exact imply₂;
-  | andElim₁   => exact andElim₁;
-  | andElim₂   => exact andElim₂;
-  | andIntro   => exact andIntro;
-  | orIntro₁   => exact orIntro₁;
-  | orIntro₂   => exact orIntro₂;
-  | orElim     => exact orElim;
-  | efq        => exact efq;
-  | kBox       => exact kBox;
-  | kDia       => exact kDia;
-  | mdp _ _ ih₁ ih₂ => exact mdp ih₁ ih₂;
-  | nec _ ih   => exact nec ih;
+  | axm hmem => exact h _ hmem;
+  | _ => grind
 
 abbrev logic (𝔸 : Set BDFormula) : BDLogic := { A | ⊢ᴴ[CK;𝔸] A }
 
