@@ -6,6 +6,8 @@ public import NCML.CK.Semantics
 
 namespace CK
 
+open Model.Forces
+
 variable {κ : Type*} {M : Model κ}
 variable {A : BDFormula}
 
@@ -27,13 +29,14 @@ export ReturningMRel (returning_mRel)
 instance [M.ReturningMRel] : M.ReflexiveMComp where
   reflexive_mComp x := by
     obtain ⟨y, Ixy, Myx⟩ := returning_mRel x;
-    exact Or.inr ⟨y, x, Ixy, Myx, refl x⟩;
+    right;
+    exact ⟨y, x, Ixy, Myx, refl x⟩;
 
 theorem valid_TBox_of_reflexiveMComp [M.ReflexiveMComp] : M ⊧ (□A 🡒 A) := by
   intro x y Ixy hyBoxA;
   rcases reflexive_mComp y with hFallible | ⟨y₁, z₁, Iyy₁, My₁z₁, Iz₁y⟩;
-  · exact Model.Forces.of_fallible hFallible;
-  · exact Model.Forces.persistent (hyBoxA y₁ z₁ Iyy₁ My₁z₁) Iz₁y;
+  · exact of_fallible hFallible;
+  · exact persistent (hyBoxA y₁ z₁ Iyy₁ My₁z₁) Iz₁y;
 
 end Model
 

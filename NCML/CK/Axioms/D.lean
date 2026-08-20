@@ -22,7 +22,7 @@ theorem valid_D_of_serialMRel [M.SerialMRel] : M ⊧ (□A 🡒 ◇A) := by
   obtain ⟨z, Muz⟩ := serial_mRel u;
   exact ⟨z, Muz, hyBoxA u z Iyu Muz⟩;
 
-theorem valid_PDia_of_serialMRel [M.SerialMRel] : M ⊧ (◇⊤ : BDFormula) := by
+theorem valid_PDia_of_serialMRel [M.SerialMRel] : M ⊧ ◇⊤ := by
   intro x y Ixy;
   obtain ⟨z, Mxz⟩ := serial_mRel y;
   exact ⟨z, Mxz, fun w _ h => h⟩;

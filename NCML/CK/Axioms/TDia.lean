@@ -6,6 +6,8 @@ public import NCML.CK.Axioms.D
 
 namespace CK
 
+open Model.Forces
+
 variable {κ : Type*} {M : Model κ}
 variable {A : BDFormula}
 
@@ -27,7 +29,9 @@ export StrictlyAscendingMRel (strictly_ascending_mRel)
 instance [M.StrictlyAscendingMRel] : M.AscendingMRel where
   ascending_mRel x := by
     obtain ⟨z, Mxz, Ixz⟩ := strictly_ascending_mRel x;
-    exact ⟨z, Mxz, Or.inl Ixz⟩;
+    refine ⟨z, Mxz, ?_⟩;
+    left;
+    exact Ixz;
 
 instance [M.AscendingMRel] : M.SerialMRel where
   serial_mRel x := by
@@ -37,10 +41,10 @@ instance [M.AscendingMRel] : M.SerialMRel where
 theorem valid_TDia_of_ascendingMRel [M.AscendingMRel] : M ⊧ (A 🡒 ◇A) := by
   intro x y Ixy hyA u Iyu;
   obtain ⟨z, Muz, hz⟩ := ascending_mRel u;
-  have huA : u ⊩[_] A := Model.Forces.persistent hyA Iyu;
+  have huA : u ⊩[_] A := persistent hyA Iyu;
   rcases hz with Iuz | hzFallible;
-  · exact ⟨z, Muz, Model.Forces.persistent huA Iuz⟩;
-  · exact ⟨z, Muz, Model.Forces.of_fallible hzFallible⟩;
+  · exact ⟨z, Muz, persistent huA Iuz⟩;
+  · exact ⟨z, Muz, of_fallible hzFallible⟩;
 
 end Model
 
