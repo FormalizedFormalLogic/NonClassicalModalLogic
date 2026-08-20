@@ -97,6 +97,9 @@ lemma Forces.of_fallible (h : M.Fallible x) : x ⊩[_] A := by
     exact ⟨z, Myz, ih (M.fallible_mRel hy Myz)⟩;
   | _ => grind [Model.fallible_val];
 
+@[simp, grind .]
+lemma forces_top : x ⊩[_] (⊤ : BDFormula) := fun _ _ h => h
+
 def Valid (M : Model κ) (A : BDFormula) := ∀ x : M.World, x ⊩[M] A
 infixl:80 " ⊧ " => Valid
 
