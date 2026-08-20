@@ -118,23 +118,18 @@ end CK
 
 theorem LogicCKTDia_TFAE {A : BDFormula} : List.TFAE [
   A ∈ LogicCKTDia,
-  ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.AscendingMRel] → M ⊧ A,
-  ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.StrictlyAscendingMRel] → M ⊧ A,
   ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.AscendingMRel] → F ⊧ A,
   ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.StrictlyAscendingMRel] → F ⊧ A,
 ] := by
-  tfae_have 1 → 2 := fun h _ M _ => CK.Model.valid_of_mem_LogicCKTDia h
-  tfae_have 2 → 3 := fun h _ M _ => h M
-  tfae_have 2 → 4 := fun h _ F _ val vp fv => h (CK.Model.mk F val vp fv)
-  tfae_have 4 → 2 := fun h _ M _ => CK.Model.valid_of_toFrame_valid (h M.toFrame)
-  tfae_have 3 → 5 := fun h _ F _ val vp fv => h (CK.Model.mk F val vp fv)
-  tfae_have 5 → 3 := fun h _ M _ => CK.Model.valid_of_toFrame_valid (h M.toFrame)
+  tfae_have 1 → 2 := fun h _ F _ val vp fv => CK.Model.valid_of_mem_LogicCKTDia h
+  tfae_have 2 → 3 := fun h _ F _ => h F
   tfae_have 3 → 1 := by
     contrapose!;
     intro h;
     obtain ⟨P, h₁⟩ := CK.exists_not_forces_of_not_mem h;
-    exact ⟨_, CK.canonicalModel LogicCKTDia, CK.strictlyAscendingMRel_canonicalModel (by grind),
-      fun hM => h₁ (hM P)⟩;
+    exact ⟨_, (CK.canonicalModel LogicCKTDia).toFrame,
+      CK.strictlyAscendingMRel_canonicalModel (by grind),
+      fun hF => h₁ (CK.Model.valid_of_toFrame_valid hF P)⟩;
   tfae_finish
 
 end

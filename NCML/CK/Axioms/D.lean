@@ -101,19 +101,16 @@ end CK
 theorem LogicCKD_TFAE {A : BDFormula} : List.TFAE [
   A ∈ LogicCKD,
   A ∈ LogicCKPDia,
-  ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.SerialMRel] → M ⊧ A,
   ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.SerialMRel] → F ⊧ A,
 ] := by
   tfae_have 1 → 2 := LogicCKD.eq_CKPDia ▸ id
-  tfae_have 2 → 3 := fun h _ M _ => CK.Model.valid_of_mem_LogicCKPDia h
-  tfae_have 3 → 4 := fun h _ F _ val vp fv => h (CK.Model.mk F val vp fv)
-  tfae_have 4 → 3 := fun h _ M _ => CK.Model.valid_of_toFrame_valid (h M.toFrame)
+  tfae_have 2 → 3 := fun h _ F _ val vp fv => CK.Model.valid_of_mem_LogicCKPDia h
   tfae_have 3 → 1 := by
     contrapose!;
     intro h;
     obtain ⟨P, h₁⟩ := CK.exists_not_forces_of_not_mem h;
-    exact ⟨_, CK.canonicalModel LogicCKD, CK.serialMRel_canonicalModel (by grind),
-      fun hM => h₁ (hM P)⟩;
+    exact ⟨_, (CK.canonicalModel LogicCKD).toFrame, CK.serialMRel_canonicalModel (by grind),
+      fun hF => h₁ (CK.Model.valid_of_toFrame_valid hF P)⟩;
   tfae_finish
 
 end
