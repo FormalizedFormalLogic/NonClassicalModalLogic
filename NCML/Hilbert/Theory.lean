@@ -241,7 +241,7 @@ end BDTheory
 
 section Maximal
 
-variable {L : BDLogic} {𝔸 : Set BDFormula} {T Y Z : BDTheory} {A : BDFormula}
+variable {L : BDLogic} {𝔸 : Set BDFormula} {T Y Z : BDTheory} {A B : BDFormula}
 
 /-- Every MP-closed theory `T` of `L` disjoint from `Z` extends to a maximal MP-closed theory of
 `L` still disjoint from `Z`. -/
@@ -274,6 +274,20 @@ lemma exists_imp_mem_of_maximal
 by a common member of `Z`. -/
 def OrDirected (𝔸 : Set BDFormula) (Z : BDFormulaSet) : Prop :=
   ∀ C ∈ Z, ∀ D ∈ Z, ∃ E ∈ Z, ⊢ᴴ[CK;𝔸] C ⋎ D 🡒 E
+
+/-- A maximal MP-closed extension of `T` avoiding an ⋎-directed `Z` is prime. -/
+lemma prime_of_maximal_avoiding_orDirected (hdir : OrDirected 𝔸 Z)
+  (hmax : Maximal (fun Y : BDTheory => T ⊆ Y ∧ Y.Mdp ∧ Y.Of (logic 𝔸) ∧ ∀ B ∈ Z, B ∉ Y) Y)
+  (h : A ⋎ B ∈ Y) : A ∈ Y ∨ B ∈ Y := by
+  by_contra! hc;
+  obtain ⟨-, hmdpY, hlogY, havoid⟩ := hmax.prop;
+  obtain ⟨C, hC, h₁⟩ := exists_imp_mem_of_maximal hmax hc.1;
+  obtain ⟨D, hD, h₂⟩ := exists_imp_mem_of_maximal hmax hc.2;
+  have h₃ : (A 🡒 C ⋎ D) ∈ Y := Y.mdp (BDTheory.provable_mem (𝔸 := 𝔸) (imp_comp_left orIntro₁)) h₁;
+  have h₄ : (B 🡒 C ⋎ D) ∈ Y := Y.mdp (BDTheory.provable_mem (𝔸 := 𝔸) (imp_comp_left orIntro₂)) h₂;
+  have h₅ : C ⋎ D ∈ Y := BDTheory.or_elim_mem (𝔸 := 𝔸) h₃ h₄ h;
+  obtain ⟨E, hE, hCD⟩ := hdir C hC D hD;
+  exact havoid E hE (Y.mdp (BDTheory.provable_mem (𝔸 := 𝔸) hCD) h₅);
 
 end Maximal
 
