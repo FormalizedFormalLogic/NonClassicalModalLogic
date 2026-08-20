@@ -142,7 +142,15 @@ lemma iRel_erase : (canonicalModel 𝔸).iRel w w.erase := subset_rfl
 
 /-- A pair missing `A 🡒 B` has an `≼`-extension containing `A` and missing `B`. -/
 lemma exists_iRel_of_imply_not_mem (h : (A 🡒 B) ∉ w.th) :
-  ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).iRel w v ∧ A ∈ v.th ∧ B ∉ v.th := sorry
+  ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).iRel w v ∧ A ∈ v.th ∧ B ∉ v.th := by
+  obtain ⟨Y, hXY, hmdp, hprime, hof, havoid⟩ :=
+    exists_prime_mdpClosed_avoiding (𝔸 := 𝔸) (T := w.th.impSet A) (Z := {B}) orDirected_singleton
+      (by rintro C rfl; exact h);
+  have := hmdp;
+  have := hprime;
+  have := hof;
+  exact ⟨ofTheory 𝔸 Y, (BDTheory.subset_impSet (𝔸 := 𝔸)).trans hXY,
+    hXY (BDTheory.self_mem_impSet (𝔸 := 𝔸)), havoid B rfl⟩;
 
 /-- A pair missing `□A` has, after erasing its forbidden formulas, a `⊏`-successor missing `A`. -/
 lemma exists_mRel_of_box_not_mem (h : □A ∉ w.th) :
