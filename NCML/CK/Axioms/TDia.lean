@@ -26,7 +26,8 @@ export StrictlyAscendingMRel (strictly_ascending_mRel)
 
 instance [M.StrictlyAscendingMRel] : M.AscendingMRel where
   ascending_mRel x := by
-    sorry
+    obtain ⟨z, Mxz, Ixz⟩ := strictly_ascending_mRel x;
+    exact ⟨z, Mxz, Or.inl Ixz⟩;
 
 instance [M.AscendingMRel] : M.SerialMRel where
   serial_mRel x := by
