@@ -46,6 +46,9 @@ theorem valid_TDia_of_ascendingMRel [M.AscendingMRel] : M ⊧ (A 🡒 ◇A) := b
   · exact ⟨z, Muz, persistent huA Iuz⟩;
   · exact ⟨z, Muz, of_fallible hzFallible⟩;
 
+theorem valid_of_mem_LogicCKTDia [M.AscendingMRel] (hA : A ∈ LogicCKTDia) : M ⊧ A :=
+  valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TDia_of_ascendingMRel) hA
+
 end Model
 
 end CK

@@ -1,6 +1,6 @@
 module
 
-public import NCML.CK.Semantics
+public import NCML.CK.Canonical
 
 @[expose] public section
 
@@ -37,6 +37,9 @@ theorem valid_TBox_of_reflexiveMComp [M.ReflexiveMComp] : M ⊧ (□A 🡒 A) :=
   rcases reflexive_mComp y with hFallible | ⟨y₁, z₁, Iyy₁, My₁z₁, Iz₁y⟩;
   · exact of_fallible hFallible;
   · exact persistent (hyBoxA y₁ z₁ Iyy₁ My₁z₁) Iz₁y;
+
+theorem valid_of_mem_LogicCKTBox [M.ReflexiveMComp] (hA : A ∈ LogicCKTBox) : M ⊧ A :=
+  valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TBox_of_reflexiveMComp) hA
 
 end Model
 

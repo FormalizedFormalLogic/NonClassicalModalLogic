@@ -1,6 +1,6 @@
 module
 
-public import NCML.CK.Semantics
+public import NCML.CK.Canonical
 
 @[expose] public section
 
@@ -25,7 +25,13 @@ theorem valid_D_of_serialMRel [M.SerialMRel] : M ⊧ (□A 🡒 ◇A) := by
 theorem valid_PDia_of_serialMRel [M.SerialMRel] : M ⊧ ◇⊤ := by
   intro x y Ixy;
   obtain ⟨z, Mxz⟩ := serial_mRel y;
-  exact ⟨z, Mxz, fun w _ h => h⟩;
+  exact ⟨z, Mxz, by grind⟩;
+
+theorem valid_of_mem_LogicCKD [M.SerialMRel] (hA : A ∈ LogicCKD) : M ⊧ A :=
+  valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_D_of_serialMRel) hA
+
+theorem valid_of_mem_LogicCKPDia [M.SerialMRel] (hA : A ∈ LogicCKPDia) : M ⊧ A :=
+  valid_of_mem_logic (by rintro B rfl; exact valid_PDia_of_serialMRel) hA
 
 end Model
 
