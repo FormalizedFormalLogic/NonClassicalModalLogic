@@ -100,4 +100,13 @@ theorem provable_D : (□A 🡒 ◇A) ∈ LogicCKTDia := provable_D_of_diaTop pr
 
 end LogicCKTDia
 
+
+namespace LogicCKD
+
+open ProvableBDHilbert
+
+theorem provable_D : (□A 🡒 ◇A) ∈ LogicCKD := axm (by grind)
+
+end LogicCKD
+
 end
