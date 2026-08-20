@@ -64,13 +64,27 @@ valid on every CK-model whose `≼ ∘ ⊏ ∘ ≼` is reflexive up to fallibili
 - [Pac24, Problem in §4]
 -/
 theorem LogicCKTBox.mem_iff_valid {A : BDFormula} :
-  A ∈ LogicCKTBox ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.ReflexiveMComp] → M ⊧ A := sorry
+  A ∈ LogicCKTBox ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.ReflexiveMComp] → M ⊧ A := by
+  constructor;
+  · intro h _ M _;
+    exact CK.Model.valid_of_mem_LogicCKTBox h;
+  · contrapose!;
+    intro h;
+    obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
+    exact ⟨_, CK.canonicalModel _, inferInstance, fun hM => hw (hM w)⟩;
 
 /-- The model characterization of `CK + T□` by the strong reflexivity condition.
 
 - [Pac24, Problem in §4]
 -/
 theorem LogicCKTBox.mem_iff_valid_returningMRel {A : BDFormula} :
-  A ∈ LogicCKTBox ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.ReturningMRel] → M ⊧ A := sorry
+  A ∈ LogicCKTBox ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.ReturningMRel] → M ⊧ A := by
+  constructor;
+  · intro h _ M _;
+    exact CK.Model.valid_of_mem_LogicCKTBox h;
+  · contrapose!;
+    intro h;
+    obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
+    exact ⟨_, CK.canonicalModel _, inferInstance, fun hM => hw (hM w)⟩;
 
 end
