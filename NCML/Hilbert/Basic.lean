@@ -121,6 +121,14 @@ lemma disj_imp (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] �
   | nil => exact efq;
   | cons A Γ ih => exact or_imp (h A (.head ..)) (ih fun B hB => h B (.tail _ hB));
 
+lemma imp_disj (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] A 🡒 ⋁Γ := by
+  induction Γ with
+  | nil => simp at h;
+  | cons B Γ ih =>
+    rcases List.mem_cons.mp h with rfl | hmem
+    · exact orIntro₁;
+    · exact imp_trans (ih hmem) orIntro₂;
+
 lemma conj_box : ⊢ᴴ[CK;𝔸] ⋀□Γ 🡒 □⋀Γ := by
   induction Γ with
   | nil => exact dhyp (nec verum);
