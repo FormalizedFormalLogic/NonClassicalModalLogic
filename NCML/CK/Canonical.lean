@@ -154,7 +154,15 @@ lemma exists_iRel_of_imply_not_mem (h : (A 🡒 B) ∉ w.th) :
 
 /-- A pair missing `□A` has, after erasing its forbidden formulas, a `⊏`-successor missing `A`. -/
 lemma exists_mRel_of_box_not_mem (h : □A ∉ w.th) :
-  ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel w.erase v ∧ A ∉ v.th := sorry
+  ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel w.erase v ∧ A ∉ v.th := by
+  have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
+  obtain ⟨Y, hXY, hmdp, hprime, hof, havoid⟩ :=
+    exists_prime_mdpClosed_avoiding (𝔸 := 𝔸) (T := □⁻¹w.th) (Z := {A}) orDirected_singleton
+      (by rintro C rfl; exact h);
+  have := hmdp;
+  have := hprime;
+  have := hof;
+  exact ⟨ofTheory 𝔸 Y, ⟨hXY, by simp⟩, havoid A rfl⟩;
 
 /-- The theory `□⁻¹T` under the assumption `A` avoids the disjunctions over `Θ`, for a pair
 `(T, Θ)` containing `◇A`. -/
