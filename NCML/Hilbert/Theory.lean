@@ -330,6 +330,16 @@ lemma orDirected_disjSet : OrDirected 𝔸 (disjSet Θ) := by
   · exact hK₁sub A hA;
   · exact hK₂sub A hA;
 
+/-- `diaDisjSet Θ` is ⋎-directed, via `dia_mono` and the same list append as `disjSet`. -/
+lemma orDirected_diaDisjSet : OrDirected 𝔸 (diaDisjSet Θ) := by
+  rintro C ⟨B₁, ⟨K₁, hK₁ne, hK₁sub, rfl⟩, rfl⟩ D ⟨B₂, ⟨K₂, hK₂ne, hK₂sub, rfl⟩, rfl⟩;
+  refine ⟨◇(⋁(K₁ ++ K₂)), ⟨⋁(K₁ ++ K₂), ⟨K₁ ++ K₂, by simp [hK₁ne], ?_, rfl⟩, rfl⟩,
+    or_imp (dia_mono ldisj_append_left) (dia_mono ldisj_append_right)⟩;
+  intro A hA;
+  rcases List.mem_append.mp hA with hA | hA;
+  · exact hK₁sub A hA;
+  · exact hK₂sub A hA;
+
 end Disj
 
 /-! ## CKB-specific consequences of the MP-closure -/
