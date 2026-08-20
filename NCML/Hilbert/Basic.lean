@@ -181,8 +181,6 @@ lemma fdisj_union_left : ⊢ᴴ[CK;𝔸] ⋁Γ₁ 🡒 ⋁(Γ₁ ∪ Γ₂) :=
 lemma fdisj_union_right : ⊢ᴴ[CK;𝔸] ⋁Γ₂ 🡒 ⋁(Γ₁ ∪ Γ₂) :=
   fdisj_imp fun _ hB => imp_fdisj (Finset.mem_union_right _ hB)
 
-lemma fconj_box : ⊢ᴴ[CK;𝔸] ⋀□Γ.toList 🡒 □⋀Γ := lconj_box
-
 end
 
 @[induction_eliminator]
