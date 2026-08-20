@@ -300,6 +300,16 @@ lemma exists_prime_mdpClosed_avoiding [T.Mdp] [T.Of (logic 𝔸)]
 
 end Maximal
 
+/-! ## Disjunctive avoid sets -/
+
+section Disj
+
+/-- The disjunctions of nonempty finite sublists of `Θ`. -/
+def disjSet (Θ : BDFormulaSet) : BDFormulaSet :=
+  { B | ∃ K : BDFormulaList, K ≠ [] ∧ (∀ A ∈ K, A ∈ Θ) ∧ B = ⋁K }
+
+end Disj
+
 /-! ## CKB-specific consequences of the MP-closure -/
 
 section CKB
