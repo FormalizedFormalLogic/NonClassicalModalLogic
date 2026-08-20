@@ -138,7 +138,7 @@ def erase (w : CanonicalPair 𝔸) : CanonicalPair 𝔸 := ofTheory 𝔸 w.th
 
 @[simp] lemma erase_forb : w.erase.forb = ∅ := rfl
 
-lemma iRel_erase : (canonicalModel 𝔸).iRel w w.erase := sorry
+lemma iRel_erase : (canonicalModel 𝔸).iRel w w.erase := subset_rfl
 
 /-- A pair missing `A 🡒 B` has an `≼`-extension containing `A` and missing `B`. -/
 lemma exists_iRel_of_imply_not_mem (h : (A 🡒 B) ∉ w.th) :
