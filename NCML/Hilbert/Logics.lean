@@ -112,6 +112,14 @@ theorem provable_diaTop : (◇⊤) ∈ LogicCKD := mdp (provable_D (A := ⊤)) (
 theorem subset_CKTDia : LogicCKD ⊆ LogicCKTDia := fun _ =>
   provable_of_provable_axioms (fun _ hB => by obtain ⟨_, rfl⟩ := hB; exact LogicCKTDia.provable_D)
 
+theorem eq_logic_diaTop : LogicCKD = ProvableBDHilbert.logic {◇⊤} :=
+  Set.Subset.antisymm
+    (fun _ =>
+      provable_of_provable_axioms
+        (fun _ hB => by obtain ⟨_, rfl⟩ := hB; exact provable_D_of_diaTop (axm rfl)))
+    (fun _ =>
+      provable_of_provable_axioms (fun _ hB => by rw [hB]; exact provable_diaTop))
+
 end LogicCKD
 
 end
