@@ -173,6 +173,22 @@ lemma exists_finite_char [T.Of (logic 𝔸)] [T.Mdp] (h : A ∈ mdpClosure (T �
           (imp_trans t₁ (imp_comp_right andElim₁))
           (imp_trans t₂ (imp_comp_right andElim₂));
 
+/-- Finite characterization of the MP-closure of a union `T₁ ∪ T₂`: every member `A` of the
+closure is entailed from a single `D ∈ T₁` and a single `E ∈ T₂`. -/
+lemma mdpClosure_union_finite_char [T₁.Of (logic 𝔸)] [T₁.Mdp] [T₂.Of (logic 𝔸)] [T₂.Mdp]
+  (h : A ∈ mdpClosure (T₁ ∪ T₂)) : ∃ D ∈ T₁, ∃ E ∈ T₂, ⊢ᴴ[CK;𝔸] D 🡒 E 🡒 A := by
+  induction h with
+  | base hA =>
+    rcases hA with hA | hA;
+    · exact ⟨_, hA, ⊤, provable_mem (𝔸 := 𝔸) verum, imply₁⟩;
+    · exact ⟨⊤, provable_mem (𝔸 := 𝔸) verum, _, hA, dhyp imp_id⟩;
+  | mdp _ _ ih₁ ih₂ =>
+    obtain ⟨D₁, hD₁, E₁, hE₁, d₁⟩ := ih₁;
+    obtain ⟨D₂, hD₂, E₂, hE₂, d₂⟩ := ih₂;
+    exact ⟨D₁ ⋏ D₂, and_mem (𝔸 := 𝔸) hD₁ hD₂, E₁ ⋏ E₂, and_mem (𝔸 := 𝔸) hE₁ hE₂,
+      mdp_ctx₂ (imp_trans (imp_trans andElim₁ d₁) (imp_comp_right andElim₁))
+               (imp_trans (imp_trans andElim₂ d₂) (imp_comp_right andElim₂))⟩;
+
 end BDTheory
 
 
