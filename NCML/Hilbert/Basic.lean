@@ -52,7 +52,7 @@ lemma mdp : (⊢ᴴ[CK;𝔸] A 🡒 B) → (⊢ᴴ[CK;𝔸] A) → (⊢ᴴ[CK;�
 lemma nec : (⊢ᴴ[CK;𝔸] A) → (⊢ᴴ[CK;𝔸] □A) :=
   fun ⟨h⟩ => ⟨ProofBDHilbert.nec h⟩
 
-lemma imp_trans (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 C :=
+@[grind <=] lemma imp_trans (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 C :=
   mdp (mdp imply₂ (mdp imply₁ h₂)) h₁
 
 @[grind .] lemma imp_id : ⊢ᴴ[CK;𝔸] A 🡒 A := mdp (mdp imply₂ (imply₁ (B := A 🡒 A))) (imply₁ (B := A))
@@ -72,18 +72,18 @@ lemma imp_comp_left (h : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] (A 🡒 B) 
 lemma imp_comp_right (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] (B 🡒 C) 🡒 (A 🡒 C) :=
   mdp_ctx (imp_trans imply₁ imply₂) (dhyp h)
 
-lemma and_intro_ctx (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] A 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 B ⋏ C :=
+@[grind <=] lemma and_intro_ctx (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] A 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 B ⋏ C :=
   mdp_ctx (imp_trans h₁ andIntro) h₂
 
 lemma imp_swap : ⊢ᴴ[CK;𝔸] (A 🡒 B 🡒 C) 🡒 (B 🡒 A 🡒 C) :=
   mdp_ctx₂ (imp_trans imply₂ imply₁) (dhyp imply₁)
 
-lemma or_imp (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 C) (h₂ : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] A ⋎ B 🡒 C :=
+@[grind <=] lemma or_imp (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 C) (h₂ : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] A ⋎ B 🡒 C :=
   mdp (mdp orElim h₁) h₂
 
-lemma box_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] □A 🡒 □B := mdp kBox (nec h)
+@[grind <=] lemma box_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] □A 🡒 □B := mdp kBox (nec h)
 
-lemma dia_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] ◇A 🡒 ◇B := mdp kDia (nec h)
+@[grind <=] lemma dia_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] ◇A 🡒 ◇B := mdp kDia (nec h)
 
 @[grind .] lemma box_or_inl : ⊢ᴴ[CK;𝔸] □A 🡒 □(A ⋎ B) := box_mono orIntro₁
 
@@ -116,11 +116,13 @@ lemma ldisj_append_right : ⊢ᴴ[CK;𝔸] ⋁Γ₂ 🡒 ⋁(Γ₁ ++ Γ₂) := 
   | nil => exact imp_id;
   | cons A Γ₁ ih => exact imp_trans ih orIntro₂;
 
+@[grind <=]
 lemma ldisj_imp (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] ⋁Γ 🡒 C := by
   induction Γ with
   | nil => exact efq;
   | cons A Γ ih => exact or_imp (h A (.head ..)) (ih fun B hB => h B (.tail _ hB));
 
+@[grind <=]
 lemma imp_ldisj (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] A 🡒 ⋁Γ := by
   induction Γ with
   | nil => simp at h;
@@ -159,9 +161,11 @@ lemma fconj_imp (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] ⋀Γ 🡒 A :=
 lemma imp_fconj (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] C 🡒 B) : ⊢ᴴ[CK;𝔸] C 🡒 ⋀Γ :=
   imp_lconj fun B hB => h B (Finset.mem_toList.mp hB)
 
+@[grind <=]
 lemma fdisj_imp (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] ⋁Γ 🡒 C :=
   ldisj_imp fun B hB => h B (Finset.mem_toList.mp hB)
 
+@[grind <=]
 lemma imp_fdisj (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] A 🡒 ⋁Γ :=
   imp_ldisj (Finset.mem_toList.mpr h)
 
