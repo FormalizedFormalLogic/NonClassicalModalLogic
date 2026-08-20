@@ -177,6 +177,15 @@ lemma exists_mRel_of_box_not_mem (h : □A ∉ w.th) :
       (by rintro C rfl; exact h);
   exact ⟨v, ⟨hXv, by simp⟩, havoid A rfl⟩;
 
+/-- A pair whose theory contains `□⁻¹w.th` and avoids `disjSet w.forb` is a `⊏`-successor
+of `w`. -/
+lemma mRel_of_avoid_disjSet {v : CanonicalPair 𝔸} (hsub : □⁻¹w.th ⊆ v.th)
+  (havoid : ∀ C ∈ disjSet w.forb, C ∉ v.th) : (canonicalModel 𝔸).mRel w v := by
+  refine ⟨hsub, ?_⟩;
+  intro B hB hBv;
+  exact havoid (⋁[B]) ⟨[B], by simp, by simpa using hB, rfl⟩
+    (v.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) (imp_ldisj (by simp))) hBv);
+
 /-- For a pair `w` containing `◇A`, the theory `□⁻¹w.th` under the assumption `A` is disjoint
 from `disjSet w.forb`. -/
 private lemma avoid_disjSet_of_dia_mem (h : ◇A ∈ w.th) :
@@ -193,11 +202,8 @@ lemma exists_mRel_of_dia_mem (h : ◇A ∈ w.th) :
   obtain ⟨v, hXv, -, havoid⟩ :=
     exists_avoiding (𝔸 := 𝔸) (T := BDTheory.impSet (□⁻¹w.th) A) (Z := disjSet w.forb)
       orDirected_disjSet (avoid_disjSet_of_dia_mem h);
-  refine ⟨v, ⟨(BDTheory.subset_impSet (𝔸 := 𝔸)).trans hXv, ?_⟩,
+  exact ⟨v, mRel_of_avoid_disjSet ((BDTheory.subset_impSet (𝔸 := 𝔸)).trans hXv) havoid,
     hXv (BDTheory.self_mem_impSet (𝔸 := 𝔸))⟩;
-  intro B hB hBv;
-  exact havoid (⋁[B]) ⟨[B], by simp, by simpa using hB, rfl⟩
-    (v.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) (imp_ldisj (by simp))) hBv);
 
 /-- The theory of a pair missing `◇A` is disjoint from `diaDisjSet {A}`. -/
 private lemma avoid_diaDisjSet_of_dia_not_mem (h : ◇A ∉ w.th) :
