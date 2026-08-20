@@ -31,12 +31,12 @@ instance : counterModel.SerialMRel where
 lemma counterModel_not_ascendingMRel : ¬ counterModel.AscendingMRel := by
   rintro ⟨h⟩;
   obtain ⟨z, Mz, hz⟩ := h 0;
-  simp_all [counterModel, Model.iRel, Model.mRel, Model.Fallible];
+  simp_all [counterModel, Frame.iRel, Frame.mRel, Frame.Fallible];
 
 lemma counterModel_not_forces : 0 ⊮[counterModel] (#0 🡒 ◇(#0)) := by
   intro h;
   obtain ⟨z, Mz, hz⟩ := h 0 rfl rfl 0 rfl;
-  simp_all [counterModel, Model.mRel, Model.Forces];
+  simp_all [counterModel, Frame.mRel, Forces];
 
 end TDia
 

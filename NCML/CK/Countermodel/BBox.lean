@@ -30,7 +30,7 @@ instance : counterModel.SymmetricMRel where
 lemma counterModel_not_forwardConfluent : ¬ counterModel.ForwardConfluent := by
   rintro ⟨h⟩;
   obtain ⟨y₁, -, M2y₁⟩ := h (x := 1) (y := 0) (x₁ := 2) (by tauto) (by tauto);
-  simp only [counterModel, Model.mRel] at M2y₁;
+  simp only [counterModel, Frame.mRel] at M2y₁;
   omega;
 
 lemma counterModel_not_forces :
@@ -42,7 +42,7 @@ lemma counterModel_not_forces :
   have hbox : (0 : counterModel.World) ⊩[_] □◇(#0) := h 0 (by tauto) h0;
   have h1 : (1 : counterModel.World) ⊩[_] ◇(#0) := hbox 0 1 (by tauto) (by tauto);
   obtain ⟨z, M2z, hzA⟩ := h1 2 (by tauto);
-  simp only [counterModel, Model.mRel] at M2z;
+  simp only [counterModel, Frame.mRel] at M2z;
   omega;
 
 end BBox

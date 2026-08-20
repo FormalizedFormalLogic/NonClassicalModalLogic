@@ -6,54 +6,42 @@ public import NCML.CK.Semantics
 
 namespace CK
 
-variable {κ : Type*} {M : Model κ}
-variable {x : M.World} {A B : BDFormula}
+namespace Frame
 
-
-namespace Model
+variable {κ : Type*} {F : Frame κ}
 
 /-- - [Pac24, Definition 5] -/
-class ForwardConfluent (M : Model κ) : Prop where
-  forward_confluent : ∀ {x y x₁ : M.World}, x ⊏ y → x ≼ x₁ → ∃ y₁, y ≼ y₁ ∧ x₁ ⊏ y₁
+class ForwardConfluent (F : Frame κ) : Prop where
+  forward_confluent : ∀ {x y x₁ : F.World}, x ⊏ y → x ≼ x₁ → ∃ y₁, y ≼ y₁ ∧ x₁ ⊏ y₁
 
 export ForwardConfluent (forward_confluent)
 
 /-- - [Pac24, Definition 5] -/
-class BackwardConfluent (M : Model κ) : Prop where
-  backward_confluent : ∀ {x y y₁ : M.World}, x ⊏ y → y ≼ y₁ → ∃ x₁, x ≼ x₁ ∧ x₁ ⊏ y₁
+class BackwardConfluent (F : Frame κ) : Prop where
+  backward_confluent : ∀ {x y y₁ : F.World}, x ⊏ y → y ≼ y₁ → ∃ x₁, x ≼ x₁ ∧ x₁ ⊏ y₁
 
 export BackwardConfluent (backward_confluent)
 
-class SymmetricMRel (M : Model κ) : Prop where
-  symm_mRel : ∀ {x y : M.World}, x ⊏ y → y ⊏ x
+class SymmetricMRel (F : Frame κ) : Prop where
+  symm_mRel : ∀ {x y : F.World}, x ⊏ y → y ⊏ x
 
 export SymmetricMRel (symm_mRel)
 
 /-- - [Pac24, Definition 7] -/
-class IsCKB (M : Model κ) : Prop extends SymmetricMRel M, ForwardConfluent M, BackwardConfluent M
+class IsCKB (F : Frame κ) : Prop extends SymmetricMRel F, ForwardConfluent F, BackwardConfluent F
 
 /-- - [Pac24, Definition 7] -/
-class IsIK (M : Model κ) : Prop extends ForwardConfluent M, BackwardConfluent M where
-  not_fallible : ∀ x : M.World, ¬ M.Fallible x
+class IsIK (F : Frame κ) : Prop extends ForwardConfluent F, BackwardConfluent F where
+  not_fallible : ∀ x : F.World, ¬ F.Fallible x
 
 /-- - [Pac24, Definition 7] -/
-class IsIKB (M : Model κ) : Prop extends IsIK M, SymmetricMRel M
+class IsIKB (F : Frame κ) : Prop extends IsIK F, SymmetricMRel F
 
-instance [M.IsIKB] : M.IsCKB where
-
-
-/-- - [Pac24, Proposition 6] -/
-lemma dia_iff_forward_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] ◇A ↔ ∃ y, x ⊏ y ∧ y ⊩[_] A := by
-  constructor;
-  · intro h;
-    exact h x (refl x);
-  · rintro ⟨y, Mxy, hyA⟩ x₁ Ixx₁;
-    obtain ⟨y₁, Iyy₁, Mx₁y₁⟩ := forward_confluent Mxy Ixx₁;
-    exact ⟨y₁, Mx₁y₁, Model.Forces.persistent hyA Iyy₁⟩;
+instance [F.IsIKB] : F.IsCKB where
 
 /-- - [Pac24, Proposition 10] -/
-lemma forwardConfluent_iff_backwardConfluent_of_symmetricMRel [M.SymmetricMRel] :
-  M.ForwardConfluent ↔ M.BackwardConfluent := by
+lemma forwardConfluent_iff_backwardConfluent_of_symmetricMRel [F.SymmetricMRel] :
+  F.ForwardConfluent ↔ F.BackwardConfluent := by
   constructor;
   · intro h;
     constructor;
@@ -71,6 +59,24 @@ lemma forwardConfluent_iff_backwardConfluent_of_symmetricMRel [M.SymmetricMRel] 
     constructor;
     . assumption;
     . exact symm_mRel My₁x₁;
+
+end Frame
+
+namespace Model
+
+open CK.Frame
+
+variable {κ : Type*} {M : Model κ}
+variable {x : M.World} {A B : BDFormula}
+
+/-- - [Pac24, Proposition 6] -/
+lemma dia_iff_forward_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] ◇A ↔ ∃ y, x ⊏ y ∧ y ⊩[_] A := by
+  constructor;
+  · intro h;
+    exact h x (refl x);
+  · rintro ⟨y, Mxy, hyA⟩ x₁ Ixx₁;
+    obtain ⟨y₁, Iyy₁, Mx₁y₁⟩ := forward_confluent Mxy Ixx₁;
+    exact ⟨y₁, Mx₁y₁, forces_persistent hyA Iyy₁⟩;
 
 /--
 - [dGSC25]
@@ -116,7 +122,7 @@ lemma forces_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] [M
   have hv₁diaA : v₁ ⊩[_] ◇A := by
     intro v₂ Iv₁v₂;
     obtain ⟨w₁, Iww₁, Mv₂w₁⟩ := forward_confluent Mv₁w Iv₁v₂;
-    exact ⟨w₁, Mv₂w₁, Model.Forces.persistent hwA Iww₁⟩;
+    exact ⟨w₁, Mv₂w₁, forces_persistent hwA Iww₁⟩;
   exact hy v₁ (Trans.trans Iyv Ivv₁) hv₁diaA v₁ w (refl v₁) Mv₁w;
 
 /--
