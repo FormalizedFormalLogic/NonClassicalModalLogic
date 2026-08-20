@@ -89,18 +89,22 @@ instance : (canonicalModel { A 🡒 ◇A | (A) }).StrictlyAscendingMRel :=
 end CK
 
 /-- The model characterization of `CK + T◇`: a formula is a theorem of `CK + T◇` exactly when it is
-valid on every ascending CK-model.
+valid on every ascending CK-model, equivalently on every strictly ascending one.
 
 - [Pac24, Problem in §4]
 -/
-theorem LogicCKTDia.mem_iff_valid {A : BDFormula} :
-  A ∈ LogicCKTDia ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.AscendingMRel] → M ⊧ A := sorry
-
-/-- The model characterization of `CK + T◇` by the strong ascending condition.
-
-- [Pac24, Problem in §4]
--/
-theorem LogicCKTDia.mem_iff_valid_strictlyAscendingMRel {A : BDFormula} :
-  A ∈ LogicCKTDia ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.StrictlyAscendingMRel] → M ⊧ A := sorry
+theorem LogicCKTDia_TFAE {A : BDFormula} : List.TFAE [
+  A ∈ LogicCKTDia,
+  ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.AscendingMRel] → M ⊧ A,
+  ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.StrictlyAscendingMRel] → M ⊧ A,
+] := by
+  tfae_have 1 → 2 := fun h _ M _ => CK.Model.valid_of_mem_LogicCKTDia h
+  tfae_have 2 → 3 := fun h _ M _ => h M
+  tfae_have 3 → 1 := by
+    contrapose!;
+    intro h;
+    obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
+    exact ⟨_, CK.canonicalModel _, inferInstance, fun hM => hw (hM w)⟩;
+  tfae_finish
 
 end
