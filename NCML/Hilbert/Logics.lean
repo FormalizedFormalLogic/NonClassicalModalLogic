@@ -27,9 +27,18 @@ abbrev LogicIKB : BDLogic := ProvableBDHilbert.logic (
   { ◇(□A) 🡒 A | (A) }
 )
 
+abbrev LogicCKTBox : BDLogic := ProvableBDHilbert.logic { □A 🡒 A | (A) }
+
+abbrev LogicCKTDia : BDLogic := ProvableBDHilbert.logic { A 🡒 ◇A | (A) }
+
+abbrev LogicCKD : BDLogic := ProvableBDHilbert.logic { □A 🡒 ◇A | (A) }
+
 theorem LogicCK.subset_CKB : LogicCK ⊆ LogicCKB := .logic_monotone (by grind)
 theorem LogicCK.subset_IK : LogicCK ⊆ LogicIK := .logic_monotone (by grind)
 theorem LogicIK.subset_IKB : LogicIK ⊆ LogicIKB := .logic_monotone (by grind)
+theorem LogicCK.subset_CKTBox : LogicCK ⊆ LogicCKTBox := .logic_monotone (by grind)
+theorem LogicCK.subset_CKTDia : LogicCK ⊆ LogicCKTDia := .logic_monotone (by grind)
+theorem LogicCK.subset_CKD : LogicCK ⊆ LogicCKD := .logic_monotone (by grind)
 
 
 namespace LogicCKB
