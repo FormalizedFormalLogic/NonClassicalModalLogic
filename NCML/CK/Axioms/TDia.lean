@@ -16,14 +16,11 @@ variable {A : BDFormula}
 
 namespace Model
 
-/-- Every world has an `⊏`-successor that is either an `≼`-successor of the source or
-fallible. -/
 class AscendingMRel (M : Model κ) : Prop where
   ascending_mRel : ∀ x : M.World, ∃ z, x ⊏ z ∧ (x ≼ z ∨ M.Fallible z)
 
 export AscendingMRel (ascending_mRel)
 
-/-- Every world has an `≼`-successor with an `⊏`-edge back to it. -/
 class StrictlyAscendingMRel (M : Model κ) : Prop where
   strictly_ascending_mRel : ∀ x : M.World, ∃ z, x ⊏ z ∧ x ≼ z
 
@@ -56,8 +53,6 @@ end Model
 
 variable {𝔸 : Set BDFormula}
 
-/-- If the logic proves `T◇`, no disjunction over the forbidden formulas of a pair `w` lies in the
-MP-closure of `w.th ∪ □⁻¹w.th`. -/
 private lemma avoid_disjSet_mdpClosure
   (h𝔸 : ∀ A : BDFormula, (A 🡒 ◇A) ∈ logic 𝔸) (w : CanonicalPair 𝔸) :
   ∀ C ∈ disjSet w.forb, C ∉ BDTheory.mdpClosure (w.th ∪ □⁻¹w.th) := by
@@ -70,7 +65,6 @@ private lemma avoid_disjSet_mdpClosure
   have h₃ : ◇D ∈ w.th := w.th.mdp (BDTheory.provable_mem (h𝔸 D)) hD;
   exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (w.th.mdp h₂ h₃);
 
-/-- The canonical model of a logic proving `T◇` is strictly ascending. -/
 lemma strictlyAscendingMRel_canonicalModel
   (h𝔸 : ∀ A : BDFormula, (A 🡒 ◇A) ∈ logic 𝔸) : (canonicalModel 𝔸).StrictlyAscendingMRel where
   strictly_ascending_mRel w := by
@@ -91,8 +85,6 @@ lemma strictlyAscendingMRel_canonicalModel_of_mem (h : ∀ {A}, A 🡒 ◇A ∈ 
 
 end CK
 
-/-- The model characterization of `CK + T◇`: a formula is a theorem of `CK + T◇` exactly when it is
-valid on every ascending CK-model, equivalently on every strictly ascending one. -/
 theorem LogicCKTDia_TFAE {A : BDFormula} : List.TFAE [
   A ∈ LogicCKTDia,
   ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.AscendingMRel] → M ⊧ A,

@@ -15,14 +15,11 @@ variable {A : BDFormula}
 
 namespace Model
 
-/-- Every world is fallible or reachable from itself by an `≼`-edge, then an `⊏`-edge, then
-an `≼`-edge. -/
 class ReflexiveMComp (M : Model κ) : Prop where
   reflexive_mComp : ∀ x : M.World, M.Fallible x ∨ ∃ y z, x ≼ y ∧ y ⊏ z ∧ z ≼ x
 
 export ReflexiveMComp (reflexive_mComp)
 
-/-- Every world has an `≼`-successor with an `⊏`-edge back to it. -/
 class ReturningMRel (M : Model κ) : Prop where
   returning_mRel : ∀ x : M.World, ∃ y, x ≼ y ∧ y ⊏ x
 
@@ -47,8 +44,6 @@ end Model
 
 variable {𝔸 : Set BDFormula}
 
-/-- The canonical model of a logic proving `T□` has an `≼`-successor with an `⊏`-edge back to
-every pair. -/
 lemma returningMRel_canonicalModel (h𝔸 : ∀ A : BDFormula, (□A 🡒 A) ∈ logic 𝔸) :
   (canonicalModel 𝔸).ReturningMRel where
   returning_mRel w :=
@@ -61,9 +56,6 @@ lemma returningMRel_canonicalModel_of_mem (h : ∀ {A}, □A 🡒 A ∈ 𝔸) :
 
 end CK
 
-/-- The model characterization of `CK + T□`: a formula is a theorem of `CK + T□` exactly when it is
-valid on every CK-model whose `≼ ∘ ⊏ ∘ ≼` is reflexive up to fallibility, equivalently on every
-CK-model in which every world has an `≼`-successor with an `⊏`-edge back to it. -/
 theorem LogicCKTBox_TFAE {A : BDFormula} : List.TFAE [
   A ∈ LogicCKTBox,
   ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.ReflexiveMComp] → M ⊧ A,

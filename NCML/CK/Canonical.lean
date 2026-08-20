@@ -23,7 +23,6 @@ namespace BDTheory
 
 variable {𝔸 : Set BDFormula} {T : BDTheory}
 
-/-- Every theory of `logic 𝔸` is a theory of `LogicCK`. -/
 lemma of_logicCK [T.Of (logic 𝔸)] : T.Of LogicCK :=
   ⟨(logic_monotone (Set.empty_subset 𝔸)).trans (subset (L := logic 𝔸))⟩
 
@@ -101,11 +100,9 @@ def univ (𝔸 : Set BDFormula) : CanonicalPair 𝔸 where
 
 @[simp] lemma univ_forb : (univ 𝔸).forb = ∅ := rfl
 
-/-- The theory of a pair containing `⊥` is the set of all formulas. -/
 lemma th_eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w.th = Set.univ :=
   BDTheory.eq_univ_of_bot_mem (𝔸 := 𝔸) h
 
-/-- A pair containing `⊥` forbids nothing. -/
 lemma forb_eq_empty_of_bot_mem (h : ⊥ ∈ w.th) : w.forb = ∅ := by
   ext B;
   simp only [Set.mem_empty_iff_false, iff_false];
@@ -113,7 +110,6 @@ lemma forb_eq_empty_of_bot_mem (h : ⊥ ∈ w.th) : w.forb = ∅ := by
   exact w.avoid (◇(⋁[B])) ⟨⋁[B], ⟨[B], by simp, by simpa using hB, rfl⟩, rfl⟩
     (by rw [th_eq_univ_of_bot_mem h]; trivial);
 
-/-- `univ 𝔸` is the only pair containing `⊥`. -/
 lemma eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w = univ 𝔸 := by
   have h₁ := th_eq_univ_of_bot_mem h;
   have h₂ := forb_eq_empty_of_bot_mem h;
@@ -159,7 +155,6 @@ def erase (w : CanonicalPair 𝔸) : CanonicalPair 𝔸 := ofTheory 𝔸 w.th
 
 lemma iRel_erase : (canonicalModel 𝔸).iRel w w.erase := subset_rfl
 
-/-- A pair missing `A 🡒 B` has an `≼`-extension containing `A` and missing `B`. -/
 lemma exists_iRel_of_imply_not_mem (h : (A 🡒 B) ∉ w.th) :
   ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).iRel w v ∧ A ∈ v.th ∧ B ∉ v.th := by
   obtain ⟨v, hXv, -, havoid⟩ :=
@@ -168,7 +163,6 @@ lemma exists_iRel_of_imply_not_mem (h : (A 🡒 B) ∉ w.th) :
   exact ⟨v, (BDTheory.subset_impSet (𝔸 := 𝔸)).trans hXv,
     hXv (BDTheory.self_mem_impSet (𝔸 := 𝔸)), havoid B rfl⟩;
 
-/-- A pair missing `□A` has, after erasing its forbidden formulas, a `⊏`-successor missing `A`. -/
 lemma exists_mRel_of_box_not_mem (h : □A ∉ w.th) :
   ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel w.erase v ∧ A ∉ v.th := by
   have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
@@ -177,8 +171,6 @@ lemma exists_mRel_of_box_not_mem (h : □A ∉ w.th) :
       (by rintro C rfl; exact h);
   exact ⟨v, ⟨hXv, by simp⟩, havoid A rfl⟩;
 
-/-- A pair whose theory contains `□⁻¹w.th` and avoids `disjSet w.forb` is a `⊏`-successor
-of `w`. -/
 lemma mRel_of_avoid_disjSet {v : CanonicalPair 𝔸} (hsub : □⁻¹w.th ⊆ v.th)
   (havoid : ∀ C ∈ disjSet w.forb, C ∉ v.th) : (canonicalModel 𝔸).mRel w v := by
   refine ⟨hsub, ?_⟩;
@@ -186,15 +178,12 @@ lemma mRel_of_avoid_disjSet {v : CanonicalPair 𝔸} (hsub : □⁻¹w.th ⊆ v.
   exact havoid (⋁[B]) ⟨[B], by simp, by simpa using hB, rfl⟩
     (v.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) (imp_ldisj (by simp))) hBv);
 
-/-- For a pair `w` containing `◇A`, the theory `□⁻¹w.th` under the assumption `A` is disjoint
-from `disjSet w.forb`. -/
 private lemma avoid_disjSet_of_dia_mem (h : ◇A ∈ w.th) :
   ∀ C ∈ disjSet w.forb, C ∉ BDTheory.impSet (□⁻¹w.th) A := by
   rintro C ⟨K, hne, hsub, rfl⟩ hmem;
   have h₁ : (◇A 🡒 ◇(⋁K)) ∈ w.th := w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) kDia) hmem;
   exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (w.th.mdp h₁ h);
 
-/-- A pair containing `◇A` has a `⊏`-successor containing `A`. -/
 lemma exists_mRel_of_dia_mem (h : ◇A ∈ w.th) :
   ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel w v ∧ A ∈ v.th := by
   have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
@@ -205,7 +194,6 @@ lemma exists_mRel_of_dia_mem (h : ◇A ∈ w.th) :
   exact ⟨v, mRel_of_avoid_disjSet ((BDTheory.subset_impSet (𝔸 := 𝔸)).trans hXv) havoid,
     hXv (BDTheory.self_mem_impSet (𝔸 := 𝔸))⟩;
 
-/-- The theory of a pair missing `◇A` is disjoint from `diaDisjSet {A}`. -/
 private lemma avoid_diaDisjSet_of_dia_not_mem (h : ◇A ∉ w.th) :
   ∀ C ∈ diaDisjSet {A}, C ∉ w.th := by
   rintro C ⟨D, ⟨K, hne, hsub, rfl⟩, rfl⟩ hmem;
@@ -215,7 +203,6 @@ private lemma avoid_diaDisjSet_of_dia_not_mem (h : ◇A ∉ w.th) :
     exact imp_id));
   exact h (w.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) h₁) hmem);
 
-/-- A pair missing `◇A` has an `≼`-extension none of whose `⊏`-successors contains `A`. -/
 lemma exists_iRel_of_dia_not_mem (h : ◇A ∉ w.th) :
   ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).iRel w v ∧
   ∀ u : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel v u → A ∉ u.th := by
@@ -224,10 +211,7 @@ lemma exists_iRel_of_dia_not_mem (h : ◇A ∉ w.th) :
       orDirected_diaDisjSet (avoid_diaDisjSet_of_dia_not_mem h);
   exact ⟨⟨Y, {A}, hmdp, hprime, hof, havoid⟩, hXY, fun _ Mvu => Mvu.2 A rfl⟩;
 
-/-- Truth lemma for the pair canonical model: a pair forces exactly the formulas of its theory.
-
-- [MdP05, Lemma 3]
--/
+/-- - [MdP05, Lemma 3] -/
 theorem truthlemma : w ⊩[canonicalModel 𝔸] A ↔ A ∈ w.th := by
   induction A generalizing w with
   | atom a => exact Iff.rfl;
@@ -280,10 +264,7 @@ section
 
 variable {𝔸 : Set BDFormula} {A : BDFormula}
 
-/-- Model existence: a formula outside `logic 𝔸` is refuted at some pair of the canonical model.
-
-- [MdP05, Theorem 2]
--/
+/-- - [MdP05, Theorem 2] -/
 theorem exists_not_forces_of_not_mem (h : A ∉ logic 𝔸) :
   ∃ w : CanonicalPair 𝔸, w ⊮[canonicalModel 𝔸] A := by
   obtain ⟨w, -, -, havoid⟩ :=
@@ -295,10 +276,7 @@ end
 
 end CK
 
-/-- Completeness of `CK` for the class of all CK-models.
-
-- [MdP05, Theorem 1]
--/
+/-- - [MdP05, Theorem 1] -/
 theorem LogicCK.mem_iff_valid {A : BDFormula} :
   A ∈ LogicCK ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, M ⊧ A := by
   constructor;

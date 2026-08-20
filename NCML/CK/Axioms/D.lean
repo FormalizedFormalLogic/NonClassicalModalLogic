@@ -14,7 +14,6 @@ variable {A : BDFormula}
 
 namespace Model
 
-/-- `⊏` is serial: every world has an `⊏`-successor. -/
 class SerialMRel (M : Model κ) : Prop where
   serial_mRel : ∀ x : M.World, ∃ y, x ⊏ y
 
@@ -40,7 +39,6 @@ end Model
 
 variable {𝔸 : Set BDFormula}
 
-/-- The canonical model of a logic proving `D` has a serial `⊏`. -/
 lemma serialMRel_canonicalModel (h𝔸 : ∀ {A}, (□A 🡒 ◇A) ∈ logic 𝔸) :
   (canonicalModel 𝔸).SerialMRel where
   serial_mRel w := by
@@ -58,8 +56,6 @@ lemma serialMRel_canonicalModel_of_mem (h : ∀ {A}, □A 🡒 ◇A ∈ 𝔸) : 
 
 end CK
 
-/-- The model characterization of `CK + D` and `CK + PDia`: a formula is a theorem of either
-logic exactly when it is valid on every CK-model with a serial `⊏`. -/
 theorem LogicCKD_TFAE {A : BDFormula} : List.TFAE [
   A ∈ LogicCKD,
   A ∈ LogicCKPDia,

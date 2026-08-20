@@ -33,7 +33,6 @@ abbrev LogicCKTDia : BDLogic := ProvableBDHilbert.logic { A 🡒 ◇A | (A) }
 
 abbrev LogicCKD : BDLogic := ProvableBDHilbert.logic { □A 🡒 ◇A | (A) }
 
-/-- `PDia := ◇⊤`. -/
 abbrev LogicCKPDia : BDLogic := ProvableBDHilbert.logic { ◇⊤ }
 
 theorem LogicCK.subset_CKB : LogicCK ⊆ LogicCKB := .logic_monotone (by grind)
@@ -126,7 +125,6 @@ theorem subset_CKTDia : LogicCKD ⊆ LogicCKTDia := by
   rintro _ ⟨B, rfl⟩;
   exact LogicCKTDia.provable_D;
 
-/-- `D` and `PDia` are interderivable over `CK`. -/
 theorem eq_CKPDia : LogicCKD = LogicCKPDia := by
   apply Set.Subset.antisymm;
   . intro;

@@ -67,7 +67,6 @@ lemma box_or_mem [T.Of (logic 𝔸)] [T.Mdp]
     (mdp (provable_mem (𝔸 := 𝔸) (imp_comp_left box_or_inr)) h₂)
     h;
 
-/-- An mdp-closed theory of `logic 𝔸` containing `⊥` is the whole formula set. -/
 lemma eq_univ_of_bot_mem [T.Of (logic 𝔸)] [T.Mdp] (h : ⊥ ∈ T) : T = Set.univ :=
   Set.eq_univ_of_forall fun _ => mdp (T := T) (provable_mem (𝔸 := 𝔸) efq) h
 
@@ -316,14 +315,12 @@ def diaDisjSet (Θ : BDFormulaSet) : BDFormulaSet := ◇(disjSet Θ)
 
 variable {𝔸 : Set BDFormula} {B : BDFormula}
 
-/-- A singleton avoid set is trivially ⋎-directed. -/
 lemma orDirected_singleton : OrDirected 𝔸 {B} := by
   rintro C rfl D rfl;
   exact ⟨D, rfl, or_imp imp_id imp_id⟩;
 
 variable {Θ : BDFormulaSet}
 
-/-- `disjSet Θ` is ⋎-directed: appending the underlying lists subsumes the disjunction. -/
 lemma orDirected_disjSet : OrDirected 𝔸 (disjSet Θ) := by
   rintro C ⟨K₁, hK₁ne, hK₁sub, rfl⟩ D ⟨K₂, hK₂ne, hK₂sub, rfl⟩;
   refine ⟨⋁(K₁ ++ K₂), ⟨K₁ ++ K₂, by simp [hK₁ne], ?_, rfl⟩,
@@ -333,7 +330,6 @@ lemma orDirected_disjSet : OrDirected 𝔸 (disjSet Θ) := by
   · exact hK₁sub A hA;
   · exact hK₂sub A hA;
 
-/-- The disjunctions over the empty set: none. -/
 @[simp]
 lemma disjSet_empty : disjSet (∅ : BDFormulaSet) = ∅ := by
   ext B;
@@ -343,12 +339,10 @@ lemma disjSet_empty : disjSet (∅ : BDFormulaSet) = ∅ := by
   | nil => exact hne rfl;
   | cons C K => exact hsub C (by simp);
 
-/-- The `◇`-disjunctions over the empty set: none. -/
 @[simp]
 lemma diaDisjSet_empty : diaDisjSet (∅ : BDFormulaSet) = ∅ := by
   simp [diaDisjSet, BDFormulaSet.dia];
 
-/-- `diaDisjSet Θ` is ⋎-directed, via `dia_mono` and the same list append as `disjSet`. -/
 lemma orDirected_diaDisjSet : OrDirected 𝔸 (diaDisjSet Θ) := by
   rintro C ⟨B₁, ⟨K₁, hK₁ne, hK₁sub, rfl⟩, rfl⟩ D ⟨B₂, ⟨K₂, hK₂ne, hK₂sub, rfl⟩, rfl⟩;
   refine ⟨◇(⋁(K₁ ++ K₂)), ⟨⋁(K₁ ++ K₂), ⟨K₁ ++ K₂, by simp [hK₁ne], ?_, rfl⟩, rfl⟩,
