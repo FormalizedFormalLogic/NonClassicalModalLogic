@@ -56,23 +56,20 @@ instance : (canonicalModel { □A 🡒 ◇A | (A) }).SerialMRel :=
 
 end CK
 
-/-- The model characterization of `CK + D`: a formula is a theorem of `CK + D` exactly when it is
-valid on every CK-model with a serial `⊏`. -/
-theorem LogicCKD.mem_iff_valid {A : BDFormula} :
-  A ∈ LogicCKD ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.SerialMRel] → M ⊧ A := by
-  constructor;
-  · intro h _ M _;
-    exact CK.Model.valid_of_mem_LogicCKD h;
-  · contrapose!;
+/-- The model characterization of `CK + D` and `CK + PDia`: a formula is a theorem of either
+logic exactly when it is valid on every CK-model with a serial `⊏`. -/
+theorem LogicCKD_TFAE {A : BDFormula} : List.TFAE [
+  A ∈ LogicCKD,
+  A ∈ LogicCKPDia,
+  ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.SerialMRel] → M ⊧ A,
+] := by
+  tfae_have 1 → 2 := LogicCKD.eq_CKPDia ▸ id
+  tfae_have 2 → 3 := fun h _ M _ => CK.Model.valid_of_mem_LogicCKPDia h
+  tfae_have 3 → 1 := by
+    contrapose!;
     intro h;
     obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
     exact ⟨_, CK.canonicalModel _, inferInstance, fun hM => hw (hM w)⟩;
-
-/-- The model characterization of `CK + PDia`: a formula is a theorem of `CK + PDia` exactly when
-it is valid on every CK-model with a serial `⊏`. -/
-theorem LogicCKPDia.mem_iff_valid {A : BDFormula} :
-  A ∈ LogicCKPDia ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.SerialMRel] → M ⊧ A := by
-  rw [← LogicCKD.eq_CKPDia];
-  exact LogicCKD.mem_iff_valid;
+  tfae_finish
 
 end
