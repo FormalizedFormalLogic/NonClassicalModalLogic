@@ -26,7 +26,9 @@ theorem valid_D_of_serialMRel [M.SerialMRel] : M ⊧ (□A 🡒 ◇A) := fun
   _ => forces_D_of_serialMRel
 
 theorem forces_PDia_of_serialMRel [M.SerialMRel] : x ⊩[_] (◇⊤ : BDFormula) := by
-  sorry
+  intro y Ixy;
+  obtain ⟨z, Mxz⟩ := serial_mRel y;
+  exact ⟨z, Mxz, fun w _ h => h⟩;
 
 theorem valid_PDia_of_serialMRel [M.SerialMRel] : M ⊧ (◇⊤ : BDFormula) := fun
   _ => forces_PDia_of_serialMRel
