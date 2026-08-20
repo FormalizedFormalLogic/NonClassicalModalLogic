@@ -174,6 +174,11 @@ noncomputable def conj (Γ : BDFormulaFinset) : BDFormula := ⋀Γ.toList
 
 @[inherit_doc] scoped prefix:90 "⋀" => BDFormulaFinset.conj
 
+/-- Disjunction of a finset of formulas, via an arbitrary enumeration as a list. -/
+noncomputable def disj (Γ : BDFormulaFinset) : BDFormula := ⋁Γ.toList
+
+@[inherit_doc] scoped prefix:90 "⋁" => BDFormulaFinset.disj
+
 end BDFormulaFinset
 
 end
