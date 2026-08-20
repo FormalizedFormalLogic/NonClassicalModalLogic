@@ -1,0 +1,41 @@
+module
+
+public import NCML.CK.Semantics
+
+@[expose] public section
+
+namespace CK
+
+variable {κ : Type*} {M : Model κ}
+variable {x : M.World} {A : BDFormula}
+
+namespace Model
+
+/-- Condition (refl°): every world is fallible or lies in the composite
+relation `R° := ≼ ∘ ⊏ ∘ ≼` to itself. -/
+class ReflexiveMComp (M : Model κ) : Prop where
+  reflexive_mComp : ∀ x : M.World, M.Fallible x ∨ ∃ y z, x ≼ y ∧ y ⊏ z ∧ z ≼ x
+
+export ReflexiveMComp (reflexive_mComp)
+
+/-- Condition (refl°⁺): every world has an `≼`-successor with an `⊏`-edge back to it. -/
+class ReturningMRel (M : Model κ) : Prop where
+  returning_mRel : ∀ x : M.World, ∃ y, x ≼ y ∧ y ⊏ x
+
+export ReturningMRel (returning_mRel)
+
+instance [M.ReturningMRel] : M.ReflexiveMComp where
+  reflexive_mComp x := by
+    sorry
+
+theorem forces_TBox_of_reflexiveMComp [M.ReflexiveMComp] : x ⊩[_] (□A 🡒 A) := by
+  sorry
+
+theorem valid_TBox_of_reflexiveMComp [M.ReflexiveMComp] : M ⊧ (□A 🡒 A) := fun
+  _ => forces_TBox_of_reflexiveMComp
+
+end Model
+
+end CK
+
+end

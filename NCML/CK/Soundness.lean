@@ -2,6 +2,9 @@ module
 
 public import NCML.CK.Semantics
 public import NCML.CK.Confluence
+public import NCML.CK.Axioms.D
+public import NCML.CK.Axioms.TDia
+public import NCML.CK.Axioms.TBox
 public import NCML.Hilbert.Logics
 
 @[expose] public section
@@ -53,6 +56,18 @@ theorem valid_of_mem_LogicIKB [M.IsIKB] (hA : A ∈ LogicIKB) : M ⊧ A :=
     · exact valid_BBox_of_symmetricMRel_of_forwardConfluent;
     · exact valid_BDia_of_symmetricMRel_of_forwardConfluent;
   ) hA
+
+theorem valid_of_mem_LogicCKD [M.SerialMRel] (hA : A ∈ LogicCKD) : M ⊧ A := by
+  sorry
+
+theorem valid_of_mem_LogicCKPDia [M.SerialMRel] (hA : A ∈ LogicCKPDia) : M ⊧ A := by
+  sorry
+
+theorem valid_of_mem_LogicCKTDia [M.AscendingMRel] (hA : A ∈ LogicCKTDia) : M ⊧ A := by
+  sorry
+
+theorem valid_of_mem_LogicCKTBox [M.ReflexiveMComp] (hA : A ∈ LogicCKTBox) : M ⊧ A := by
+  sorry
 
 end Model
 
