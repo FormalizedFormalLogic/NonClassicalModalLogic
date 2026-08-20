@@ -31,12 +31,12 @@ instance : counterModel.ReturningMRel where
 lemma counterModel_not_serialMRel : ¬counterModel.SerialMRel := by
   rintro ⟨h⟩;
   obtain ⟨y, My⟩ := h 0;
-  simp_all [counterModel, Model.mRel];
+  simp_all [counterModel, Frame.mRel];
 
 lemma counterModel_not_forces_PDia : 0 ⊮[counterModel] ◇⊤ := by
   intro h;
   obtain ⟨z, Mz, -⟩ := h 0 (le_refl 0);
-  simp_all [counterModel, Model.mRel];
+  simp_all [counterModel, Frame.mRel];
 
 lemma counterModel_not_forces_D : 0 ⊮[counterModel] (□⊤ 🡒 ◇⊤) :=
   fun h => counterModel_not_forces_PDia (h 0 (le_refl 0) fun _ _ _ _ => forces_top)
