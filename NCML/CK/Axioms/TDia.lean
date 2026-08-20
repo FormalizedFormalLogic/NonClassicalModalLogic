@@ -54,9 +54,11 @@ theorem valid_of_mem_LogicCKTDia [M.AscendingMRel] (hA : A ∈ LogicCKTDia) : M 
 
 end Model
 
+variable {𝔸 : Set BDFormula}
+
 /-- If the logic proves `T◇`, no disjunction over the forbidden formulas of a pair `w` lies in the
 MP-closure of `w.th ∪ □⁻¹w.th`. -/
-private lemma avoid_disjSet_mdpClosure {𝔸 : Set BDFormula}
+private lemma avoid_disjSet_mdpClosure
   (h𝔸 : ∀ A : BDFormula, (A 🡒 ◇A) ∈ logic 𝔸) (w : CanonicalPair 𝔸) :
   ∀ C ∈ disjSet w.forb, C ∉ BDTheory.mdpClosure (w.th ∪ □⁻¹w.th) := by
   have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
@@ -69,7 +71,7 @@ private lemma avoid_disjSet_mdpClosure {𝔸 : Set BDFormula}
   exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (w.th.mdp h₂ h₃);
 
 /-- The canonical model of a logic proving `T◇` is strictly ascending. -/
-lemma strictlyAscendingMRel_canonicalModel {𝔸 : Set BDFormula}
+lemma strictlyAscendingMRel_canonicalModel
   (h𝔸 : ∀ A : BDFormula, (A 🡒 ◇A) ∈ logic 𝔸) : (canonicalModel 𝔸).StrictlyAscendingMRel where
   strictly_ascending_mRel w := by
     have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
@@ -83,8 +85,9 @@ lemma strictlyAscendingMRel_canonicalModel {𝔸 : Set BDFormula}
     exact ⟨v, CanonicalPair.mRel_of_avoid_disjSet (Set.subset_union_right.trans h₁) havoid,
       Set.subset_union_left.trans h₁⟩;
 
-instance : (canonicalModel { A 🡒 ◇A | (A) }).StrictlyAscendingMRel :=
-  strictlyAscendingMRel_canonicalModel fun _ => LogicCKTDia.provable_TDia
+lemma strictlyAscendingMRel_canonicalModel_of_mem (h : ∀ {A}, A 🡒 ◇A ∈ 𝔸) :
+  (canonicalModel 𝔸).StrictlyAscendingMRel :=
+  strictlyAscendingMRel_canonicalModel $ by tauto;
 
 end CK
 
@@ -101,7 +104,8 @@ theorem LogicCKTDia_TFAE {A : BDFormula} : List.TFAE [
     contrapose!;
     intro h;
     obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
-    exact ⟨_, CK.canonicalModel _, inferInstance, fun hM => hw (hM w)⟩;
+    exact ⟨_, CK.canonicalModel _, CK.strictlyAscendingMRel_canonicalModel_of_mem (by grind),
+      fun hM => hw (hM w)⟩;
   tfae_finish
 
 end

@@ -38,21 +38,23 @@ theorem valid_of_mem_LogicCKPDia [M.SerialMRel] (hA : A ∈ LogicCKPDia) : M ⊧
 
 end Model
 
+variable {𝔸 : Set BDFormula}
+
 /-- The canonical model of a logic proving `D` has a serial `⊏`. -/
-lemma serialMRel_canonicalModel {𝔸 : Set BDFormula} (h𝔸 : ∀ A : BDFormula, (□A 🡒 ◇A) ∈ logic 𝔸) :
+lemma serialMRel_canonicalModel (h𝔸 : ∀ {A}, (□A 🡒 ◇A) ∈ logic 𝔸) :
   (canonicalModel 𝔸).SerialMRel where
   serial_mRel w := by
     have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
     have h : ∀ C ∈ disjSet w.forb, C ∉ □⁻¹w.th := by
       rintro C ⟨K, hne, hsub, rfl⟩ hmem;
       exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩
-        (w.th.mdp (BDTheory.provable_mem (h𝔸 (⋁K))) hmem);
+        (w.th.mdp (BDTheory.provable_mem (h𝔸)) hmem);
     obtain ⟨v, hXv, -, havoid⟩ :=
       CanonicalPair.exists_avoiding (𝔸 := 𝔸) (T := □⁻¹w.th) orDirected_disjSet h;
     exact ⟨v, CanonicalPair.mRel_of_avoid_disjSet hXv havoid⟩;
 
-instance : (canonicalModel { □A 🡒 ◇A | (A) }).SerialMRel :=
-  serialMRel_canonicalModel fun _ => LogicCKD.provable_D
+lemma serialMRel_canonicalModel_of_mem (h : ∀ {A}, □A 🡒 ◇A ∈ 𝔸) : (canonicalModel 𝔸).SerialMRel :=
+  serialMRel_canonicalModel $ by tauto;
 
 end CK
 
@@ -69,7 +71,7 @@ theorem LogicCKD_TFAE {A : BDFormula} : List.TFAE [
     contrapose!;
     intro h;
     obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
-    exact ⟨_, CK.canonicalModel _, inferInstance, fun hM => hw (hM w)⟩;
+    exact ⟨_, CK.canonicalModel _, CK.serialMRel_canonicalModel_of_mem (by grind), fun hM => hw (hM w)⟩;
   tfae_finish
 
 end

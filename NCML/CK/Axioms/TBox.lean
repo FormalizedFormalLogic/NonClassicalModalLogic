@@ -45,16 +45,19 @@ theorem valid_of_mem_LogicCKTBox [M.ReflexiveMComp] (hA : A ∈ LogicCKTBox) : M
 
 end Model
 
+variable {𝔸 : Set BDFormula}
+
 /-- The canonical model of a logic proving `T□` has an `≼`-successor with an `⊏`-edge back to
 every pair. -/
-lemma returningMRel_canonicalModel {𝔸 : Set BDFormula} (h𝔸 : ∀ A : BDFormula, (□A 🡒 A) ∈ logic 𝔸) :
+lemma returningMRel_canonicalModel (h𝔸 : ∀ A : BDFormula, (□A 🡒 A) ∈ logic 𝔸) :
   (canonicalModel 𝔸).ReturningMRel where
   returning_mRel w :=
     ⟨w.erase, CanonicalPair.iRel_erase,
       fun _ hA => w.th.mdp (BDTheory.provable_mem (h𝔸 _)) hA, by simp⟩
 
-instance : (canonicalModel { □A 🡒 A | (A) }).ReturningMRel :=
-  returningMRel_canonicalModel fun _ => LogicCKTBox.provable_TBox
+lemma returningMRel_canonicalModel_of_mem (h : ∀ {A}, □A 🡒 A ∈ 𝔸) :
+  (canonicalModel 𝔸).ReturningMRel :=
+  returningMRel_canonicalModel $ by tauto;
 
 end CK
 
@@ -72,7 +75,8 @@ theorem LogicCKTBox_TFAE {A : BDFormula} : List.TFAE [
     contrapose!;
     intro h;
     obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
-    exact ⟨_, CK.canonicalModel _, inferInstance, fun hM => hw (hM w)⟩;
+    exact ⟨_, CK.canonicalModel _, CK.returningMRel_canonicalModel_of_mem (by grind),
+      fun hM => hw (hM w)⟩;
   tfae_finish
 
 end
