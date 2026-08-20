@@ -4,6 +4,9 @@ public import NCML.CK.Axioms.D
 
 @[expose] public section
 
+open ProvableBDHilbert
+open scoped BDFormulaSet BDFormulaList
+
 namespace CK
 
 open Model.Forces
@@ -51,6 +54,29 @@ theorem valid_of_mem_LogicCKTDia [M.AscendingMRel] (hA : A ∈ LogicCKTDia) : M 
 
 end Model
 
+/-- Every `⋁K` over the forbidden formulas of a `CK + T◇`-pair `w` stays outside the MP-closure
+of `w.th ∪ □⁻¹w.th`. -/
+private lemma avoid_disjSet_mdpClosure {w : CanonicalPair { A 🡒 ◇A | (A) }} :
+  ∀ C ∈ disjSet w.forb, C ∉ BDTheory.mdpClosure (w.th ∪ □⁻¹w.th) := sorry
+
+/-- The canonical model of `CK + T◇` satisfies the strong ascending condition. -/
+instance : (canonicalModel { A 🡒 ◇A | (A) }).StrictlyAscendingMRel := sorry
+
 end CK
+
+/-- The model characterization of `CK + T◇`: a formula is a theorem of `CK + T◇` exactly when it is
+valid on every ascending CK-model.
+
+- [Pac24, Problem in §4]
+-/
+theorem LogicCKTDia.mem_iff_valid {A : BDFormula} :
+  A ∈ LogicCKTDia ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.AscendingMRel] → M ⊧ A := sorry
+
+/-- The model characterization of `CK + T◇` by the strong ascending condition.
+
+- [Pac24, Problem in §4]
+-/
+theorem LogicCKTDia.mem_iff_valid_strictlyAscendingMRel {A : BDFormula} :
+  A ∈ LogicCKTDia ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.StrictlyAscendingMRel] → M ⊧ A := sorry
 
 end

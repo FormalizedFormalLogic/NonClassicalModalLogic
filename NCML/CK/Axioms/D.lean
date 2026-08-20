@@ -4,6 +4,9 @@ public import NCML.CK.Canonical
 
 @[expose] public section
 
+open ProvableBDHilbert
+open scoped BDFormulaSet BDFormulaList
+
 namespace CK
 
 variable {κ : Type*} {M : Model κ}
@@ -35,6 +38,25 @@ theorem valid_of_mem_LogicCKPDia [M.SerialMRel] (hA : A ∈ LogicCKPDia) : M ⊧
 
 end Model
 
+/-- The canonical model of `CK + D` has a serial `⊏`. -/
+instance : (canonicalModel { □A 🡒 ◇A | (A) }).SerialMRel := sorry
+
 end CK
+
+/-- The model characterization of `CK + D`: a formula is a theorem of `CK + D` exactly when it is
+valid on every CK-model with a serial `⊏`.
+
+- [Pac24, Problem in §4]
+-/
+theorem LogicCKD.mem_iff_valid {A : BDFormula} :
+  A ∈ LogicCKD ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.SerialMRel] → M ⊧ A := sorry
+
+/-- The model characterization of `CK + PDia`: a formula is a theorem of `CK + PDia` exactly when
+it is valid on every CK-model with a serial `⊏`.
+
+- [Pac24, Problem in §4]
+-/
+theorem LogicCKPDia.mem_iff_valid {A : BDFormula} :
+  A ∈ LogicCKPDia ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.SerialMRel] → M ⊧ A := sorry
 
 end
