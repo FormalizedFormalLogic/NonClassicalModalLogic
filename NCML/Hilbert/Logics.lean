@@ -44,7 +44,7 @@ theorem LogicCK.subset_CKTDia : LogicCK ⊆ LogicCKTDia := .logic_monotone (by g
 theorem LogicCK.subset_CKD : LogicCK ⊆ LogicCKD := .logic_monotone (by grind)
 theorem LogicCK.subset_CKPDia : LogicCK ⊆ LogicCKPDia := .logic_monotone (by grind)
 
-theorem ProvableBDHilbert.provable_D_of_diaTop
+theorem ProvableBDHilbert.provable_D_of_PDia
     {𝔸 : Set BDFormula} {A : BDFormula} (h : ⊢ᴴ[CK;𝔸] (◇⊤ : BDFormula)) :
     ⊢ᴴ[CK;𝔸] □A 🡒 ◇A :=
   ProvableBDHilbert.mdp_ctx (ProvableBDHilbert.imp_trans (ProvableBDHilbert.box_mono
@@ -105,9 +105,9 @@ open ProvableBDHilbert
 
 theorem provable_TDia : (A 🡒 ◇A) ∈ LogicCKTDia := axm (by grind)
 
-theorem provable_diaTop : (◇⊤) ∈ LogicCKTDia := mdp (provable_TDia (A := ⊤)) verum
+theorem provable_PDia : (◇⊤) ∈ LogicCKTDia := mdp (provable_TDia (A := ⊤)) verum
 
-theorem provable_D : (□A 🡒 ◇A) ∈ LogicCKTDia := provable_D_of_diaTop provable_diaTop
+theorem provable_D : (□A 🡒 ◇A) ∈ LogicCKTDia := provable_D_of_PDia provable_PDia
 
 end LogicCKTDia
 
@@ -118,7 +118,7 @@ open ProvableBDHilbert
 
 theorem provable_D : (□A 🡒 ◇A) ∈ LogicCKD := axm (by grind)
 
-theorem provable_diaTop : (◇⊤) ∈ LogicCKD := mdp (provable_D (A := ⊤)) (nec verum)
+theorem provable_PDia : (◇⊤) ∈ LogicCKD := mdp (provable_D (A := ⊤)) (nec verum)
 
 theorem subset_CKTDia : LogicCKD ⊆ LogicCKTDia := fun _ =>
   provable_of_provable_axioms (fun _ hB => by obtain ⟨_, rfl⟩ := hB; exact LogicCKTDia.provable_D)
@@ -127,9 +127,9 @@ theorem eq_logic_diaTop : LogicCKD = ProvableBDHilbert.logic {◇⊤} :=
   Set.Subset.antisymm
     (fun _ =>
       provable_of_provable_axioms
-        (fun _ hB => by obtain ⟨_, rfl⟩ := hB; exact provable_D_of_diaTop (axm rfl)))
+        (fun _ hB => by obtain ⟨_, rfl⟩ := hB; exact provable_D_of_PDia (axm rfl)))
     (fun _ =>
-      provable_of_provable_axioms (fun _ hB => by rw [hB]; exact provable_diaTop))
+      provable_of_provable_axioms (fun _ hB => by rw [hB]; exact provable_PDia))
 
 end LogicCKD
 
