@@ -308,6 +308,9 @@ section Disj
 def disjSet (Θ : BDFormulaSet) : BDFormulaSet :=
   { B | ∃ K : BDFormulaList, K ≠ [] ∧ (∀ A ∈ K, A ∈ Θ) ∧ B = ⋁K }
 
+/-- The `◇`-images of `disjSet Θ`. -/
+def diaDisjSet (Θ : BDFormulaSet) : BDFormulaSet := ◇(disjSet Θ)
+
 end Disj
 
 /-! ## CKB-specific consequences of the MP-closure -/
