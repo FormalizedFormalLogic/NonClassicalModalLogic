@@ -53,7 +53,7 @@ lemma exists_ascendingMRel_not_forces_N :
 
 end CK
 
-theorem LogicCKD.not_provable_TDia : (#0 🡒 ◇(#0)) ∉ LogicCKD := by
+lemma LogicCKD.not_provable_TDia : (#0 🡒 ◇(#0)) ∉ LogicCKD := by
   intro h;
   apply CK.TDia.counterModel_not_forces (CK.Model.valid_of_mem_LogicCKD h 0)
 

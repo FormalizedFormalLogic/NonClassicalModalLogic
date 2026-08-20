@@ -38,7 +38,7 @@ instance [M.AscendingMRel] : M.SerialMRel where
     obtain ⟨z, Mxz, _⟩ := ascending_mRel x;
     exact ⟨z, Mxz⟩;
 
-theorem valid_TDia_of_ascendingMRel [M.AscendingMRel] : M ⊧ (A 🡒 ◇A) := by
+lemma valid_TDia_of_ascendingMRel [M.AscendingMRel] : M ⊧ (A 🡒 ◇A) := by
   intro x y Ixy hyA u Iyu;
   obtain ⟨z, Muz, hz⟩ := ascending_mRel u;
   have huA : u ⊩[_] A := persistent hyA Iyu;
@@ -46,7 +46,7 @@ theorem valid_TDia_of_ascendingMRel [M.AscendingMRel] : M ⊧ (A 🡒 ◇A) := b
   · exact ⟨z, Muz, persistent huA Iuz⟩;
   · exact ⟨z, Muz, of_fallible hzFallible⟩;
 
-theorem valid_of_mem_LogicCKTDia [M.AscendingMRel] (hA : A ∈ LogicCKTDia) : M ⊧ A :=
+lemma valid_of_mem_LogicCKTDia [M.AscendingMRel] (hA : A ∈ LogicCKTDia) : M ⊧ A :=
   valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TDia_of_ascendingMRel) hA
 
 end Model

@@ -181,7 +181,7 @@ lemma extrinsicForces_iff_intrinsicForces {M : Model κ} [M.MRelLifting] [M.MixC
       exact ⟨y₁, Mx₁y₁, ihA.mpr h⟩;
   | _ => grind;
 
-theorem logicIntrinsic_subset_logicExtrinsic : logicIntrinsic.{u} ⊆ logicExtrinsic.{u} := by
+lemma logicIntrinsic_subset_logicExtrinsic : logicIntrinsic.{u} ⊆ logicExtrinsic.{u} := by
   simp only [logicIntrinsic, IntrinsicValid, logicExtrinsic, ExtrinsicValid, Set.ofPred_subset_ofPred];
   grind [extrinsicForces_iff_intrinsicForces];
 
@@ -203,7 +203,7 @@ lemma axiomCDia_notMem_logicIntrinsic : ◇(#0 ⋎ #1) 🡒 (◇(#0) ⋎ ◇(#1)
   push Not;
   refine ⟨0, ?_, ?_, ⟨1, ?_⟩, ⟨0, ?_⟩⟩ <;> grind;
 
-theorem logicIntrinsic_ssubset_logicExtrinsic : logicIntrinsic.{0} ⊂ logicExtrinsic.{0} := by
+lemma logicIntrinsic_ssubset_logicExtrinsic : logicIntrinsic.{0} ⊂ logicExtrinsic.{0} := by
   apply Set.ssubset_iff_exists.mpr;
   exact ⟨logicIntrinsic_subset_logicExtrinsic, ◇(#0 ⋎ #1) 🡒 (◇(#0) ⋎ ◇(#1)),
     axiomCDia_mem_logicExtrinsic, axiomCDia_notMem_logicIntrinsic⟩;
@@ -249,7 +249,7 @@ lemma dnBoxBot_notMem_logicDiaFreeExtrinsic : (∼∼□⊥ 🡒 □⊥) ∉ log
       use 4;
       tauto;
 
-theorem logicDiaFreeExtrinsic_ssubset_logicExtrinsic : logicDiaFreeExtrinsic.{0} ⊂ logicExtrinsic.{0} := by
+lemma logicDiaFreeExtrinsic_ssubset_logicExtrinsic : logicDiaFreeExtrinsic.{0} ⊂ logicExtrinsic.{0} := by
   apply Set.ssubset_iff_exists.mpr;
   constructor;
   . simp only [logicDiaFreeExtrinsic, logicExtrinsic, Set.ofPred_subset_ofPred];

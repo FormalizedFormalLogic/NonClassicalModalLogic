@@ -35,15 +35,15 @@ abbrev LogicCKD : BDLogic := ProvableBDHilbert.logic { □A 🡒 ◇A | (A) }
 
 abbrev LogicCKPDia : BDLogic := ProvableBDHilbert.logic { ◇⊤ }
 
-theorem LogicCK.subset_CKB : LogicCK ⊆ LogicCKB := .logic_monotone (by grind)
-theorem LogicCK.subset_IK : LogicCK ⊆ LogicIK := .logic_monotone (by grind)
-theorem LogicIK.subset_IKB : LogicIK ⊆ LogicIKB := .logic_monotone (by grind)
-theorem LogicCK.subset_CKTBox : LogicCK ⊆ LogicCKTBox := .logic_monotone (by grind)
-theorem LogicCK.subset_CKTDia : LogicCK ⊆ LogicCKTDia := .logic_monotone (by grind)
-theorem LogicCK.subset_CKD : LogicCK ⊆ LogicCKD := .logic_monotone (by grind)
-theorem LogicCK.subset_CKPDia : LogicCK ⊆ LogicCKPDia := .logic_monotone (by grind)
+lemma LogicCK.subset_CKB : LogicCK ⊆ LogicCKB := .logic_monotone (by grind)
+lemma LogicCK.subset_IK : LogicCK ⊆ LogicIK := .logic_monotone (by grind)
+lemma LogicIK.subset_IKB : LogicIK ⊆ LogicIKB := .logic_monotone (by grind)
+lemma LogicCK.subset_CKTBox : LogicCK ⊆ LogicCKTBox := .logic_monotone (by grind)
+lemma LogicCK.subset_CKTDia : LogicCK ⊆ LogicCKTDia := .logic_monotone (by grind)
+lemma LogicCK.subset_CKD : LogicCK ⊆ LogicCKD := .logic_monotone (by grind)
+lemma LogicCK.subset_CKPDia : LogicCK ⊆ LogicCKPDia := .logic_monotone (by grind)
 
-theorem ProvableBDHilbert.provable_D_of_PDia
+lemma ProvableBDHilbert.provable_D_of_PDia
     {𝔸 : Set BDFormula} {A : BDFormula} (h : ⊢ᴴ[CK;𝔸] (◇⊤ : BDFormula)) :
     ⊢ᴴ[CK;𝔸] □A 🡒 ◇A :=
   ProvableBDHilbert.mdp_ctx (ProvableBDHilbert.imp_trans (ProvableBDHilbert.box_mono
@@ -52,7 +52,7 @@ theorem ProvableBDHilbert.provable_D_of_PDia
 
 namespace LogicCKPDia
 
-theorem provable_PDia : (◇⊤) ∈ LogicCKPDia := ProvableBDHilbert.axm rfl
+lemma provable_PDia : (◇⊤) ∈ LogicCKPDia := ProvableBDHilbert.axm rfl
 
 end LogicCKPDia
 
@@ -61,10 +61,10 @@ namespace LogicCKB
 
 open ProvableBDHilbert
 
-theorem subset_IKB : LogicCKB ⊆ LogicIKB := .logic_monotone (by grind)
+lemma subset_IKB : LogicCKB ⊆ LogicIKB := .logic_monotone (by grind)
 
 /-- - [Pac24, Theorem 3] -/
-theorem provable_N : (∼◇⊥) ∈ LogicCKB := by
+lemma provable_N : (∼◇⊥) ∈ LogicCKB := by
   have h1 : (⊥ 🡒 □⊥) ∈ LogicCKB := efq;
   have h2 : (□(⊥ 🡒 □⊥)) ∈ LogicCKB := nec h1;
   have h3 : (◇⊥ 🡒 ◇(□⊥)) ∈ LogicCKB := mdp kDia h2;
@@ -72,7 +72,7 @@ theorem provable_N : (∼◇⊥) ∈ LogicCKB := by
   exact imp_trans h3 h4;
 
 /-- - [Pac24, Theorem 3] -/
-theorem provable_DP : (◇(A ⋎ B) 🡒 ◇A ⋎ ◇B) ∈ LogicCKB := by
+lemma provable_DP : (◇(A ⋎ B) 🡒 ◇A ⋎ ◇B) ∈ LogicCKB := by
   have h₁ : (A 🡒 □◇A) ∈ LogicCKB := axm (by grind);
   have h₂ : (B 🡒 □◇B) ∈ LogicCKB := axm (by grind);
   have h₃ : (◇(□(◇A ⋎ ◇B)) 🡒 ◇A ⋎ ◇B) ∈ LogicCKB := axm (by grind);
@@ -91,9 +91,9 @@ namespace LogicCKTBox
 
 open ProvableBDHilbert
 
-theorem provable_TBox : (□A 🡒 A) ∈ LogicCKTBox := axm (by grind)
+lemma provable_TBox : (□A 🡒 A) ∈ LogicCKTBox := axm (by grind)
 
-theorem provable_not_box_bot : (∼□⊥) ∈ LogicCKTBox := provable_TBox (A := ⊥)
+lemma provable_not_box_bot : (∼□⊥) ∈ LogicCKTBox := provable_TBox (A := ⊥)
 
 end LogicCKTBox
 
@@ -102,11 +102,11 @@ namespace LogicCKTDia
 
 open ProvableBDHilbert
 
-theorem provable_TDia : (A 🡒 ◇A) ∈ LogicCKTDia := axm (by grind)
+lemma provable_TDia : (A 🡒 ◇A) ∈ LogicCKTDia := axm (by grind)
 
-theorem provable_PDia : (◇⊤) ∈ LogicCKTDia := mdp provable_TDia verum
+lemma provable_PDia : (◇⊤) ∈ LogicCKTDia := mdp provable_TDia verum
 
-theorem provable_D : (□A 🡒 ◇A) ∈ LogicCKTDia := provable_D_of_PDia provable_PDia
+lemma provable_D : (□A 🡒 ◇A) ∈ LogicCKTDia := provable_D_of_PDia provable_PDia
 
 end LogicCKTDia
 
@@ -115,17 +115,17 @@ namespace LogicCKD
 
 open ProvableBDHilbert
 
-theorem provable_D : □A 🡒 ◇A ∈ LogicCKD := axm (by grind)
+lemma provable_D : □A 🡒 ◇A ∈ LogicCKD := axm (by grind)
 
-theorem provable_PDia : ◇⊤ ∈ LogicCKD := mdp (provable_D) (nec verum)
+lemma provable_PDia : ◇⊤ ∈ LogicCKD := mdp (provable_D) (nec verum)
 
-theorem subset_CKTDia : LogicCKD ⊆ LogicCKTDia := by
+lemma subset_CKTDia : LogicCKD ⊆ LogicCKTDia := by
   intro A;
   apply provable_of_provable_axioms;
   rintro _ ⟨B, rfl⟩;
   exact LogicCKTDia.provable_D;
 
-theorem eq_CKPDia : LogicCKD = LogicCKPDia := by
+lemma eq_CKPDia : LogicCKD = LogicCKPDia := by
   apply Set.Subset.antisymm;
   . intro;
     apply provable_of_provable_axioms;

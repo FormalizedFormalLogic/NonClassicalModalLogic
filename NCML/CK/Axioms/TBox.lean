@@ -31,13 +31,13 @@ instance [M.ReturningMRel] : M.ReflexiveMComp where
     right;
     exact ⟨y, x, Ixy, Myx, refl x⟩;
 
-theorem valid_TBox_of_reflexiveMComp [M.ReflexiveMComp] : M ⊧ (□A 🡒 A) := by
+lemma valid_TBox_of_reflexiveMComp [M.ReflexiveMComp] : M ⊧ (□A 🡒 A) := by
   intro x y Ixy hyBoxA;
   rcases reflexive_mComp y with hFallible | ⟨y₁, z₁, Iyy₁, My₁z₁, Iz₁y⟩;
   · exact of_fallible hFallible;
   · exact persistent (hyBoxA y₁ z₁ Iyy₁ My₁z₁) Iz₁y;
 
-theorem valid_of_mem_LogicCKTBox [M.ReflexiveMComp] (hA : A ∈ LogicCKTBox) : M ⊧ A :=
+lemma valid_of_mem_LogicCKTBox [M.ReflexiveMComp] (hA : A ∈ LogicCKTBox) : M ⊧ A :=
   valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TBox_of_reflexiveMComp) hA
 
 end Model

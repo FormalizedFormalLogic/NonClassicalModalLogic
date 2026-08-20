@@ -27,13 +27,13 @@ def counterModel : Model (Fin 3) where
 instance : counterModel.SymmetricMRel where
   symm_mRel := by grind [counterModel]
 
-theorem counterModel_not_forwardConfluent : ¬ counterModel.ForwardConfluent := by
+lemma counterModel_not_forwardConfluent : ¬ counterModel.ForwardConfluent := by
   rintro ⟨h⟩;
   obtain ⟨y₁, -, M2y₁⟩ := h (x := 1) (y := 0) (x₁ := 2) (by tauto) (by tauto);
   simp only [counterModel, Model.mRel] at M2y₁;
   omega;
 
-theorem counterModel_not_forces :
+lemma counterModel_not_forces :
     (0 : counterModel.World) ⊮[_] (#0 🡒 □◇(#0)) := by
   intro h;
   have h0 : (0 : counterModel.World) ⊩[_] (#0 : BDFormula) := by

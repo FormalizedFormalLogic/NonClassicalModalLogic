@@ -212,7 +212,7 @@ lemma exists_iRel_of_dia_not_mem (h : ◇A ∉ w.th) :
   exact ⟨⟨Y, {A}, hmdp, hprime, hof, havoid⟩, hXY, fun _ Mvu => Mvu.2 A rfl⟩;
 
 /-- - [MdP05, Lemma 3] -/
-theorem truthlemma : w ⊩[canonicalModel 𝔸] A ↔ A ∈ w.th := by
+lemma truthlemma : w ⊩[canonicalModel 𝔸] A ↔ A ∈ w.th := by
   induction A generalizing w with
   | atom a => exact Iff.rfl;
   | falsum => exact Iff.rfl;
@@ -265,7 +265,7 @@ section
 variable {𝔸 : Set BDFormula} {A : BDFormula}
 
 /-- - [MdP05, Theorem 2] -/
-theorem exists_not_forces_of_not_mem (h : A ∉ logic 𝔸) :
+lemma exists_not_forces_of_not_mem (h : A ∉ logic 𝔸) :
   ∃ w : CanonicalPair 𝔸, w ⊮[canonicalModel 𝔸] A := by
   obtain ⟨w, -, -, havoid⟩ :=
     CanonicalPair.exists_avoiding (𝔸 := 𝔸) (T := logic 𝔸) (Z := {A}) orDirected_singleton

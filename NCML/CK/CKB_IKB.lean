@@ -202,7 +202,7 @@ end Diamond
 
 - [Pac24, Lemma 19]
 -/
-theorem truthlemma {T : CKBTheory} {A : BDFormula} : T ⊩[CKBcanonicalModel] A ↔ A ∈ T.1 := by
+lemma truthlemma {T : CKBTheory} {A : BDFormula} : T ⊩[CKBcanonicalModel] A ↔ A ∈ T.1 := by
   induction A generalizing T with
   | atom a => exact Iff.rfl;
   | falsum => exact ⟨False.elim, fun h => (T.1.consistent h).elim⟩;

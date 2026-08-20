@@ -208,13 +208,13 @@ lemma rec
   | nec h ih => exact nec ⟨h⟩ ih;
   | _ => grind
 
-theorem monotone (h : 𝔸₁ ⊆ 𝔸₂) : ⊢ᴴ[CK;𝔸₁] A → ⊢ᴴ[CK;𝔸₂] A := by
+lemma monotone (h : 𝔸₁ ⊆ 𝔸₂) : ⊢ᴴ[CK;𝔸₁] A → ⊢ᴴ[CK;𝔸₂] A := by
   intro p;
   induction p with
   | axm hmem => exact axm (h hmem);
   | _ => grind
 
-theorem provable_of_provable_axioms
+lemma provable_of_provable_axioms
     (h : ∀ B ∈ 𝔸₁, ⊢ᴴ[CK;𝔸₂] B) : (⊢ᴴ[CK;𝔸₁] A) → ⊢ᴴ[CK;𝔸₂] A := by
   intro p;
   induction p with
@@ -226,7 +226,7 @@ abbrev logic (𝔸 : Set BDFormula) : BDLogic := { A | ⊢ᴴ[CK;𝔸] A }
 @[simp]
 lemma mem_logic : A ∈ logic 𝔸 ↔ ⊢ᴴ[CK;𝔸] A := Iff.rfl
 
-theorem logic_monotone (h : 𝔸₁ ⊆ 𝔸₂) : logic 𝔸₁ ⊆ logic 𝔸₂ := fun _ => monotone h
+lemma logic_monotone (h : 𝔸₁ ⊆ 𝔸₂) : logic 𝔸₁ ⊆ logic 𝔸₂ := fun _ => monotone h
 
 end ProvableBDHilbert
 
