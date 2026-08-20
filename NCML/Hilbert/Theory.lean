@@ -46,7 +46,7 @@ lemma provable_mem [T.Of (logic 𝔸)] (h : ⊢ᴴ[CK;𝔸] A) : A ∈ T :=
 lemma and_mem [T.Of (logic 𝔸)] [T.Mdp] (hA : A ∈ T) (hB : B ∈ T) : A ⋏ B ∈ T :=
   mdp (mdp (provable_mem (𝔸 := 𝔸) andIntro) hA) hB
 
-lemma conj_mem [T.Of (logic 𝔸)] [T.Mdp]
+lemma lconj_mem [T.Of (logic 𝔸)] [T.Mdp]
   {Γ : BDFormulaList} (h : ∀ A ∈ Γ, A ∈ T) : ⋀Γ ∈ T := by
   induction Γ with
   | nil => exact provable_mem (𝔸 := 𝔸) verum;
@@ -156,8 +156,8 @@ lemma exists_finite_char [T.Of (logic 𝔸)] [T.Mdp] (h : A ∈ mdpClosure (T �
       constructor;
       . exact and_mem (𝔸 := 𝔸) hC₁ hC₂;
       . rw [dia_append];
-        have t₁ := imp_trans (conj_append_left (Γ₁ := ◇Γ₁) (Γ₂ := ◇Γ₂)) d₁;
-        have t₂ := imp_trans (conj_append_right (Γ₁ := ◇Γ₁) (Γ₂ := ◇Γ₂)) d₂;
+        have t₁ := imp_trans (lconj_append_left (Γ₁ := ◇Γ₁) (Γ₂ := ◇Γ₂)) d₁;
+        have t₂ := imp_trans (lconj_append_right (Γ₁ := ◇Γ₁) (Γ₂ := ◇Γ₂)) d₂;
         exact mdp_ctx₂
           (imp_trans t₁ (imp_comp_right andElim₁))
           (imp_trans t₂ (imp_comp_right andElim₂));
@@ -256,9 +256,9 @@ lemma mem_of_box_mem_mdpClosure [T.Of LogicCKB] [T.Mdp] [U.CKB]
   (hdia : ∀ B ∈ T, ◇B ∈ U) (h : □A ∈ BDTheory.mdpClosure (T ∪ ◇U)) : A ∈ U := by
   obtain ⟨Γ, hΓ, C, hC, d⟩ := BDTheory.exists_finite_char (𝔸 := ∅) h;
   have d₁ : (⋀□◇Γ 🡒 ◇C 🡒 ◇(□A)) ∈ LogicCK :=
-    imp_trans (imp_trans conj_box (mdp kBox (nec d))) kDia;
+    imp_trans (imp_trans lconj_box (mdp kBox (nec d))) kDia;
   have h₁ : ⋀□◇Γ ∈ U := by
-    apply BDTheory.conj_mem (𝔸 := ∅);
+    apply BDTheory.lconj_mem (𝔸 := ∅);
     intro B hB;
     simp at hB;
     obtain ⟨B, hB, rfl⟩ := hB;

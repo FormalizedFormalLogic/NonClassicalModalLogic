@@ -96,32 +96,32 @@ lemma imp_bot_imp_box_bot : ⊢ᴴ[CK;𝔸] (A 🡒 ⊥) 🡒 (A 🡒 □⊥) :=
 
 open scoped BDFormulaList
 
-lemma conj_append_left : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₁ := by
+lemma lconj_append_left : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₁ := by
   induction Γ₁ with
   | nil => exact dhyp verum;
   | cons A Γ₁ ih => exact and_intro_ctx andElim₁ (imp_trans andElim₂ ih);
 
-lemma conj_append_right : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₂ := by
+lemma lconj_append_right : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₂ := by
   induction Γ₁ with
   | nil => exact imp_id;
   | cons A Γ₁ ih => exact imp_trans andElim₂ ih;
 
-lemma disj_append_left : ⊢ᴴ[CK;𝔸] ⋁Γ₁ 🡒 ⋁(Γ₁ ++ Γ₂) := by
+lemma ldisj_append_left : ⊢ᴴ[CK;𝔸] ⋁Γ₁ 🡒 ⋁(Γ₁ ++ Γ₂) := by
   induction Γ₁ with
   | nil => exact efq;
   | cons A Γ₁ ih => exact or_imp orIntro₁ (imp_trans ih orIntro₂);
 
-lemma disj_append_right : ⊢ᴴ[CK;𝔸] ⋁Γ₂ 🡒 ⋁(Γ₁ ++ Γ₂) := by
+lemma ldisj_append_right : ⊢ᴴ[CK;𝔸] ⋁Γ₂ 🡒 ⋁(Γ₁ ++ Γ₂) := by
   induction Γ₁ with
   | nil => exact imp_id;
   | cons A Γ₁ ih => exact imp_trans ih orIntro₂;
 
-lemma disj_imp (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] ⋁Γ 🡒 C := by
+lemma ldisj_imp (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] ⋁Γ 🡒 C := by
   induction Γ with
   | nil => exact efq;
   | cons A Γ ih => exact or_imp (h A (.head ..)) (ih fun B hB => h B (.tail _ hB));
 
-lemma imp_disj (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] A 🡒 ⋁Γ := by
+lemma imp_ldisj (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] A 🡒 ⋁Γ := by
   induction Γ with
   | nil => simp at h;
   | cons B Γ ih =>
@@ -129,7 +129,7 @@ lemma imp_disj (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] A 🡒 ⋁Γ := by
     · exact orIntro₁;
     · exact imp_trans (ih hmem) orIntro₂;
 
-lemma conj_box : ⊢ᴴ[CK;𝔸] ⋀□Γ 🡒 □⋀Γ := by
+lemma lconj_box : ⊢ᴴ[CK;𝔸] ⋀□Γ 🡒 □⋀Γ := by
   induction Γ with
   | nil => exact dhyp (nec verum);
   | cons A Γ ih => exact mdp_ctx (imp_trans andElim₁ box_and_intro) (imp_trans andElim₂ ih);
