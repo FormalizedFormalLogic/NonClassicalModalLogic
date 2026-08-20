@@ -318,6 +318,18 @@ lemma orDirected_singleton : OrDirected 𝔸 {B} := by
   rintro C rfl D rfl;
   exact ⟨D, rfl, or_imp imp_id imp_id⟩;
 
+variable {Θ : BDFormulaSet}
+
+/-- `disjSet Θ` is ⋎-directed: appending the underlying lists subsumes the disjunction. -/
+lemma orDirected_disjSet : OrDirected 𝔸 (disjSet Θ) := by
+  rintro C ⟨K₁, hK₁ne, hK₁sub, rfl⟩ D ⟨K₂, hK₂ne, hK₂sub, rfl⟩;
+  refine ⟨⋁(K₁ ++ K₂), ⟨K₁ ++ K₂, by simp [hK₁ne], ?_, rfl⟩,
+    or_imp ldisj_append_left ldisj_append_right⟩;
+  intro A hA;
+  rcases List.mem_append.mp hA with hA | hA;
+  · exact hK₁sub A hA;
+  · exact hK₂sub A hA;
+
 end Disj
 
 /-! ## CKB-specific consequences of the MP-closure -/
