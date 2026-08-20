@@ -7,7 +7,7 @@ public import NCML.CK.Semantics
 namespace CK
 
 variable {κ : Type*} {M : Model κ}
-variable {x : M.World} {A : BDFormula}
+variable {A : BDFormula}
 
 namespace Model
 
@@ -28,11 +28,8 @@ instance [M.ReturningMRel] : M.ReflexiveMComp where
   reflexive_mComp x := by
     sorry
 
-theorem forces_TBox_of_reflexiveMComp [M.ReflexiveMComp] : x ⊩[_] (□A 🡒 A) := by
+theorem valid_TBox_of_reflexiveMComp [M.ReflexiveMComp] : M ⊧ (□A 🡒 A) := by
   sorry
-
-theorem valid_TBox_of_reflexiveMComp [M.ReflexiveMComp] : M ⊧ (□A 🡒 A) := fun
-  _ => forces_TBox_of_reflexiveMComp
 
 end Model
 

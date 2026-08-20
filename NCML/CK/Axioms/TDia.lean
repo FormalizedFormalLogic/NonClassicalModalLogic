@@ -7,7 +7,7 @@ public import NCML.CK.Axioms.D
 namespace CK
 
 variable {κ : Type*} {M : Model κ}
-variable {x : M.World} {A : BDFormula}
+variable {A : BDFormula}
 
 namespace Model
 
@@ -32,11 +32,8 @@ instance [M.AscendingMRel] : M.SerialMRel where
   serial_mRel x := by
     sorry
 
-theorem forces_TDia_of_ascendingMRel [M.AscendingMRel] : x ⊩[_] (A 🡒 ◇A) := by
+theorem valid_TDia_of_ascendingMRel [M.AscendingMRel] : M ⊧ (A 🡒 ◇A) := by
   sorry
-
-theorem valid_TDia_of_ascendingMRel [M.AscendingMRel] : M ⊧ (A 🡒 ◇A) := fun
-  _ => forces_TDia_of_ascendingMRel
 
 end Model
 
