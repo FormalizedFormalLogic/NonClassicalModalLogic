@@ -199,6 +199,8 @@ These remain welcome, and are neither why nor how in this sense: the citation li
 
 Write the names used in this repository, not the notation of the source paper. The one exception is the docstring of the definition itself, which may record where the alternative name comes from ("also known as `K4.3` in the source").
 
+The same applies to labels: do not carry over tags such as "condition (C)" or "property (\*)" from a paper or a planning document, and do not invent new ones. A condition is referred to by the name of the class or definition that states it.
+
 ### References and citations
 
 When a definition or theorem formalizes a result from the literature, add the source to [references.bib](../references.bib) (formatted with bibtool, see [index.md](./index.md)) and cite it in the docstring, so a reader can find the informal counterpart.
