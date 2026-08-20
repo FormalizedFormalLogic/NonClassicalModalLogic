@@ -332,7 +332,13 @@ lemma orDirected_disjSet : OrDirected 𝔸 (disjSet Θ) := by
 
 /-- The disjunctions over the empty set: none. -/
 @[simp]
-lemma disjSet_empty : disjSet (∅ : BDFormulaSet) = ∅ := sorry
+lemma disjSet_empty : disjSet (∅ : BDFormulaSet) = ∅ := by
+  ext B;
+  simp only [Set.mem_empty_iff_false, iff_false];
+  rintro ⟨K, hne, hsub, rfl⟩;
+  cases K with
+  | nil => exact hne rfl;
+  | cons C K => exact hsub C (by simp);
 
 /-- The `◇`-disjunctions over the empty set: none. -/
 @[simp]
