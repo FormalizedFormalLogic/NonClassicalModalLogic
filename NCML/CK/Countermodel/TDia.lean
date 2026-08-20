@@ -60,7 +60,7 @@ theorem LogicCKD.ssubset_CKTDia : LogicCKD ⊂ LogicCKTDia :=
   LogicCKD.subset_CKTDia.ssubset_of_not_subset
     fun h => LogicCKD.not_provable_TDia (h LogicCKTDia.provable_TDia)
 
-theorem LogicCKTDia.not_provable_N : (∼◇⊥) ∉ LogicCKTDia := by
-  sorry
+theorem LogicCKTDia.not_provable_N : (∼◇⊥) ∉ LogicCKTDia :=
+  fun h => CK.D.counterModel_not_forces (CK.Model.valid_of_mem_LogicCKTDia h 0)
 
 end
