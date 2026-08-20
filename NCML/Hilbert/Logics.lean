@@ -88,6 +88,8 @@ open ProvableBDHilbert
 
 theorem provable_TDia : (A 🡒 ◇A) ∈ LogicCKTDia := axm (by grind)
 
+theorem provable_diaTop : (◇⊤) ∈ LogicCKTDia := mdp (provable_TDia (A := ⊤)) verum
+
 end LogicCKTDia
 
 end
