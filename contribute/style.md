@@ -127,10 +127,11 @@ Modal logic:
 | lists / finite sets of formulas | `Γ`, `Δ` |
 | theories | `T`, `T₁`, `U` |
 | sets of formulas not meant as theories | `X`, `Y`, `Z` |
+| pair-canonical-model worlds (`CanonicalPair L`) | `P`, `Q` / `P₁`, `P₂` |
 
-Never use Greek letters (`φ`, `ψ`) or late-alphabet capitals (`P`, `Q`) for modal formulas — those namespaces are taken. `Γ` and `Δ` are for lists and finite sets only: a theory is `T`, and a set of formulas that is not yet known to be one is `X`, `Y` or `Z`. Within a proof, introduce formulas in order (`A`, `B`, `C`), without skipping letters.
+Never use Greek letters (`φ`, `ψ`) or late-alphabet capitals (`P`, `Q`) for modal formulas — those namespaces are taken: `P`/`Q` name the worlds of a pair canonical model (`CanonicalPair L`), spelled `P₁`, `P₂`, … when more than two are in scope. `Γ` and `Δ` are for lists and finite sets only: a theory is `T`, and a set of formulas that is not yet known to be one is `X`, `Y` or `Z`. Within a proof, introduce formulas in order (`A`, `B`, `C`), without skipping letters.
 
-Kripke semantics: worlds are `x`, `y`, `z`, `w`, `v`, `u`. When introducing several world variables, use subscripted names (`x₁`, `x₂`, `y₁`, `y₂`, …) rather than primed variants (`x'`, `x''`). When building one model out of another, index the new model by `M.World` rather than reintroducing a `κ : Type u`.
+Kripke semantics: worlds are `x`, `y`, `z`, `w`, `v`, `u`. When introducing several world variables, use subscripted names (`x₁`, `x₂`, `y₁`, `y₂`, …) rather than primed variants (`x'`, `x''`). When building one model out of another, index the new model by `M.World` rather than reintroducing a `κ : Type u`. This applies to the worlds of a general `Model κ`; a pair canonical model's worlds are `CanonicalPair L`-typed and use `P`/`Q` instead (see above).
 
 Name a hypothesis witnessing a binary relation `R x y` after the relation's leading letter plus the two endpoints it relates: an `iRel x y` hypothesis is named `Ixy`, an `mRel x y` hypothesis is named `Mxy` (e.g. `Ix₁x₂ : x₁ ≼ x₂`, `Mx₂y₂ : x₂ ⊏ y₂`). Avoid generic names such as `h`, `h1`, `h2`, `hxy`.
 
