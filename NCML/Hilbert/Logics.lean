@@ -107,6 +107,8 @@ open ProvableBDHilbert
 
 theorem provable_D : (□A 🡒 ◇A) ∈ LogicCKD := axm (by grind)
 
+theorem provable_diaTop : (◇⊤) ∈ LogicCKD := mdp (provable_D (A := ⊤)) (nec verum)
+
 end LogicCKD
 
 end
