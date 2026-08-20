@@ -9,47 +9,81 @@ open scoped BDFormulaSet BDFormulaList
 
 namespace CK
 
-open Model.Forces
-
 variable {κ : Type*} {M : Model κ}
 variable {A : BDFormula}
 
-namespace Model
+namespace Frame
 
-class AscendingMRel (M : Model κ) : Prop where
-  ascending_mRel : ∀ x : M.World, ∃ z, x ⊏ z ∧ (x ≼ z ∨ M.Fallible z)
+class AscendingMRel (F : Frame κ) : Prop where
+  ascending_mRel : ∀ x : F.World, ∃ z, x ⊏ z ∧ (x ≼ z ∨ F.Fallible z)
 
 export AscendingMRel (ascending_mRel)
 
-class StrictlyAscendingMRel (M : Model κ) : Prop where
-  strictly_ascending_mRel : ∀ x : M.World, ∃ z, x ⊏ z ∧ x ≼ z
+class StrictlyAscendingMRel (F : Frame κ) : Prop where
+  strictly_ascending_mRel : ∀ x : F.World, ∃ z, x ⊏ z ∧ x ≼ z
 
 export StrictlyAscendingMRel (strictly_ascending_mRel)
 
-instance [M.StrictlyAscendingMRel] : M.AscendingMRel where
+instance {F : Frame κ} [F.StrictlyAscendingMRel] : F.AscendingMRel where
   ascending_mRel x := by
     obtain ⟨z, Mxz, Ixz⟩ := strictly_ascending_mRel x;
     refine ⟨z, Mxz, ?_⟩;
     left;
     exact Ixz;
 
-instance [M.AscendingMRel] : M.SerialMRel where
+instance {F : Frame κ} [F.AscendingMRel] : F.SerialMRel where
   serial_mRel x := by
     obtain ⟨z, Mxz, _⟩ := ascending_mRel x;
     exact ⟨z, Mxz⟩;
 
+end Frame
+
+namespace Model
+
+open CK.Frame
+
 lemma valid_TDia_of_ascendingMRel [M.AscendingMRel] : M ⊧ (A 🡒 ◇A) := by
   intro x y Ixy hyA u Iyu;
   obtain ⟨z, Muz, hz⟩ := ascending_mRel u;
-  have huA : u ⊩[_] A := persistent hyA Iyu;
+  have huA : u ⊩[_] A := CK.forces_persistent hyA Iyu;
   rcases hz with Iuz | hzFallible;
-  · exact ⟨z, Muz, persistent huA Iuz⟩;
-  · exact ⟨z, Muz, of_fallible hzFallible⟩;
+  · exact ⟨z, Muz, CK.forces_persistent huA Iuz⟩;
+  · exact ⟨z, Muz, CK.forces_of_fallible hzFallible⟩;
 
 lemma valid_of_mem_LogicCKTDia [M.AscendingMRel] (hA : A ∈ LogicCKTDia) : M ⊧ A :=
   valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TDia_of_ascendingMRel) hA
 
 end Model
+
+namespace Frame
+
+variable {F : Frame κ}
+
+lemma valid_TDia_of_ascendingMRel [F.AscendingMRel] : F ⊧ (A 🡒 ◇A) :=
+  fun _ _ _ => Model.valid_TDia_of_ascendingMRel
+
+lemma ascendingMRel_of_valid_TDia (h : F ⊧ (#0 🡒 ◇(#0))) : F.AscendingMRel where
+  ascending_mRel w :=
+    h (fun x _ => w ≼ x ∨ F.Fallible x)
+      (by
+        rintro x y a (Iwx | hx) Ixy
+        · exact Or.inl (Trans.trans Iwx Ixy)
+        · exact Or.inr (F.fallible_iRel hx Ixy))
+      (by rintro x a hx; exact Or.inr hx)
+      w w (refl w) (Or.inl (refl w)) w (refl w)
+
+/-- `T◇` defines the frames whose `⊏` is ascending. -/
+theorem ascendingMRel_TFAE : List.TFAE [
+  F.AscendingMRel,
+  ∀ A : BDFormula, F ⊧ (A 🡒 ◇A),
+  F ⊧ (#0 🡒 ◇(#0)),
+] := by
+  tfae_have 1 → 2 := fun h A => @valid_TDia_of_ascendingMRel _ A _ h
+  tfae_have 2 → 3 := fun h => h _
+  tfae_have 3 → 1 := ascendingMRel_of_valid_TDia
+  tfae_finish
+
+end Frame
 
 variable {L : BDLogic} [L.CK]
 
@@ -81,9 +115,15 @@ theorem LogicCKTDia_TFAE {A : BDFormula} : List.TFAE [
   A ∈ LogicCKTDia,
   ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.AscendingMRel] → M ⊧ A,
   ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.StrictlyAscendingMRel] → M ⊧ A,
+  ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.AscendingMRel] → F ⊧ A,
+  ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.StrictlyAscendingMRel] → F ⊧ A,
 ] := by
   tfae_have 1 → 2 := fun h _ M _ => CK.Model.valid_of_mem_LogicCKTDia h
   tfae_have 2 → 3 := fun h _ M _ => h M
+  tfae_have 2 → 4 := fun h _ F _ val vp fv => h (CK.Model.mk F val vp fv)
+  tfae_have 4 → 2 := fun h _ M _ => CK.Model.valid_of_toFrame_valid (h M.toFrame)
+  tfae_have 3 → 5 := fun h _ F _ val vp fv => h (CK.Model.mk F val vp fv)
+  tfae_have 5 → 3 := fun h _ M _ => CK.Model.valid_of_toFrame_valid (h M.toFrame)
   tfae_have 3 → 1 := by
     contrapose!;
     intro h;
