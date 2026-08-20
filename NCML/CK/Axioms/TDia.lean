@@ -70,8 +70,18 @@ private lemma avoid_disjSet_mdpClosure {𝔸 : Set BDFormula}
 
 /-- The canonical model of a logic proving `T◇` is strictly ascending. -/
 lemma strictlyAscendingMRel_canonicalModel {𝔸 : Set BDFormula}
-  (h𝔸 : ∀ A : BDFormula, (A 🡒 ◇A) ∈ logic 𝔸) :
-  (canonicalModel 𝔸).StrictlyAscendingMRel := sorry
+  (h𝔸 : ∀ A : BDFormula, (A 🡒 ◇A) ∈ logic 𝔸) : (canonicalModel 𝔸).StrictlyAscendingMRel where
+  strictly_ascending_mRel w := by
+    have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
+    have : BDTheory.Of (logic 𝔸) (w.th ∪ □⁻¹w.th) :=
+      ⟨(w.th.subset (L := logic 𝔸)).trans Set.subset_union_left⟩;
+    have := BDTheory.logic_subset_mdpClosure (𝔸 := 𝔸) (T := w.th ∪ □⁻¹w.th);
+    obtain ⟨v, hXv, -, havoid⟩ :=
+      CanonicalPair.exists_avoiding (𝔸 := 𝔸) (T := BDTheory.mdpClosure (w.th ∪ □⁻¹w.th))
+        orDirected_disjSet (avoid_disjSet_mdpClosure h𝔸 w);
+    have h₁ : w.th ∪ □⁻¹w.th ⊆ v.th := BDTheory.subset_mdpClosure.trans hXv;
+    exact ⟨v, CanonicalPair.mRel_of_avoid_disjSet (Set.subset_union_right.trans h₁) havoid,
+      Set.subset_union_left.trans h₁⟩;
 
 instance : (canonicalModel { A 🡒 ◇A | (A) }).StrictlyAscendingMRel :=
   strictlyAscendingMRel_canonicalModel fun _ => LogicCKTDia.provable_TDia
