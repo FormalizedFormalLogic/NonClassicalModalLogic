@@ -90,7 +90,12 @@ lemma th_eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w.th = Set.univ :=
   BDTheory.eq_univ_of_bot_mem (𝔸 := 𝔸) h
 
 /-- A pair containing `⊥` forbids nothing. -/
-lemma forb_eq_empty_of_bot_mem (h : ⊥ ∈ w.th) : w.forb = ∅ := sorry
+lemma forb_eq_empty_of_bot_mem (h : ⊥ ∈ w.th) : w.forb = ∅ := by
+  ext B;
+  simp only [Set.mem_empty_iff_false, iff_false];
+  intro hB;
+  exact w.avoid (◇(⋁[B])) ⟨⋁[B], ⟨[B], by simp, by simpa using hB, rfl⟩, rfl⟩
+    (by rw [th_eq_univ_of_bot_mem h]; trivial);
 
 /-- `univ 𝔸` is the only pair containing `⊥`. -/
 lemma eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w = univ 𝔸 := sorry
