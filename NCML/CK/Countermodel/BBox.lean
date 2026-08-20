@@ -34,7 +34,7 @@ theorem counterModel_not_forwardConfluent : ¬ counterModel.ForwardConfluent := 
   omega;
 
 theorem counterModel_not_forces :
-    ¬ (0 : counterModel.World) ⊩[_] (#0 🡒 □◇(#0)) := by
+    (0 : counterModel.World) ⊮[_] (#0 🡒 □◇(#0)) := by
   intro h;
   have h0 : (0 : counterModel.World) ⊩[_] (#0 : BDFormula) := by
     show counterModel.val 0 0;
@@ -49,7 +49,7 @@ end BBox
 
 /-- - [Pac24, Proposition 9] -/
 theorem exists_symmetricMRel_not_forces_bBox :
-    ∃ (κ : Type) (M : Model κ), M.SymmetricMRel ∧ ∃ x : M.World, ¬ x ⊩[_] (#0 🡒 □◇(#0)) :=
+    ∃ (κ : Type) (M : Model κ), M.SymmetricMRel ∧ ∃ x : M.World, x ⊮[_] (#0 🡒 □◇(#0)) :=
   ⟨Fin 3, BBox.counterModel, inferInstance, 0, BBox.counterModel_not_forces⟩
 
 end CK
