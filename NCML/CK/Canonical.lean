@@ -42,7 +42,7 @@ structure CanonicalPair (𝔸 : Set BDFormula) where
 
 namespace CanonicalPair
 
-variable {𝔸 : Set BDFormula} {A B : BDFormula} {w v : CanonicalPair 𝔸}
+variable {𝔸 : Set BDFormula} {w : CanonicalPair 𝔸}
 
 instance : w.th.Mdp := w.mdp
 
@@ -71,6 +71,17 @@ variable (𝔸 : Set BDFormula) (T : BDTheory) [T.Mdp] [T.Prime] [T.Of (logic �
 @[simp] lemma ofTheory_forb : (ofTheory 𝔸 T).forb = ∅ := rfl
 
 end
+
+/-- An MP-closed theory of `logic 𝔸` disjoint from an ⋎-directed `Z` extends to the theory of a
+pair with no forbidden formulas, still disjoint from `Z`. -/
+lemma exists_avoiding {T : BDTheory} {Z : BDFormulaSet} [T.Mdp] [T.Of (logic 𝔸)]
+  (hdir : OrDirected 𝔸 Z) (hdisj : ∀ C ∈ Z, C ∉ T) :
+  ∃ v : CanonicalPair 𝔸, T ⊆ v.th ∧ v.forb = ∅ ∧ ∀ C ∈ Z, C ∉ v.th := by
+  obtain ⟨Y, hTY, hmdp, hprime, hof, havoid⟩ := exists_prime_mdpClosed_avoiding hdir hdisj;
+  have := hmdp;
+  have := hprime;
+  have := hof;
+  exact ⟨ofTheory 𝔸 Y, hTY, rfl, havoid⟩;
 
 /-- The pair of the set of all formulas and the empty set of forbidden formulas. -/
 def univ (𝔸 : Set BDFormula) : CanonicalPair 𝔸 where
@@ -129,7 +140,7 @@ def canonicalModel (𝔸 : Set BDFormula) : Model (CanonicalPair 𝔸) where
 
 namespace CanonicalPair
 
-variable {𝔸 : Set BDFormula} {A B : BDFormula} {w v : CanonicalPair 𝔸}
+variable {𝔸 : Set BDFormula} {A B : BDFormula} {w : CanonicalPair 𝔸}
 
 /-- The pair `w = (T, Θ)` with its forbidden formulas erased. -/
 def erase (w : CanonicalPair 𝔸) : CanonicalPair 𝔸 := ofTheory 𝔸 w.th
@@ -143,26 +154,20 @@ lemma iRel_erase : (canonicalModel 𝔸).iRel w w.erase := subset_rfl
 /-- A pair missing `A 🡒 B` has an `≼`-extension containing `A` and missing `B`. -/
 lemma exists_iRel_of_imply_not_mem (h : (A 🡒 B) ∉ w.th) :
   ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).iRel w v ∧ A ∈ v.th ∧ B ∉ v.th := by
-  obtain ⟨Y, hXY, hmdp, hprime, hof, havoid⟩ :=
-    exists_prime_mdpClosed_avoiding (𝔸 := 𝔸) (T := w.th.impSet A) (Z := {B}) orDirected_singleton
+  obtain ⟨v, hXv, -, havoid⟩ :=
+    exists_avoiding (𝔸 := 𝔸) (T := w.th.impSet A) (Z := {B}) orDirected_singleton
       (by rintro C rfl; exact h);
-  have := hmdp;
-  have := hprime;
-  have := hof;
-  exact ⟨ofTheory 𝔸 Y, (BDTheory.subset_impSet (𝔸 := 𝔸)).trans hXY,
-    hXY (BDTheory.self_mem_impSet (𝔸 := 𝔸)), havoid B rfl⟩;
+  exact ⟨v, (BDTheory.subset_impSet (𝔸 := 𝔸)).trans hXv,
+    hXv (BDTheory.self_mem_impSet (𝔸 := 𝔸)), havoid B rfl⟩;
 
 /-- A pair missing `□A` has, after erasing its forbidden formulas, a `⊏`-successor missing `A`. -/
 lemma exists_mRel_of_box_not_mem (h : □A ∉ w.th) :
   ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel w.erase v ∧ A ∉ v.th := by
   have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
-  obtain ⟨Y, hXY, hmdp, hprime, hof, havoid⟩ :=
-    exists_prime_mdpClosed_avoiding (𝔸 := 𝔸) (T := □⁻¹w.th) (Z := {A}) orDirected_singleton
+  obtain ⟨v, hXv, -, havoid⟩ :=
+    exists_avoiding (𝔸 := 𝔸) (T := □⁻¹w.th) (Z := {A}) orDirected_singleton
       (by rintro C rfl; exact h);
-  have := hmdp;
-  have := hprime;
-  have := hof;
-  exact ⟨ofTheory 𝔸 Y, ⟨hXY, by simp⟩, havoid A rfl⟩;
+  exact ⟨v, ⟨hXv, by simp⟩, havoid A rfl⟩;
 
 /-- The theory `□⁻¹T` under the assumption `A` avoids the disjunctions over `Θ`, for a pair
 `(T, Θ)` containing `◇A`. -/
@@ -177,17 +182,14 @@ lemma exists_mRel_of_dia_mem (h : ◇A ∈ w.th) :
   ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel w v ∧ A ∈ v.th := by
   have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
   have := BDTheory.of_logicCK (𝔸 := 𝔸) (T := □⁻¹w.th);
-  obtain ⟨Y, hXY, hmdp, hprime, hof, havoid⟩ :=
-    exists_prime_mdpClosed_avoiding (𝔸 := 𝔸) (T := BDTheory.impSet (□⁻¹w.th) A)
-      (Z := disjSet w.forb) orDirected_disjSet (avoid_disjSet_of_dia_mem h);
-  have := hmdp;
-  have := hprime;
-  have := hof;
-  refine ⟨ofTheory 𝔸 Y, ⟨(BDTheory.subset_impSet (𝔸 := 𝔸)).trans hXY, ?_⟩,
-    hXY (BDTheory.self_mem_impSet (𝔸 := 𝔸))⟩;
-  intro B hB hBY;
+  obtain ⟨v, hXv, -, havoid⟩ :=
+    exists_avoiding (𝔸 := 𝔸) (T := BDTheory.impSet (□⁻¹w.th) A) (Z := disjSet w.forb)
+      orDirected_disjSet (avoid_disjSet_of_dia_mem h);
+  refine ⟨v, ⟨(BDTheory.subset_impSet (𝔸 := 𝔸)).trans hXv, ?_⟩,
+    hXv (BDTheory.self_mem_impSet (𝔸 := 𝔸))⟩;
+  intro B hB hBv;
   exact havoid (⋁[B]) ⟨[B], by simp, by simpa using hB, rfl⟩
-    (Y.mdp (BDTheory.provable_mem (𝔸 := 𝔸) (imp_ldisj (by simp))) hBY);
+    (v.th.mdp (BDTheory.provable_mem (𝔸 := 𝔸) (imp_ldisj (by simp))) hBv);
 
 /-- A pair `(T, Θ)` missing `◇A` avoids the `◇`-disjunctions over `{A}`. -/
 private lemma avoid_diaDisjSet_of_dia_not_mem (h : ◇A ∉ w.th) :
