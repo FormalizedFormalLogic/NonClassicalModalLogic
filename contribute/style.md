@@ -79,6 +79,19 @@ exact step1.trans <| step2.trans <| step3.trans step4
 
 🤖 **Do not bundle lemmas into a `structure … : Prop` for convenience.** It is justified only when three or more properties must travel together as the hypothesis of a mutual or nested induction; otherwise state separate lemmas.
 
+🤖 **Do not introduce disjunctions with `Or.inl` / `Or.inr`.** Use the `left` / `right` tactics, let `tauto`, `grind` or `simp` discharge the goal, or restructure so that the disjunction never has to be introduced by hand. A term-mode `Or.inl` is acceptable only where it is plainly the clearest thing to write.
+
+```lean
+-- Avoid:
+exact Or.inr ⟨y, z, Ixy, Myz, Izx⟩
+
+-- Prefer:
+right;
+exact ⟨y, z, Ixy, Myz, Izx⟩
+```
+
+🤖 **`open` the namespaces you would otherwise spell out repeatedly.** Writing `Model.Forces.persistent` and `Model.Forces.of_fallible` throughout a file is noise; `open Model.Forces` at the top and then `persistent` / `of_fallible` reads better and is shorter. The same goes for `Model`, `ProvableBDHilbert`, and `BDFormula`. Place the `open` lines where the surrounding files place theirs, and stop short of the point where an unqualified name becomes ambiguous or misleading to a reader.
+
 **When proving several equivalences at once with `List.TFAE`, do not refer to them by index** (`foo_TFAE.out 1 0`) from other proofs: the indices break as soon as the list is reordered. Cut the individual implications out as named lemmas instead.
 
 ### Trailing semicolons
