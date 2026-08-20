@@ -52,7 +52,7 @@ lemma ProvableBDHilbert.provable_D_of_PDia
 
 namespace LogicCKPDia
 
-lemma provable_PDia : (◇⊤) ∈ LogicCKPDia := ProvableBDHilbert.axm rfl
+@[simp, grind .] lemma provable_PDia : (◇⊤) ∈ LogicCKPDia := ProvableBDHilbert.axm rfl
 
 end LogicCKPDia
 
@@ -64,7 +64,7 @@ open ProvableBDHilbert
 lemma subset_IKB : LogicCKB ⊆ LogicIKB := .logic_monotone (by grind)
 
 /-- - [Pac24, Theorem 3] -/
-lemma provable_N : (∼◇⊥) ∈ LogicCKB := by
+@[simp, grind .] lemma provable_N : (∼◇⊥) ∈ LogicCKB := by
   have h1 : (⊥ 🡒 □⊥) ∈ LogicCKB := efq;
   have h2 : (□(⊥ 🡒 □⊥)) ∈ LogicCKB := nec h1;
   have h3 : (◇⊥ 🡒 ◇(□⊥)) ∈ LogicCKB := mdp kDia h2;
@@ -72,7 +72,7 @@ lemma provable_N : (∼◇⊥) ∈ LogicCKB := by
   exact imp_trans h3 h4;
 
 /-- - [Pac24, Theorem 3] -/
-lemma provable_DP : (◇(A ⋎ B) 🡒 ◇A ⋎ ◇B) ∈ LogicCKB := by
+@[simp, grind .] lemma provable_DP : (◇(A ⋎ B) 🡒 ◇A ⋎ ◇B) ∈ LogicCKB := by
   have h₁ : (A 🡒 □◇A) ∈ LogicCKB := axm (by grind);
   have h₂ : (B 🡒 □◇B) ∈ LogicCKB := axm (by grind);
   have h₃ : (◇(□(◇A ⋎ ◇B)) 🡒 ◇A ⋎ ◇B) ∈ LogicCKB := axm (by grind);
@@ -91,9 +91,8 @@ namespace LogicCKTBox
 
 open ProvableBDHilbert
 
-lemma provable_TBox : (□A 🡒 A) ∈ LogicCKTBox := axm (by grind)
-
-lemma provable_not_box_bot : (∼□⊥) ∈ LogicCKTBox := provable_TBox (A := ⊥)
+@[simp, grind .] lemma provable_TBox : (□A 🡒 A) ∈ LogicCKTBox := axm (by grind)
+@[simp, grind .] lemma provable_not_box_bot : (∼□⊥) ∈ LogicCKTBox := provable_TBox (A := ⊥)
 
 end LogicCKTBox
 
@@ -102,11 +101,9 @@ namespace LogicCKTDia
 
 open ProvableBDHilbert
 
-lemma provable_TDia : (A 🡒 ◇A) ∈ LogicCKTDia := axm (by grind)
-
-lemma provable_PDia : (◇⊤) ∈ LogicCKTDia := mdp provable_TDia verum
-
-lemma provable_D : (□A 🡒 ◇A) ∈ LogicCKTDia := provable_D_of_PDia provable_PDia
+@[simp, grind .] lemma provable_TDia : (A 🡒 ◇A) ∈ LogicCKTDia := axm (by grind)
+@[simp, grind .] lemma provable_PDia : (◇⊤) ∈ LogicCKTDia := mdp provable_TDia verum
+@[simp, grind .] lemma provable_D : (□A 🡒 ◇A) ∈ LogicCKTDia := provable_D_of_PDia provable_PDia
 
 end LogicCKTDia
 
@@ -115,9 +112,9 @@ namespace LogicCKD
 
 open ProvableBDHilbert
 
-lemma provable_D : □A 🡒 ◇A ∈ LogicCKD := axm (by grind)
+@[simp, grind .] lemma provable_D : □A 🡒 ◇A ∈ LogicCKD := axm (by grind)
 
-lemma provable_PDia : ◇⊤ ∈ LogicCKD := mdp (provable_D) (nec verum)
+@[simp, grind .] lemma provable_PDia : ◇⊤ ∈ LogicCKD := mdp (provable_D) (nec verum)
 
 lemma subset_CKTDia : LogicCKD ⊆ LogicCKTDia := by
   intro A;
