@@ -187,6 +187,25 @@ theorem monotone (h : 𝔸₁ ⊆ 𝔸₂) : ⊢ᴴ[CK;𝔸₁] A → ⊢ᴴ[CK;
   | mdp _ _ ih₁ ih₂ => exact mdp ih₁ ih₂;
   | nec _ ih   => exact nec ih;
 
+theorem provable_of_provable_axioms
+    (h : ∀ B ∈ 𝔸₁, ⊢ᴴ[CK;𝔸₂] B) : (⊢ᴴ[CK;𝔸₁] A) → ⊢ᴴ[CK;𝔸₂] A := by
+  intro p;
+  induction p with
+  | axm hmem   => exact h _ hmem;
+  | imply₁     => exact imply₁;
+  | imply₂     => exact imply₂;
+  | andElim₁   => exact andElim₁;
+  | andElim₂   => exact andElim₂;
+  | andIntro   => exact andIntro;
+  | orIntro₁   => exact orIntro₁;
+  | orIntro₂   => exact orIntro₂;
+  | orElim     => exact orElim;
+  | efq        => exact efq;
+  | kBox       => exact kBox;
+  | kDia       => exact kDia;
+  | mdp _ _ ih₁ ih₂ => exact mdp ih₁ ih₂;
+  | nec _ ih   => exact nec ih;
+
 abbrev logic (𝔸 : Set BDFormula) : BDLogic := { A | ⊢ᴴ[CK;𝔸] A }
 
 @[simp]
