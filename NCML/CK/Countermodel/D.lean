@@ -27,7 +27,10 @@ instance : counterModel.SerialMRel where
   serial_mRel x := ⟨x, le_refl x⟩
 
 theorem counterModel_not_forces : (0 : counterModel.World) ⊮[_] ∼◇⊥ := by
-  sorry
+  intro h;
+  have h₁ : (0 : counterModel.World) ⊩[_] ◇⊥ := fun y _ => ⟨1, Fin.le_last y, rfl⟩;
+  have h₂ : (0 : Fin 2) = 1 := h 0 rfl h₁;
+  simp at h₂;
 
 end D
 
