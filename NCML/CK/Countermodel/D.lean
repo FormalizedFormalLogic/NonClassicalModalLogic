@@ -2,6 +2,12 @@ module
 
 public import NCML.CK.Axioms.D
 
+/-!
+# A countermodel for `CK + D`
+
+A two-world CK-model with a serial `⊏` and a fallible world, on which `∼◇⊥` fails.
+-/
+
 @[expose] public section
 
 namespace CK
@@ -10,7 +16,6 @@ open Model BDFormula
 
 namespace D
 
-/-- Two worlds, the second fallible, with `≼` the equality and `⊏` the order of `Fin 2`. -/
 def counterModel : Model (Fin 2) where
   iRel' x y := x = y
   iRel_preorder := { refl := by grind, trans := by grind }
@@ -34,7 +39,7 @@ lemma counterModel_not_forces : (0 : counterModel.World) ⊮[_] ∼◇⊥ := by
 
 end D
 
-theorem exists_serialMRel_not_forces_N :
+lemma exists_serialMRel_not_forces_N :
   ∃ (κ : Type) (M : Model κ), M.SerialMRel ∧ ∃ x : M.World, x ⊮[_] ∼◇⊥ :=
   ⟨Fin 2, D.counterModel, inferInstance, 0, D.counterModel_not_forces⟩
 
