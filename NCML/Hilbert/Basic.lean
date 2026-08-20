@@ -1,6 +1,7 @@
 module
 
 public import NCML.Formula
+public import NCML.Logic.BD.Basic
 public import Mathlib.Tactic
 
 @[expose] public section
