@@ -16,14 +16,11 @@ namespace Frame
 
 variable {F : Frame κ}
 
-/-- The frame class corresponding to `T◇`: every world has a `⊏`-successor that is either a
-`≼`-successor of it or fallible. -/
 class AscendingMRel (F : Frame κ) : Prop where
   ascending_mRel : ∀ x : F.World, ∃ z, x ⊏ z ∧ (x ≼ z ∨ F.Fallible z)
 
 export AscendingMRel (ascending_mRel)
 
-/-- A stronger condition than `AscendingMRel`, used for the canonical model. -/
 class StrictlyAscendingMRel (F : Frame κ) : Prop where
   strictly_ascending_mRel : ∀ x : F.World, ∃ z, x ⊏ z ∧ x ≼ z
 

@@ -15,15 +15,11 @@ namespace Frame
 
 variable {F : Frame κ}
 
-/-- The frame class corresponding to `T□`: `≼ ∘ ⊏ ∘ ≼` is reflexive away from the fallible
-worlds. -/
 class ReflexiveMComp (F : Frame κ) : Prop where
   reflexive_mComp : ∀ x : F.World, F.Fallible x ∨ ∃ y z, x ≼ y ∧ y ⊏ z ∧ z ≼ x
 
 export ReflexiveMComp (reflexive_mComp)
 
-/-- A stronger condition than `ReflexiveMComp`, used for the canonical model: every world has a
-`≼`-successor that sees it via `⊏`. -/
 class ReturningMRel (F : Frame κ) : Prop where
   returning_mRel : ∀ x : F.World, ∃ y, x ≼ y ∧ y ⊏ x
 

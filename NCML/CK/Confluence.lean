@@ -22,7 +22,6 @@ class BackwardConfluent (F : Frame κ) : Prop where
 
 export BackwardConfluent (backward_confluent)
 
-/-- `⊏` is symmetric. -/
 class SymmetricMRel (F : Frame κ) : Prop where
   symm_mRel : ∀ {x y : F.World}, x ⊏ y → y ⊏ x
 

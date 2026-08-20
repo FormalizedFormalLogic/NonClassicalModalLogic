@@ -16,7 +16,6 @@ namespace Frame
 
 variable {F : Frame κ}
 
-/-- The frame class corresponding to `D`: `⊏` is serial. -/
 class SerialMRel (F : Frame κ) : Prop where
   serial_mRel : ∀ x : F.World, ∃ y, x ⊏ y
 

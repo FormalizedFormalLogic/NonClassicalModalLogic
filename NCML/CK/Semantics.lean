@@ -105,16 +105,13 @@ lemma forces_of_fallible (h : M.Fallible x) : x ⊩[_] A := by
     exact ⟨z, Myz, ih (M.fallible_mRel hy Myz)⟩;
   | _ => grind [Model.fallible_val];
 
-/-- A formula is valid on a model when every world of the model forces it. -/
 def Model.Valid (M : Model κ) (A : BDFormula) := ∀ x : M.World, x ⊩[M] A
 infixl:80 " ⊧ " => Model.Valid
 
-/-- A formula is valid on a frame when it is valid on every model built over that frame. -/
 def Frame.Valid (F : Frame κ) (A : BDFormula) : Prop :=
   ∀ val val_persistent fallible_val, (Model.mk F val val_persistent fallible_val) ⊧ A
 infixl:80 " ⊧ " => Frame.Valid
 
-/-- A model validates every formula valid on its underlying frame. -/
 lemma Model.valid_of_toFrame_valid {M : Model κ} {A : BDFormula} (h : M.toFrame ⊧ A) : M ⊧ A :=
   h M.val M.val_persistent M.fallible_val
 
