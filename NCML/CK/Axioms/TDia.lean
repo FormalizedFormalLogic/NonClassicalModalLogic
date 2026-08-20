@@ -14,24 +14,29 @@ variable {A : BDFormula}
 
 namespace Frame
 
+variable {F : Frame κ}
+
+/-- The frame class corresponding to `T◇`: every world has a `⊏`-successor that is either a
+`≼`-successor of it or fallible. -/
 class AscendingMRel (F : Frame κ) : Prop where
   ascending_mRel : ∀ x : F.World, ∃ z, x ⊏ z ∧ (x ≼ z ∨ F.Fallible z)
 
 export AscendingMRel (ascending_mRel)
 
+/-- A stronger condition than `AscendingMRel`, used for the canonical model. -/
 class StrictlyAscendingMRel (F : Frame κ) : Prop where
   strictly_ascending_mRel : ∀ x : F.World, ∃ z, x ⊏ z ∧ x ≼ z
 
 export StrictlyAscendingMRel (strictly_ascending_mRel)
 
-instance {F : Frame κ} [F.StrictlyAscendingMRel] : F.AscendingMRel where
+instance [F.StrictlyAscendingMRel] : F.AscendingMRel where
   ascending_mRel x := by
     obtain ⟨z, Mxz, Ixz⟩ := strictly_ascending_mRel x;
     refine ⟨z, Mxz, ?_⟩;
     left;
     exact Ixz;
 
-instance {F : Frame κ} [F.AscendingMRel] : F.SerialMRel where
+instance [F.AscendingMRel] : F.SerialMRel where
   serial_mRel x := by
     obtain ⟨z, Mxz, _⟩ := ascending_mRel x;
     exact ⟨z, Mxz⟩;
@@ -45,10 +50,10 @@ open CK.Frame
 lemma valid_TDia_of_ascendingMRel [M.AscendingMRel] : M ⊧ (A 🡒 ◇A) := by
   intro x y Ixy hyA u Iyu;
   obtain ⟨z, Muz, hz⟩ := ascending_mRel u;
-  have huA : u ⊩[_] A := CK.forces_persistent hyA Iyu;
+  have huA : u ⊩[_] A := forces_persistent hyA Iyu;
   rcases hz with Iuz | hzFallible;
-  · exact ⟨z, Muz, CK.forces_persistent huA Iuz⟩;
-  · exact ⟨z, Muz, CK.forces_of_fallible hzFallible⟩;
+  · exact ⟨z, Muz, forces_persistent huA Iuz⟩;
+  · exact ⟨z, Muz, forces_of_fallible hzFallible⟩;
 
 lemma valid_of_mem_LogicCKTDia [M.AscendingMRel] (hA : A ∈ LogicCKTDia) : M ⊧ A :=
   valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TDia_of_ascendingMRel) hA
@@ -78,7 +83,7 @@ theorem ascendingMRel_TFAE : List.TFAE [
   ∀ A : BDFormula, F ⊧ (A 🡒 ◇A),
   F ⊧ (#0 🡒 ◇(#0)),
 ] := by
-  tfae_have 1 → 2 := fun h A => @valid_TDia_of_ascendingMRel _ A _ h
+  tfae_have 1 → 2 := by intro h A; exact valid_TDia_of_ascendingMRel
   tfae_have 2 → 3 := fun h => h _
   tfae_have 3 → 1 := ascendingMRel_of_valid_TDia
   tfae_finish

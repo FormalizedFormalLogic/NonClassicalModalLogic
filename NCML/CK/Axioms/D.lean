@@ -14,6 +14,8 @@ variable {A : BDFormula}
 
 namespace Frame
 
+variable {F : Frame κ}
+
 /-- The frame class corresponding to `D`: `⊏` is serial. -/
 class SerialMRel (F : Frame κ) : Prop where
   serial_mRel : ∀ x : F.World, ∃ y, x ⊏ y
@@ -73,10 +75,10 @@ theorem serialMRel_TFAE : List.TFAE [
   F ⊧ (□(#0) 🡒 ◇(#0)),
   F ⊧ ◇⊤,
 ] := by
-  tfae_have 1 → 2 := fun h A => @valid_D_of_serialMRel _ A _ h
+  tfae_have 1 → 2 := by intro h A; exact valid_D_of_serialMRel
   tfae_have 2 → 3 := fun h => h _
   tfae_have 3 → 1 := serialMRel_of_valid_D
-  tfae_have 1 → 4 := fun h => @valid_PDia_of_serialMRel _ _ h
+  tfae_have 1 → 4 := by intro h; exact valid_PDia_of_serialMRel
   tfae_have 4 → 1 := serialMRel_of_valid_PDia
   tfae_finish
 

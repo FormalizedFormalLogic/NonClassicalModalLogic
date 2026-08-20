@@ -13,17 +13,23 @@ variable {A : BDFormula}
 
 namespace Frame
 
+variable {F : Frame κ}
+
+/-- The frame class corresponding to `T□`: `≼ ∘ ⊏ ∘ ≼` is reflexive away from the fallible
+worlds. -/
 class ReflexiveMComp (F : Frame κ) : Prop where
   reflexive_mComp : ∀ x : F.World, F.Fallible x ∨ ∃ y z, x ≼ y ∧ y ⊏ z ∧ z ≼ x
 
 export ReflexiveMComp (reflexive_mComp)
 
+/-- A stronger condition than `ReflexiveMComp`, used for the canonical model: every world has a
+`≼`-successor that sees it via `⊏`. -/
 class ReturningMRel (F : Frame κ) : Prop where
   returning_mRel : ∀ x : F.World, ∃ y, x ≼ y ∧ y ⊏ x
 
 export ReturningMRel (returning_mRel)
 
-instance {F : Frame κ} [F.ReturningMRel] : F.ReflexiveMComp where
+instance [F.ReturningMRel] : F.ReflexiveMComp where
   reflexive_mComp x := by
     obtain ⟨y, Ixy, Myx⟩ := returning_mRel x;
     right;
@@ -38,8 +44,8 @@ open CK.Frame
 lemma valid_TBox_of_reflexiveMComp [M.ReflexiveMComp] : M ⊧ (□A 🡒 A) := by
   intro x y Ixy hyBoxA;
   rcases reflexive_mComp y with hFallible | ⟨y₁, z₁, Iyy₁, My₁z₁, Iz₁y⟩;
-  · exact CK.forces_of_fallible hFallible;
-  · exact CK.forces_persistent (hyBoxA y₁ z₁ Iyy₁ My₁z₁) Iz₁y;
+  · exact forces_of_fallible hFallible;
+  · exact forces_persistent (hyBoxA y₁ z₁ Iyy₁ My₁z₁) Iz₁y;
 
 lemma valid_of_mem_LogicCKTBox [M.ReflexiveMComp] (hA : A ∈ LogicCKTBox) : M ⊧ A :=
   valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TBox_of_reflexiveMComp) hA
@@ -72,7 +78,7 @@ theorem reflexiveMComp_TFAE : List.TFAE [
   ∀ A : BDFormula, F ⊧ (□A 🡒 A),
   F ⊧ (□(#0) 🡒 #0),
 ] := by
-  tfae_have 1 → 2 := fun h A => @valid_TBox_of_reflexiveMComp _ A _ h
+  tfae_have 1 → 2 := by intro h A; exact valid_TBox_of_reflexiveMComp
   tfae_have 2 → 3 := fun h => h _
   tfae_have 3 → 1 := reflexiveMComp_of_valid_TBox
   tfae_finish

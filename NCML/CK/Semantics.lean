@@ -44,11 +44,11 @@ lemma fallible_iRel (h : F.Fallible x) (Ixy : x ≼ y) : F.Fallible y :=
   F.fallible_iRel' h Ixy
 
 @[grind =>]
-lemma fallible_mRel {x y : F.World} (h : F.Fallible x) (Mxy : x ⊏ y) : F.Fallible y :=
+lemma fallible_mRel (h : F.Fallible x) (Mxy : x ⊏ y) : F.Fallible y :=
   F.fallible_mRel' h Mxy
 
 @[grind =>]
-lemma fallible_exists_mRel {x : F.World} (h : F.Fallible x) : ∃ y, x ⊏ y :=
+lemma fallible_exists_mRel (h : F.Fallible x) : ∃ y, x ⊏ y :=
   F.fallible_exists_mRel' h
 
 end Frame
@@ -61,22 +61,7 @@ structure Model (κ : Type*) extends Frame κ where
 
 attribute [grind =>] Model.val_persistent
 
-namespace Model
-
-variable {M : Model κ} {x y : M.World}
-
-@[grind =>]
-lemma fallible_iRel (h : M.Fallible x) (Ixy : x ≼ y) : M.Fallible y := M.fallible_iRel' h Ixy
-
-@[grind =>]
-lemma fallible_mRel (h : M.Fallible x) (Mxy : x ⊏ y) : M.Fallible y := M.fallible_mRel' h Mxy
-
-@[grind =>]
-lemma fallible_exists_mRel (h : M.Fallible x) : ∃ y, x ⊏ y := M.fallible_exists_mRel' h
-
-end Model
-
-variable {M : Model κ} {x y z : M.World} {A B : BDFormula}
+variable {M : Model κ} {x y : M.World} {A : BDFormula}
 
 /-- - [Pac24, Definition 4] -/
 @[grind]
@@ -90,7 +75,7 @@ def Forces (M : Model κ) (x : M.World) : BDFormula → Prop
   | ◇A    => ∀ y, x ≼ y → ∃ z, y ⊏ z ∧ Forces M z A
 notation:80 x:81 " ⊩[" M "] " A:81 => Forces M x A
 
-abbrev NotForces (M : Model κ) (x : M.World) (A : BDFormula) : Prop := ¬(Forces M x A)
+abbrev NotForces (M : Model κ) (x : M.World) (A : BDFormula) : Prop := ¬Forces M x A
 notation:80 x:81 " ⊮[" M "] " A:81 => NotForces M x A
 
 @[simp, grind .]
@@ -120,6 +105,7 @@ lemma forces_of_fallible (h : M.Fallible x) : x ⊩[_] A := by
     exact ⟨z, Myz, ih (M.fallible_mRel hy Myz)⟩;
   | _ => grind [Model.fallible_val];
 
+/-- A formula is valid on a model when every world of the model forces it. -/
 def Model.Valid (M : Model κ) (A : BDFormula) := ∀ x : M.World, x ⊩[M] A
 infixl:80 " ⊧ " => Model.Valid
 
