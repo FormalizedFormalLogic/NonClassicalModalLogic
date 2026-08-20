@@ -81,4 +81,13 @@ theorem provable_not_box_bot : (∼□⊥) ∈ LogicCKTBox := provable_TBox (A :
 
 end LogicCKTBox
 
+
+namespace LogicCKTDia
+
+open ProvableBDHilbert
+
+theorem provable_TDia : (A 🡒 ◇A) ∈ LogicCKTDia := axm (by grind)
+
+end LogicCKTDia
+
 end
