@@ -43,8 +43,8 @@ open CK.Frame
 lemma valid_BDia_of_returningMComp [M.ReturningMComp] : M ⊧ (◇(□A) 🡒 A) := by
   intro x w _ hw;
   rcases returning_mComp w with hFallible | ⟨y, Iwy, hy⟩;
-  · exact forces_of_fallible hFallible;
-  · obtain ⟨z, Iyz, hz⟩ := hw y Iwy;
+  . exact forces_of_fallible hFallible;
+  . obtain ⟨z, Iyz, hz⟩ := hw y Iwy;
     obtain ⟨u, v, Izu, Muv, Ivw⟩ := hy z Iyz;
     exact forces_persistent (hz u v Izu Muv) Ivw;
 
@@ -60,9 +60,9 @@ lemma valid_BDia_of_returningMComp [F.ReturningMComp] : F ⊧ (◇(□A) 🡒 A)
 lemma returningMComp_of_valid_BDia (h : F ⊧ (◇(□(#0)) 🡒 #0)) : F.ReturningMComp where
   returning_mComp w := by
     by_cases hw : F.Fallible w;
-    · left;
+    . left;
       exact hw;
-    · right;
+    . right;
       by_contra! hc;
       let M : Model κ := {
         toFrame := F,
@@ -86,8 +86,8 @@ lemma returningMComp_of_valid_BDia (h : F ⊧ (◇(□(#0)) 🡒 #0)) : F.Return
         intro u v Izu Muv;
         exact Or.inl $ hz u v Izu Muv;
       rcases h M.val M.val_persistent M.fallible_val w w (refl w) hDiaBox with hc₁ | hc₁;
-      · exact hc₁ (refl w);
-      · exact hw hc₁;
+      . exact hc₁ (refl w);
+      . exact hw hc₁;
 
 /-- `B◇` defines the frames on which every world has a `≼`-successor all of whose `⊏`-successors
 return to it. -/

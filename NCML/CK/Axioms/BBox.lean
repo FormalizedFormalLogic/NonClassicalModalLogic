@@ -42,8 +42,8 @@ open CK.Frame
 lemma valid_BBox_of_symmetricMComp [M.SymmetricMComp] : M ⊧ (A 🡒 □◇A) := by
   intro x y Ixy hyA y₁ z Iyy₁ My₁z u Izu;
   obtain ⟨v, Muv, Iy₁v | hv⟩ := symm_mComp My₁z Izu;
-  · exact ⟨v, Muv, forces_persistent hyA (Trans.trans Iyy₁ Iy₁v)⟩;
-  · exact ⟨v, Muv, forces_of_fallible hv⟩;
+  . exact ⟨v, Muv, forces_persistent hyA (Trans.trans Iyy₁ Iy₁v)⟩;
+  . exact ⟨v, Muv, forces_of_fallible hv⟩;
 
 end Model
 
