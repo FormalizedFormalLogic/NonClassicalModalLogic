@@ -129,10 +129,57 @@ lemma imp_ldisj (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] A 🡒 ⋁Γ := by
     · exact orIntro₁;
     · exact imp_trans (ih hmem) orIntro₂;
 
+lemma lconj_imp (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] ⋀Γ 🡒 A := by
+  induction Γ with
+  | nil => simp at h;
+  | cons B Γ ih =>
+    rcases List.mem_cons.mp h with rfl | hmem
+    · exact andElim₁;
+    · exact imp_trans andElim₂ (ih hmem);
+
+lemma imp_lconj (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] C 🡒 B) : ⊢ᴴ[CK;𝔸] C 🡒 ⋀Γ := by
+  induction Γ with
+  | nil => exact dhyp verum;
+  | cons A Γ ih => exact and_intro_ctx (h A (.head ..)) (ih fun B hB => h B (.tail _ hB));
+
 lemma lconj_box : ⊢ᴴ[CK;𝔸] ⋀□Γ 🡒 □⋀Γ := by
   induction Γ with
   | nil => exact dhyp (nec verum);
   | cons A Γ ih => exact mdp_ctx (imp_trans andElim₁ box_and_intro) (imp_trans andElim₂ ih);
+
+section
+
+open scoped BDFormulaFinset
+
+variable {Γ Γ₁ Γ₂ : BDFormulaFinset}
+
+lemma fconj_imp (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] ⋀Γ 🡒 A :=
+  lconj_imp (Finset.mem_toList.mpr h)
+
+lemma imp_fconj (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] C 🡒 B) : ⊢ᴴ[CK;𝔸] C 🡒 ⋀Γ :=
+  imp_lconj fun B hB => h B (Finset.mem_toList.mp hB)
+
+lemma fdisj_imp (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] ⋁Γ 🡒 C :=
+  ldisj_imp fun B hB => h B (Finset.mem_toList.mp hB)
+
+lemma imp_fdisj (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] A 🡒 ⋁Γ :=
+  imp_ldisj (Finset.mem_toList.mpr h)
+
+lemma fconj_union_left : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ∪ Γ₂) 🡒 ⋀Γ₁ :=
+  imp_fconj fun _ hB => fconj_imp (Finset.mem_union_left _ hB)
+
+lemma fconj_union_right : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ∪ Γ₂) 🡒 ⋀Γ₂ :=
+  imp_fconj fun _ hB => fconj_imp (Finset.mem_union_right _ hB)
+
+lemma fdisj_union_left : ⊢ᴴ[CK;𝔸] ⋁Γ₁ 🡒 ⋁(Γ₁ ∪ Γ₂) :=
+  fdisj_imp fun _ hB => imp_fdisj (Finset.mem_union_left _ hB)
+
+lemma fdisj_union_right : ⊢ᴴ[CK;𝔸] ⋁Γ₂ 🡒 ⋁(Γ₁ ∪ Γ₂) :=
+  fdisj_imp fun _ hB => imp_fdisj (Finset.mem_union_right _ hB)
+
+lemma fconj_box : ⊢ᴴ[CK;𝔸] ⋀□Γ.toList 🡒 □⋀Γ := lconj_box
+
+end
 
 @[induction_eliminator]
 lemma rec
