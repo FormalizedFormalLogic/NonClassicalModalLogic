@@ -83,6 +83,8 @@ lemma or_imp (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 C) (h₂ : ⊢ᴴ[CK;𝔸] B 🡒 C)
 
 lemma box_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] □A 🡒 □B := mdp kBox (nec h)
 
+lemma dia_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] ◇A 🡒 ◇B := mdp kDia (nec h)
+
 @[grind .] lemma box_or_inl : ⊢ᴴ[CK;𝔸] □A 🡒 □(A ⋎ B) := box_mono orIntro₁
 
 @[grind .] lemma box_or_inr : ⊢ᴴ[CK;𝔸] □B 🡒 □(A ⋎ B) := box_mono orIntro₂
