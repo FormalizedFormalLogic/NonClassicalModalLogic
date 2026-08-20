@@ -3,13 +3,7 @@ module
 public import NCML.CK.Axioms.TBox
 public import NCML.CK.Countermodel.D
 
-/-!
-# Countermodels for `CK + T□`
-
-A two-world CK-model in which every world has an `≼`-successor with an `⊏`-edge back to it while
-`⊏` is not serial, on which `◇⊤` and `□⊤ 🡒 ◇⊤` fail, together with the failure of `∼◇⊥` on the
-model of `NCML.CK.Countermodel.D`.
--/
+/-! CK-models refuting `◇⊤`, `D` and `∼◇⊥` over `CK + T□`. -/
 
 @[expose] public section
 
@@ -34,13 +28,13 @@ def counterModel : Model (Fin 2) where
 instance : counterModel.ReturningMRel where
   returning_mRel x := ⟨1, Fin.le_last x, rfl⟩
 
-theorem counterModel_not_serialMRel : ¬ counterModel.SerialMRel := by
+lemma counterModel_not_serialMRel : ¬ counterModel.SerialMRel := by
   sorry
 
-theorem counterModel_not_forces_PDia : (0 : counterModel.World) ⊮[_] (◇⊤ : BDFormula) := by
+lemma counterModel_not_forces_PDia : (0 : counterModel.World) ⊮[_] (◇⊤ : BDFormula) := by
   sorry
 
-theorem counterModel_not_forces_D : (0 : counterModel.World) ⊮[_] (□⊤ 🡒 ◇⊤ : BDFormula) := by
+lemma counterModel_not_forces_D : (0 : counterModel.World) ⊮[_] (□⊤ 🡒 ◇⊤ : BDFormula) := by
   sorry
 
 end TBox
@@ -52,7 +46,7 @@ theorem exists_returningMRel_not_serialMRel :
   ∃ (κ : Type) (M : Model κ), M.ReturningMRel ∧ ¬ M.SerialMRel :=
   ⟨Fin 2, TBox.counterModel, inferInstance, TBox.counterModel_not_serialMRel⟩
 
-theorem exists_reflexiveMComp_not_forces_N :
+lemma exists_reflexiveMComp_not_forces_N :
   ∃ (κ : Type) (M : Model κ), M.ReflexiveMComp ∧ ∃ x : M.World, x ⊮[_] ∼◇⊥ :=
   ⟨Fin 2, D.counterModel, inferInstance, 0, D.counterModel_not_forces⟩
 

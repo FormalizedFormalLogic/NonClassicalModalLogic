@@ -2,11 +2,7 @@ module
 
 public import NCML.CK.Axioms.D
 
-/-!
-# A countermodel for `CK + D`
-
-A two-world CK-model with a serial `⊏` and a fallible world, on which `∼◇⊥` fails.
--/
+/-! A CK-model with a serial `⊏` on which `∼◇⊥` fails. -/
 
 @[expose] public section
 

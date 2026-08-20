@@ -3,12 +3,7 @@ module
 public import NCML.CK.Axioms.TDia
 public import NCML.CK.Countermodel.D
 
-/-!
-# Countermodels for `CK + T◇`
-
-A two-world CK-model with a serial but not ascending `⊏`, on which `T◇` fails, together with the
-failure of `∼◇⊥` on the ascending model of `NCML.CK.Countermodel.D`.
--/
+/-! CK-models refuting `T◇` over `CK + D`, and `∼◇⊥` over `CK + T◇`. -/
 
 @[expose] public section
 
@@ -33,10 +28,10 @@ def counterModel : Model (Fin 2) where
 instance : counterModel.SerialMRel where
   serial_mRel _ := ⟨1, rfl⟩
 
-theorem counterModel_not_ascendingMRel : ¬ counterModel.AscendingMRel := by
+lemma counterModel_not_ascendingMRel : ¬ counterModel.AscendingMRel := by
   sorry
 
-theorem counterModel_not_forces : (0 : counterModel.World) ⊮[_] (#0 🡒 ◇(#0)) := by
+lemma counterModel_not_forces : (0 : counterModel.World) ⊮[_] (#0 🡒 ◇(#0)) := by
   sorry
 
 end TDia
@@ -48,7 +43,7 @@ theorem exists_serialMRel_not_ascendingMRel :
   ∃ (κ : Type) (M : Model κ), M.SerialMRel ∧ ¬ M.AscendingMRel :=
   ⟨Fin 2, TDia.counterModel, inferInstance, TDia.counterModel_not_ascendingMRel⟩
 
-theorem exists_ascendingMRel_not_forces_N :
+lemma exists_ascendingMRel_not_forces_N :
   ∃ (κ : Type) (M : Model κ), M.AscendingMRel ∧ ∃ x : M.World, x ⊮[_] ∼◇⊥ :=
   ⟨Fin 2, D.counterModel, inferInstance, 0, D.counterModel_not_forces⟩
 
