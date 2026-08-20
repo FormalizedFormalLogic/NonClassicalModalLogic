@@ -46,9 +46,9 @@ variable {L : BDLogic} [L.CK]
 
 lemma returningMRel_canonicalModel (hTBox : ∀ {A}, (□A 🡒 A) ∈ L) :
   (canonicalModel L).ReturningMRel where
-  returning_mRel w :=
-    ⟨w.erase, CanonicalPair.iRel_erase,
-      fun _ hA => w.theory.mdp (w.theory.subset (L := L) hTBox) hA, by simp⟩
+  returning_mRel P :=
+    ⟨P.erase, CanonicalPair.iRel_erase,
+      fun _ hA => P.theory.mdp (P.theory.subset (L := L) hTBox) hA, by simp⟩
 
 end CK
 
@@ -62,9 +62,9 @@ theorem LogicCKTBox_TFAE {A : BDFormula} : List.TFAE [
   tfae_have 3 → 1 := by
     contrapose!;
     intro h;
-    obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
+    obtain ⟨P, hw⟩ := CK.exists_not_forces_of_not_mem h;
     exact ⟨_, CK.canonicalModel LogicCKTBox, CK.returningMRel_canonicalModel (by grind),
-      fun hM => hw (hM w)⟩;
+      fun hM => hw (hM P)⟩;
   tfae_finish
 
 end

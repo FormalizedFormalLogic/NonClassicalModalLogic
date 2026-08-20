@@ -40,14 +40,14 @@ end Model
 variable {L : BDLogic} [L.CK]
 
 lemma serialMRel_canonicalModel (hD : ∀ {A}, (□A 🡒 ◇A) ∈ L) : (canonicalModel L).SerialMRel where
-  serial_mRel w := by
-    have h : ∀ C ∈ disjSet w.forbidden, C ∉ □⁻¹w.theory := by
+  serial_mRel P := by
+    have h : ∀ C ∈ disjSet P.forbidden, C ∉ □⁻¹P.theory := by
       rintro C ⟨K, hne, hsub, rfl⟩ hmem;
-      exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩
-        (w.theory.mdp (w.theory.subset (L := L) hD) hmem);
-    obtain ⟨v, hXv, -, havoid⟩ :=
-      CanonicalPair.exists_avoiding (L := L) (T := □⁻¹w.theory) orDirected_disjSet h;
-    exact ⟨v, CanonicalPair.mRel_of_avoid_disjSet hXv havoid⟩;
+      exact P.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩
+        (P.theory.mdp (P.theory.subset (L := L) hD) hmem);
+    obtain ⟨P₁, hXv, -, havoid⟩ :=
+      CanonicalPair.exists_avoiding (L := L) (T := □⁻¹P.theory) orDirected_disjSet h;
+    exact ⟨P₁, CanonicalPair.mRel_of_avoid_disjSet hXv havoid⟩;
 
 end CK
 
@@ -61,9 +61,9 @@ theorem LogicCKD_TFAE {A : BDFormula} : List.TFAE [
   tfae_have 3 → 1 := by
     contrapose!;
     intro h;
-    obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
+    obtain ⟨P, hw⟩ := CK.exists_not_forces_of_not_mem h;
     exact ⟨_, CK.canonicalModel LogicCKD, CK.serialMRel_canonicalModel (by grind),
-      fun hM => hw (hM w)⟩;
+      fun hM => hw (hM P)⟩;
   tfae_finish
 
 end

@@ -36,15 +36,15 @@ structure CanonicalPair (L : BDLogic) where
 
 namespace CanonicalPair
 
-variable {L : BDLogic} {w : CanonicalPair L}
+variable {L : BDLogic} {P : CanonicalPair L}
 
-instance : w.theory.Mdp := w.theory_mdp
+instance : P.theory.Mdp := P.theory_mdp
 
-instance : w.theory.Prime := w.theory_prime
+instance : P.theory.Prime := P.theory_prime
 
-instance : w.theory.Of L := w.theory_of
+instance : P.theory.Of L := P.theory_of
 
-instance [L.CK] : w.theory.Of LogicCK := BDTheory.of_logicCK (L := L)
+instance [L.CK] : P.theory.Of LogicCK := BDTheory.of_logicCK (L := L)
 
 /-- The pair `(T, ∅)` of a prime MP-closed theory `T` of `L`. -/
 def ofTheory (L : BDLogic) (T : BDTheory) [T.Mdp] [T.Prime] [T.Of L] : CanonicalPair L where
@@ -69,7 +69,7 @@ end
 with no forbidden formulas, still disjoint from `Z`. -/
 lemma exists_avoiding [L.CK] {T : BDTheory} {Z : BDFormulaSet} [T.Mdp] [T.Of L]
   (hdir : OrDirected L Z) (hdisj : ∀ C ∈ Z, C ∉ T) :
-  ∃ v : CanonicalPair L, T ⊆ v.theory ∧ v.forbidden = ∅ ∧ ∀ C ∈ Z, C ∉ v.theory := by
+  ∃ P₁ : CanonicalPair L, T ⊆ P₁.theory ∧ P₁.forbidden = ∅ ∧ ∀ C ∈ Z, C ∉ P₁.theory := by
   obtain ⟨Y, hTY, hmdp, hprime, hof, havoid⟩ := exists_prime_mdpClosed_avoiding hdir hdisj;
   exact ⟨ofTheory L Y, hTY, rfl, havoid⟩;
 
@@ -88,20 +88,20 @@ def univ (L : BDLogic) : CanonicalPair L where
 
 variable [L.CK]
 
-lemma theory_eq_univ_of_bot_mem (h : ⊥ ∈ w.theory) : w.theory = Set.univ :=
+lemma theory_eq_univ_of_bot_mem (h : ⊥ ∈ P.theory) : P.theory = Set.univ :=
   BDTheory.eq_univ_of_bot_mem h
 
-lemma forbidden_eq_empty_of_bot_mem (h : ⊥ ∈ w.theory) : w.forbidden = ∅ := by
+lemma forbidden_eq_empty_of_bot_mem (h : ⊥ ∈ P.theory) : P.forbidden = ∅ := by
   ext B;
   simp only [Set.mem_empty_iff_false, iff_false];
   intro hB;
-  exact w.avoid (◇(⋁[B])) ⟨⋁[B], ⟨[B], by simp, by grind, rfl⟩, rfl⟩
+  exact P.avoid (◇(⋁[B])) ⟨⋁[B], ⟨[B], by simp, by grind, rfl⟩, rfl⟩
     (by rw [theory_eq_univ_of_bot_mem h]; trivial);
 
-lemma eq_univ_of_bot_mem (h : ⊥ ∈ w.theory) : w = univ L := by
+lemma eq_univ_of_bot_mem (h : ⊥ ∈ P.theory) : P = univ L := by
   have h₁ := theory_eq_univ_of_bot_mem h;
   have h₂ := forbidden_eq_empty_of_bot_mem h;
-  cases w;
+  cases P;
   subst h₁;
   subst h₂;
   rfl;
@@ -113,93 +113,93 @@ end CanonicalPair
 - [MdP05, Definition 3, Lemma 3]
 -/
 def canonicalModel (L : BDLogic) [L.CK] : Model (CanonicalPair L) where
-  iRel' w v := w.theory ⊆ v.theory
+  iRel' P P₁ := P.theory ⊆ P₁.theory
   iRel_preorder := {
     refl := fun _ => subset_rfl,
     trans := fun _ _ _ => subset_trans
   }
-  mRel' w v := □⁻¹w.theory ⊆ v.theory ∧ ∀ B ∈ w.forbidden, B ∉ v.theory
-  Fallible' w := ⊥ ∈ w.theory
-  fallible_iRel' h Iwv := Iwv h
-  fallible_mRel' h Mwv := Mwv.1 (by rw [CanonicalPair.theory_eq_univ_of_bot_mem h]; trivial)
+  mRel' P P₁ := □⁻¹P.theory ⊆ P₁.theory ∧ ∀ B ∈ P.forbidden, B ∉ P₁.theory
+  Fallible' P := ⊥ ∈ P.theory
+  fallible_iRel' h IPP₁ := IPP₁ h
+  fallible_mRel' h MPP₁ := MPP₁.1 (by rw [CanonicalPair.theory_eq_univ_of_bot_mem h]; trivial)
   fallible_exists_mRel' h :=
     ⟨CanonicalPair.univ L, Set.subset_univ _, by
       rw [CanonicalPair.forbidden_eq_empty_of_bot_mem h];
       simp⟩
-  val w a := (#a) ∈ w.theory
-  val_persistent h Iwv := Iwv h
+  val P a := (#a) ∈ P.theory
+  val_persistent h IPP₁ := IPP₁ h
   fallible_val h := by rw [CanonicalPair.theory_eq_univ_of_bot_mem h]; trivial
 
 namespace CanonicalPair
 
-variable {L : BDLogic} {A B : BDFormula} {w : CanonicalPair L}
+variable {L : BDLogic} {A B : BDFormula} {P : CanonicalPair L}
 
-/-- The pair `w` with its forbidden formulas erased. -/
-def erase (w : CanonicalPair L) : CanonicalPair L := ofTheory L w.theory
+/-- The pair `P` with its forbidden formulas erased. -/
+def erase (P : CanonicalPair L) : CanonicalPair L := ofTheory L P.theory
 
-@[simp] lemma erase_theory : w.erase.theory = w.theory := rfl
+@[simp] lemma erase_theory : P.erase.theory = P.theory := rfl
 
-@[simp] lemma erase_forbidden : w.erase.forbidden = ∅ := rfl
+@[simp] lemma erase_forbidden : P.erase.forbidden = ∅ := rfl
 
 variable [L.CK]
 
-lemma iRel_erase : (canonicalModel L).iRel w w.erase := subset_rfl
+lemma iRel_erase : (canonicalModel L).iRel P P.erase := subset_rfl
 
-lemma exists_iRel_of_imply_not_mem (h : (A 🡒 B) ∉ w.theory) :
-  ∃ v : CanonicalPair L, (canonicalModel L).iRel w v ∧ A ∈ v.theory ∧ B ∉ v.theory := by
-  obtain ⟨v, hXv, -, havoid⟩ :=
-    exists_avoiding (L := L) (T := w.theory.impSet A) (Z := {B}) orDirected_singleton
+lemma exists_iRel_of_imply_not_mem (h : (A 🡒 B) ∉ P.theory) :
+  ∃ P₁ : CanonicalPair L, (canonicalModel L).iRel P P₁ ∧ A ∈ P₁.theory ∧ B ∉ P₁.theory := by
+  obtain ⟨P₁, hXv, -, havoid⟩ :=
+    exists_avoiding (L := L) (T := P.theory.impSet A) (Z := {B}) orDirected_singleton
       (by rintro C rfl; exact h);
-  exact ⟨v, BDTheory.subset_impSet.trans hXv, hXv BDTheory.self_mem_impSet, havoid B rfl⟩;
+  exact ⟨P₁, BDTheory.subset_impSet.trans hXv, hXv BDTheory.self_mem_impSet, havoid B rfl⟩;
 
-lemma exists_mRel_of_box_not_mem (h : □A ∉ w.theory) :
-  ∃ v : CanonicalPair L, (canonicalModel L).mRel w.erase v ∧ A ∉ v.theory := by
-  obtain ⟨v, hXv, -, havoid⟩ :=
-    exists_avoiding (L := L) (T := □⁻¹w.theory) (Z := {A}) orDirected_singleton
+lemma exists_mRel_of_box_not_mem (h : □A ∉ P.theory) :
+  ∃ P₁ : CanonicalPair L, (canonicalModel L).mRel P.erase P₁ ∧ A ∉ P₁.theory := by
+  obtain ⟨P₁, hXv, -, havoid⟩ :=
+    exists_avoiding (L := L) (T := □⁻¹P.theory) (Z := {A}) orDirected_singleton
       (by rintro C rfl; exact h);
-  exact ⟨v, ⟨hXv, by simp⟩, havoid A rfl⟩;
+  exact ⟨P₁, ⟨hXv, by simp⟩, havoid A rfl⟩;
 
-lemma mRel_of_avoid_disjSet {v : CanonicalPair L} (hsub : □⁻¹w.theory ⊆ v.theory)
-  (havoid : ∀ C ∈ disjSet w.forbidden, C ∉ v.theory) : (canonicalModel L).mRel w v := by
+lemma mRel_of_avoid_disjSet {P₁ : CanonicalPair L} (hsub : □⁻¹P.theory ⊆ P₁.theory)
+  (havoid : ∀ C ∈ disjSet P.forbidden, C ∉ P₁.theory) : (canonicalModel L).mRel P P₁ := by
   refine ⟨hsub, ?_⟩;
   intro B hB hBv;
   exact havoid (⋁[B]) ⟨[B], by simp, by simpa using hB, rfl⟩
-    (v.theory.mdp (BDTheory.provable_mem (imp_ldisj (by simp))) hBv);
+    (P₁.theory.mdp (BDTheory.provable_mem (imp_ldisj (by simp))) hBv);
 
-private lemma avoid_disjSet_of_dia_mem (h : ◇A ∈ w.theory) :
-  ∀ C ∈ disjSet w.forbidden, C ∉ BDTheory.impSet (□⁻¹w.theory) A := by
+private lemma avoid_disjSet_of_dia_mem (h : ◇A ∈ P.theory) :
+  ∀ C ∈ disjSet P.forbidden, C ∉ BDTheory.impSet (□⁻¹P.theory) A := by
   rintro C ⟨K, hne, hsub, rfl⟩ hmem;
-  have h₁ : (◇A 🡒 ◇(⋁K)) ∈ w.theory := w.theory.mdp (BDTheory.provable_mem kDia) hmem;
-  exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (w.theory.mdp h₁ h);
+  have h₁ : (◇A 🡒 ◇(⋁K)) ∈ P.theory := P.theory.mdp (BDTheory.provable_mem kDia) hmem;
+  exact P.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (P.theory.mdp h₁ h);
 
-lemma exists_mRel_of_dia_mem (h : ◇A ∈ w.theory) :
-  ∃ v : CanonicalPair L, (canonicalModel L).mRel w v ∧ A ∈ v.theory := by
-  obtain ⟨v, hXv, -, havoid⟩ :=
-    exists_avoiding (L := L) (T := BDTheory.impSet (□⁻¹w.theory) A) (Z := disjSet w.forbidden)
+lemma exists_mRel_of_dia_mem (h : ◇A ∈ P.theory) :
+  ∃ P₁ : CanonicalPair L, (canonicalModel L).mRel P P₁ ∧ A ∈ P₁.theory := by
+  obtain ⟨P₁, hXv, -, havoid⟩ :=
+    exists_avoiding (L := L) (T := BDTheory.impSet (□⁻¹P.theory) A) (Z := disjSet P.forbidden)
       orDirected_disjSet (avoid_disjSet_of_dia_mem h);
-  exact ⟨v, mRel_of_avoid_disjSet (BDTheory.subset_impSet.trans hXv) havoid,
+  exact ⟨P₁, mRel_of_avoid_disjSet (BDTheory.subset_impSet.trans hXv) havoid,
     hXv BDTheory.self_mem_impSet⟩;
 
-private lemma avoid_diaDisjSet_of_dia_not_mem (h : ◇A ∉ w.theory) :
-  ∀ C ∈ diaDisjSet {A}, C ∉ w.theory := by
+private lemma avoid_diaDisjSet_of_dia_not_mem (h : ◇A ∉ P.theory) :
+  ∀ C ∈ diaDisjSet {A}, C ∉ P.theory := by
   rintro C ⟨D, ⟨K, hne, hsub, rfl⟩, rfl⟩ hmem;
   have h₁ : (◇(⋁K) 🡒 ◇A) ∈ LogicCK := dia_mono (ldisj_imp (by
     intro B hB;
     obtain rfl : B = A := hsub B hB;
     exact imp_id));
-  exact h (w.theory.mdp (BDTheory.provable_mem h₁) hmem);
+  exact h (P.theory.mdp (BDTheory.provable_mem h₁) hmem);
 
-lemma exists_iRel_of_dia_not_mem (h : ◇A ∉ w.theory) :
-  ∃ v : CanonicalPair L, (canonicalModel L).iRel w v ∧
-  ∀ u : CanonicalPair L, (canonicalModel L).mRel v u → A ∉ u.theory := by
+lemma exists_iRel_of_dia_not_mem (h : ◇A ∉ P.theory) :
+  ∃ P₁ : CanonicalPair L, (canonicalModel L).iRel P P₁ ∧
+  ∀ P₂ : CanonicalPair L, (canonicalModel L).mRel P₁ P₂ → A ∉ P₂.theory := by
   obtain ⟨Y, hXY, hmdp, hprime, hof, havoid⟩ :=
-    exists_prime_mdpClosed_avoiding (L := L) (T := w.theory) (Z := diaDisjSet {A})
+    exists_prime_mdpClosed_avoiding (L := L) (T := P.theory) (Z := diaDisjSet {A})
       orDirected_diaDisjSet (avoid_diaDisjSet_of_dia_not_mem h);
-  exact ⟨⟨Y, {A}, havoid⟩, hXY, fun _ Mvu => Mvu.2 A rfl⟩;
+  exact ⟨⟨Y, {A}, havoid⟩, hXY, fun _ MP₁P₂ => MP₁P₂.2 A rfl⟩;
 
 /-- - [MdP05, Lemma 3] -/
-lemma truthlemma : w ⊩[canonicalModel L] A ↔ A ∈ w.theory := by
-  induction A generalizing w with
+lemma truthlemma : P ⊩[canonicalModel L] A ↔ A ∈ P.theory := by
+  induction A generalizing P with
   | atom a => exact Iff.rfl;
   | falsum => exact Iff.rfl;
   | and A B ihA ihB =>
@@ -208,41 +208,41 @@ lemma truthlemma : w ⊩[canonicalModel L] A ↔ A ∈ w.theory := by
       exact BDTheory.and_mem (ihA.mp hA) (ihB.mp hB);
     · intro h;
       constructor;
-      . exact ihA.mpr (w.theory.mdp (BDTheory.provable_mem andElim₁) h);
-      . exact ihB.mpr (w.theory.mdp (BDTheory.provable_mem andElim₂) h);
+      . exact ihA.mpr (P.theory.mdp (BDTheory.provable_mem andElim₁) h);
+      . exact ihB.mpr (P.theory.mdp (BDTheory.provable_mem andElim₂) h);
   | or A B ihA ihB =>
     constructor;
     · rintro (hA | hB);
-      · exact w.theory.mdp (BDTheory.provable_mem orIntro₁) (ihA.mp hA);
-      · exact w.theory.mdp (BDTheory.provable_mem orIntro₂) (ihB.mp hB);
+      · exact P.theory.mdp (BDTheory.provable_mem orIntro₁) (ihA.mp hA);
+      · exact P.theory.mdp (BDTheory.provable_mem orIntro₂) (ihB.mp hB);
     · intro h;
-      rcases w.theory.prime h <;> grind;
+      rcases P.theory.prime h <;> grind;
   | imply A B ihA ihB =>
     constructor;
     · intro h;
       by_contra! hc;
-      obtain ⟨v, Iwv, hAv, hBv⟩ := exists_iRel_of_imply_not_mem hc;
-      exact hBv (ihB.mp (h v Iwv (ihA.mpr hAv)));
-    · intro h v Iwv hvA;
-      exact ihB.mpr (v.theory.mdp (Iwv h) (ihA.mp hvA));
+      obtain ⟨P₁, IPP₁, hAv, hBv⟩ := exists_iRel_of_imply_not_mem hc;
+      exact hBv (ihB.mp (h P₁ IPP₁ (ihA.mpr hAv)));
+    · intro h P₁ IPP₁ hvA;
+      exact ihB.mpr (P₁.theory.mdp (IPP₁ h) (ihA.mp hvA));
   | box A ih =>
     constructor;
     · intro h;
       by_contra! hc;
-      obtain ⟨v, Mwv, hAv⟩ := exists_mRel_of_box_not_mem hc;
-      exact hAv (ih.mp (h w.erase v iRel_erase Mwv));
-    · intro h v u Iwv Mvu;
-      exact ih.mpr (Mvu.1 (Iwv h));
+      obtain ⟨P₁, MPP₁, hAv⟩ := exists_mRel_of_box_not_mem hc;
+      exact hAv (ih.mp (h P.erase P₁ iRel_erase MPP₁));
+    · intro h P₁ P₂ IPP₁ MP₁P₂;
+      exact ih.mpr (MP₁P₂.1 (IPP₁ h));
   | dia A ih =>
     constructor;
     · intro h;
       by_contra! hc;
-      obtain ⟨v, Iwv, hblock⟩ := exists_iRel_of_dia_not_mem hc;
-      obtain ⟨u, Mvu, hAu⟩ := h v Iwv;
-      exact hblock u Mvu (ih.mp hAu);
-    · intro h v Iwv;
-      obtain ⟨u, Mvu, hAu⟩ := exists_mRel_of_dia_mem (Iwv h);
-      exact ⟨u, Mvu, ih.mpr hAu⟩;
+      obtain ⟨P₁, IPP₁, hblock⟩ := exists_iRel_of_dia_not_mem hc;
+      obtain ⟨P₂, MP₁P₂, hAu⟩ := h P₁ IPP₁;
+      exact hblock P₂ MP₁P₂ (ih.mp hAu);
+    · intro h P₁ IPP₁;
+      obtain ⟨P₂, MP₁P₂, hAu⟩ := exists_mRel_of_dia_mem (IPP₁ h);
+      exact ⟨P₂, MP₁P₂, ih.mpr hAu⟩;
 
 end CanonicalPair
 
@@ -252,11 +252,11 @@ variable {L : BDLogic} [L.CK] {A : BDFormula}
 
 /-- - [MdP05, Theorem 2] -/
 lemma exists_not_forces_of_not_mem (h : A ∉ L) :
-  ∃ w : CanonicalPair L, w ⊮[canonicalModel L] A := by
-  obtain ⟨w, -, -, havoid⟩ :=
+  ∃ P : CanonicalPair L, P ⊮[canonicalModel L] A := by
+  obtain ⟨P, -, -, havoid⟩ :=
     CanonicalPair.exists_avoiding (L := L) (T := L) (Z := {A}) orDirected_singleton
       (by rintro C rfl; exact h);
-  exact ⟨w, fun hw => havoid A rfl (CanonicalPair.truthlemma.mp hw)⟩;
+  exact ⟨P, fun hw => havoid A rfl (CanonicalPair.truthlemma.mp hw)⟩;
 
 end
 
@@ -270,7 +270,7 @@ theorem LogicCK.mem_iff_valid {A : BDFormula} :
     exact CK.Model.valid_of_mem_LogicCK h;
   · contrapose!;
     intro h;
-    obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem (L := LogicCK) h;
-    exact ⟨_, CK.canonicalModel LogicCK, fun hM => hw (hM w)⟩;
+    obtain ⟨P, hw⟩ := CK.exists_not_forces_of_not_mem (L := LogicCK) h;
+    exact ⟨_, CK.canonicalModel LogicCK, fun hM => hw (hM P)⟩;
 
 end

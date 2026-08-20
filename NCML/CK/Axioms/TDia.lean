@@ -53,26 +53,26 @@ end Model
 
 variable {L : BDLogic} [L.CK]
 
-private lemma avoid_disjSet_mdpClosure (hTDia : ∀ {A}, (A 🡒 ◇A) ∈ L) (w : CanonicalPair L) :
-  ∀ C ∈ disjSet w.forbidden, C ∉ BDTheory.mdpClosure (w.theory ∪ □⁻¹w.theory) := by
+private lemma avoid_disjSet_mdpClosure (hTDia : ∀ {A}, (A 🡒 ◇A) ∈ L) (P : CanonicalPair L) :
+  ∀ C ∈ disjSet P.forbidden, C ∉ BDTheory.mdpClosure (P.theory ∪ □⁻¹P.theory) := by
   rintro C ⟨K, hne, hsub, rfl⟩ hmem;
   obtain ⟨D, hD, E, hE, hDE⟩ := BDTheory.mdpClosure_union_finite_char hmem;
-  have h₁ : □(D 🡒 ⋁K) ∈ w.theory :=
-    w.theory.mdp (BDTheory.provable_mem (box_mono (mdp imp_swap hDE))) hE;
-  have h₂ : (◇D 🡒 ◇(⋁K)) ∈ w.theory := w.theory.mdp (BDTheory.provable_mem kDia) h₁;
-  have h₃ : ◇D ∈ w.theory := w.theory.mdp (w.theory.subset (L := L) hTDia) hD;
-  exact w.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (w.theory.mdp h₂ h₃);
+  have h₁ : □(D 🡒 ⋁K) ∈ P.theory :=
+    P.theory.mdp (BDTheory.provable_mem (box_mono (mdp imp_swap hDE))) hE;
+  have h₂ : (◇D 🡒 ◇(⋁K)) ∈ P.theory := P.theory.mdp (BDTheory.provable_mem kDia) h₁;
+  have h₃ : ◇D ∈ P.theory := P.theory.mdp (P.theory.subset (L := L) hTDia) hD;
+  exact P.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (P.theory.mdp h₂ h₃);
 
 lemma strictlyAscendingMRel_canonicalModel (hTDia : ∀ {A}, (A 🡒 ◇A) ∈ L) :
   (canonicalModel L).StrictlyAscendingMRel where
-  strictly_ascending_mRel w := by
-    have : BDTheory.Of L (w.theory ∪ □⁻¹w.theory) :=
-      ⟨(w.theory.subset (L := L)).trans Set.subset_union_left⟩;
-    obtain ⟨v, hXv, -, havoid⟩ :=
-      CanonicalPair.exists_avoiding (L := L) (T := BDTheory.mdpClosure (w.theory ∪ □⁻¹w.theory))
-        orDirected_disjSet (avoid_disjSet_mdpClosure hTDia w);
-    have h₁ : w.theory ∪ □⁻¹w.theory ⊆ v.theory := BDTheory.subset_mdpClosure.trans hXv;
-    exact ⟨v, CanonicalPair.mRel_of_avoid_disjSet (Set.subset_union_right.trans h₁) havoid,
+  strictly_ascending_mRel P := by
+    have : BDTheory.Of L (P.theory ∪ □⁻¹P.theory) :=
+      ⟨(P.theory.subset (L := L)).trans Set.subset_union_left⟩;
+    obtain ⟨P₁, hXv, -, havoid⟩ :=
+      CanonicalPair.exists_avoiding (L := L) (T := BDTheory.mdpClosure (P.theory ∪ □⁻¹P.theory))
+        orDirected_disjSet (avoid_disjSet_mdpClosure hTDia P);
+    have h₁ : P.theory ∪ □⁻¹P.theory ⊆ P₁.theory := BDTheory.subset_mdpClosure.trans hXv;
+    exact ⟨P₁, CanonicalPair.mRel_of_avoid_disjSet (Set.subset_union_right.trans h₁) havoid,
       Set.subset_union_left.trans h₁⟩;
 
 end CK
@@ -87,9 +87,9 @@ theorem LogicCKTDia_TFAE {A : BDFormula} : List.TFAE [
   tfae_have 3 → 1 := by
     contrapose!;
     intro h;
-    obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
+    obtain ⟨P, hw⟩ := CK.exists_not_forces_of_not_mem h;
     exact ⟨_, CK.canonicalModel LogicCKTDia, CK.strictlyAscendingMRel_canonicalModel (by grind),
-      fun hM => hw (hM w)⟩;
+      fun hM => hw (hM P)⟩;
   tfae_finish
 
 end
