@@ -311,6 +311,13 @@ def disjSet (Θ : BDFormulaSet) : BDFormulaSet :=
 /-- The `◇`-images of `disjSet Θ`. -/
 def diaDisjSet (Θ : BDFormulaSet) : BDFormulaSet := ◇(disjSet Θ)
 
+variable {𝔸 : Set BDFormula} {B : BDFormula}
+
+/-- A singleton avoid set is trivially ⋎-directed. -/
+lemma orDirected_singleton : OrDirected 𝔸 {B} := by
+  rintro C rfl D rfl;
+  exact ⟨D, rfl, or_imp imp_id imp_id⟩;
+
 end Disj
 
 /-! ## CKB-specific consequences of the MP-closure -/
