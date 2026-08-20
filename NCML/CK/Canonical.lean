@@ -174,7 +174,20 @@ private lemma avoid_disjSet_of_dia_mem (h : ◇A ∈ w.th) :
 
 /-- A pair containing `◇A` has a `⊏`-successor containing `A`. -/
 lemma exists_mRel_of_dia_mem (h : ◇A ∈ w.th) :
-  ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel w v ∧ A ∈ v.th := sorry
+  ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel w v ∧ A ∈ v.th := by
+  have := BDTheory.prebox_of' (𝔸 := 𝔸) (T := w.th);
+  have := BDTheory.of_logicCK (𝔸 := 𝔸) (T := □⁻¹w.th);
+  obtain ⟨Y, hXY, hmdp, hprime, hof, havoid⟩ :=
+    exists_prime_mdpClosed_avoiding (𝔸 := 𝔸) (T := BDTheory.impSet (□⁻¹w.th) A)
+      (Z := disjSet w.forb) orDirected_disjSet (avoid_disjSet_of_dia_mem h);
+  have := hmdp;
+  have := hprime;
+  have := hof;
+  refine ⟨ofTheory 𝔸 Y, ⟨(BDTheory.subset_impSet (𝔸 := 𝔸)).trans hXY, ?_⟩,
+    hXY (BDTheory.self_mem_impSet (𝔸 := 𝔸))⟩;
+  intro B hB hBY;
+  exact havoid (⋁[B]) ⟨[B], by simp, by simpa using hB, rfl⟩
+    (Y.mdp (BDTheory.provable_mem (𝔸 := 𝔸) (imp_ldisj (by simp))) hBY);
 
 /-- A pair `(T, Θ)` missing `◇A` avoids the `◇`-disjunctions over `{A}`. -/
 private lemma avoid_diaDisjSet_of_dia_not_mem (h : ◇A ∉ w.th) :
