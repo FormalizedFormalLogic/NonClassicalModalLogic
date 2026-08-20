@@ -116,6 +116,11 @@ lemma disj_append_right : ⊢ᴴ[CK;𝔸] ⋁Γ₂ 🡒 ⋁(Γ₁ ++ Γ₂) := b
   | nil => exact imp_id;
   | cons A Γ₁ ih => exact imp_trans ih orIntro₂;
 
+lemma disj_imp (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] ⋁Γ 🡒 C := by
+  induction Γ with
+  | nil => exact efq;
+  | cons A Γ ih => exact or_imp (h A (.head ..)) (ih fun B hB => h B (.tail _ hB));
+
 lemma conj_box : ⊢ᴴ[CK;𝔸] ⋀□Γ 🡒 □⋀Γ := by
   induction Γ with
   | nil => exact dhyp (nec verum);
