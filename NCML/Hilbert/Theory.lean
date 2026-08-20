@@ -107,6 +107,9 @@ lemma dia_bot_not_mem [T.CKB] : ◇(⊥ : BDFormula) ∉ T :=
 
 end CKB
 
+instance [T.Of LogicCKTDia] : T.Of LogicCK :=
+  ⟨LogicCK.subset_CKTDia.trans (subset (L := LogicCKTDia))⟩
+
 end BDTheory
 
 
