@@ -342,7 +342,8 @@ lemma disjSet_empty : disjSet (∅ : BDFormulaSet) = ∅ := by
 
 /-- The `◇`-disjunctions over the empty set: none. -/
 @[simp]
-lemma diaDisjSet_empty : diaDisjSet (∅ : BDFormulaSet) = ∅ := sorry
+lemma diaDisjSet_empty : diaDisjSet (∅ : BDFormulaSet) = ∅ := by
+  simp [diaDisjSet, BDFormulaSet.dia];
 
 /-- `diaDisjSet Θ` is ⋎-directed, via `dia_mono` and the same list append as `disjSet`. -/
 lemma orDirected_diaDisjSet : OrDirected 𝔸 (diaDisjSet Θ) := by
