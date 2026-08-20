@@ -109,6 +109,9 @@ theorem provable_D : (□A 🡒 ◇A) ∈ LogicCKD := axm (by grind)
 
 theorem provable_diaTop : (◇⊤) ∈ LogicCKD := mdp (provable_D (A := ⊤)) (nec verum)
 
+theorem subset_CKTDia : LogicCKD ⊆ LogicCKTDia := fun _ =>
+  provable_of_provable_axioms (fun _ hB => by obtain ⟨_, rfl⟩ := hB; exact LogicCKTDia.provable_D)
+
 end LogicCKD
 
 end
