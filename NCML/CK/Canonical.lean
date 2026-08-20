@@ -10,9 +10,10 @@ public import NCML.Hilbert.Theory
 # The pair canonical model
 
 For an axiom set `𝔸`, the canonical model whose worlds are the pairs `(T, Θ)` of a prime
-MP-closed theory `T` of `logic 𝔸` and a set `Θ` of formulas omitted by every `⊏`-successor.
+MP-closed theory `T` of `logic 𝔸` and a set `Θ` of formulas omitted by every `⊏`-successor, its
+truth lemma, and the completeness of `CK` for the class of all CK-models.
 
-- [MdP05, Definition 3]
+- [MdP05, Definition 3, Lemma 3, Theorem 1]
 -/
 
 open BDFormula ProvableBDHilbert
