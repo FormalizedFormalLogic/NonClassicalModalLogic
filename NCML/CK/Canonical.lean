@@ -202,7 +202,11 @@ private lemma avoid_diaDisjSet_of_dia_not_mem (h : ◇A ∉ w.th) :
 /-- A pair missing `◇A` has an `≼`-extension none of whose `⊏`-successors contains `A`. -/
 lemma exists_iRel_of_dia_not_mem (h : ◇A ∉ w.th) :
   ∃ v : CanonicalPair 𝔸, (canonicalModel 𝔸).iRel w v ∧
-  ∀ u : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel v u → A ∉ u.th := sorry
+  ∀ u : CanonicalPair 𝔸, (canonicalModel 𝔸).mRel v u → A ∉ u.th := by
+  obtain ⟨Y, hXY, hmdp, hprime, hof, havoid⟩ :=
+    exists_prime_mdpClosed_avoiding (𝔸 := 𝔸) (T := w.th) (Z := diaDisjSet {A})
+      orDirected_diaDisjSet (avoid_diaDisjSet_of_dia_not_mem h);
+  exact ⟨⟨Y, {A}, hmdp, hprime, hof, havoid⟩, hXY, fun _ Mvu => Mvu.2 A rfl⟩;
 
 end CanonicalPair
 
