@@ -86,7 +86,8 @@ def univ (𝔸 : Set BDFormula) : CanonicalPair 𝔸 where
 @[simp] lemma univ_forb : (univ 𝔸).forb = ∅ := rfl
 
 /-- A pair containing `⊥` forces every formula. -/
-lemma th_eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w.th = Set.univ := sorry
+lemma th_eq_univ_of_bot_mem (h : ⊥ ∈ w.th) : w.th = Set.univ :=
+  BDTheory.eq_univ_of_bot_mem (𝔸 := 𝔸) h
 
 /-- A pair containing `⊥` forbids nothing. -/
 lemma forb_eq_empty_of_bot_mem (h : ⊥ ∈ w.th) : w.forb = ∅ := sorry
