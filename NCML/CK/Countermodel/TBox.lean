@@ -38,8 +38,8 @@ lemma counterModel_not_forces_PDia : (0 : counterModel.World) ⊮[_] (◇⊤ : B
   obtain ⟨z, Mz, -⟩ := h 0 (le_refl 0);
   simp_all [counterModel, Model.mRel];
 
-lemma counterModel_not_forces_D : (0 : counterModel.World) ⊮[_] (□⊤ 🡒 ◇⊤ : BDFormula) := by
-  sorry
+lemma counterModel_not_forces_D : (0 : counterModel.World) ⊮[_] (□⊤ 🡒 ◇⊤ : BDFormula) :=
+  fun h => counterModel_not_forces_PDia (h 0 (le_refl 0) fun _ _ _ _ => forces_top)
 
 end TBox
 
