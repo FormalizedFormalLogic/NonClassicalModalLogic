@@ -70,4 +70,13 @@ theorem provable_DP : (◇(A ⋎ B) 🡒 ◇A ⋎ ◇B) ∈ LogicCKB := by
 
 end LogicCKB
 
+
+namespace LogicCKTBox
+
+open ProvableBDHilbert
+
+theorem provable_TBox : (□A 🡒 A) ∈ LogicCKTBox := axm (by grind)
+
+end LogicCKTBox
+
 end
