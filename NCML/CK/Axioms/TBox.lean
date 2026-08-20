@@ -59,32 +59,23 @@ instance : (canonicalModel { □A 🡒 A | (A) }).ReturningMRel :=
 end CK
 
 /-- The model characterization of `CK + T□`: a formula is a theorem of `CK + T□` exactly when it is
-valid on every CK-model whose `≼ ∘ ⊏ ∘ ≼` is reflexive up to fallibility.
+valid on every CK-model whose `≼ ∘ ⊏ ∘ ≼` is reflexive up to fallibility, equivalently on every
+CK-model in which every world has an `≼`-successor with an `⊏`-edge back to it.
 
 - [Pac24, Problem in §4]
 -/
-theorem LogicCKTBox.mem_iff_valid {A : BDFormula} :
-  A ∈ LogicCKTBox ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.ReflexiveMComp] → M ⊧ A := by
-  constructor;
-  · intro h _ M _;
-    exact CK.Model.valid_of_mem_LogicCKTBox h;
-  · contrapose!;
+theorem LogicCKTBox_TFAE {A : BDFormula} : List.TFAE [
+  A ∈ LogicCKTBox,
+  ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.ReflexiveMComp] → M ⊧ A,
+  ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.ReturningMRel] → M ⊧ A,
+] := by
+  tfae_have 1 → 2 := fun h _ M _ => CK.Model.valid_of_mem_LogicCKTBox h
+  tfae_have 2 → 3 := fun h _ M _ => h M
+  tfae_have 3 → 1 := by
+    contrapose!;
     intro h;
     obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
     exact ⟨_, CK.canonicalModel _, inferInstance, fun hM => hw (hM w)⟩;
-
-/-- The model characterization of `CK + T□` by the strong reflexivity condition.
-
-- [Pac24, Problem in §4]
--/
-theorem LogicCKTBox.mem_iff_valid_returningMRel {A : BDFormula} :
-  A ∈ LogicCKTBox ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, [M.ReturningMRel] → M ⊧ A := by
-  constructor;
-  · intro h _ M _;
-    exact CK.Model.valid_of_mem_LogicCKTBox h;
-  · contrapose!;
-    intro h;
-    obtain ⟨w, hw⟩ := CK.exists_not_forces_of_not_mem h;
-    exact ⟨_, CK.canonicalModel _, inferInstance, fun hM => hw (hM w)⟩;
+  tfae_finish
 
 end
