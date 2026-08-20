@@ -30,7 +30,10 @@ instance [M.ReturningMRel] : M.ReflexiveMComp where
     exact Or.inr ⟨y, x, Ixy, Myx, refl x⟩;
 
 theorem valid_TBox_of_reflexiveMComp [M.ReflexiveMComp] : M ⊧ (□A 🡒 A) := by
-  sorry
+  intro x y Ixy hyBoxA;
+  rcases reflexive_mComp y with hFallible | ⟨y₁, z₁, Iyy₁, My₁z₁, Iz₁y⟩;
+  · exact Model.Forces.of_fallible hFallible;
+  · exact Model.Forces.persistent (hyBoxA y₁ z₁ Iyy₁ My₁z₁) Iz₁y;
 
 end Model
 
