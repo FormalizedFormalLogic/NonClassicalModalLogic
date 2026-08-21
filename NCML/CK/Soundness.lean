@@ -25,15 +25,15 @@ lemma valid_of_mem_logic (h𝔸 : ∀ B ∈ 𝔸, M ⊧ B) (hA : A ∈ ProvableB
     intro y _ hyABC z Iyz hzAB w Izw hwA;
     exact hyABC w (Trans.trans Iyz Izw) hwA w (refl _) $ hzAB w Izw hwA;
   | kBox =>
-    intro y Ixy hyAB z Iyz hzA z₁ u₁ Izz₁ Mz₁u₁;
-    exact hyAB z₁ u₁ (Trans.trans Iyz Izz₁) Mz₁u₁ u₁ (refl _) $ hzA z₁ u₁ Izz₁ Mz₁u₁;
+    intro y Ixy hyAB z Iyz hzA w v Izw Mwv;
+    exact hyAB w v (Trans.trans Iyz Izw) Mwv v (refl _) $ hzA w v Izw Mwv;
   | kDia =>
-    intro y Ixy hyAB z Iyz hzDiaA z₁ Izz₁;
-    obtain ⟨u₁, Mz₁u₁, huA⟩ := hzDiaA z₁ Izz₁;
-    use u₁;
+    intro y Ixy hyAB z Iyz hzDiaA w Izw;
+    obtain ⟨v, Mwv, hvA⟩ := hzDiaA w Izw;
+    use v;
     constructor;
-    . exact Mz₁u₁;
-    . exact (hyAB z₁ u₁ (Trans.trans Iyz Izz₁) Mz₁u₁) u₁ (refl _) huA;
+    . exact Mwv;
+    . exact (hyAB w v (Trans.trans Iyz Izw) Mwv) v (refl _) hvA;
   | mdp _ _ ihAB ihA => exact ihAB x x (refl _) (ihA x);
   | _ => grind;
 
