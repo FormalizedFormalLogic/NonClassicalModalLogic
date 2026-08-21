@@ -1,7 +1,7 @@
 module
 
 public import NCML.CK.Logic.CKTDia
-public import NCML.CK.Countermodel.D
+public import NCML.CK.Countermodel.SerialMRel
 
 /-! CK-models refuting `T◇` over `CK + D`, and `∼◇⊥` over `CK + T◇`. -/
 
@@ -11,7 +11,7 @@ namespace CK
 
 open Model BDFormula
 
-namespace TDia
+namespace AscendingMRel
 
 def counterModel : Model (Fin 2) where
   iRel' x y := x = y
@@ -38,24 +38,24 @@ lemma counterModel_not_forces : 0 ⊮[counterModel] (#0 🡒 ◇(#0)) := by
   obtain ⟨z, Mz, hz⟩ := h 0 rfl rfl 0 rfl;
   simp_all [counterModel, Frame.mRel, Forces];
 
-end TDia
+end AscendingMRel
 
-instance : D.counterModel.StrictlyAscendingMRel where
+instance : SerialMRel.counterModel.StrictlyAscendingMRel where
   strictly_ascending_mRel x := ⟨x, le_refl x, rfl⟩
 
 theorem exists_serialMRel_not_ascendingMRel :
   ∃ (κ : Type) (M : Model κ), M.SerialMRel ∧ ¬M.AscendingMRel :=
-  ⟨Fin 2, TDia.counterModel, inferInstance, TDia.counterModel_not_ascendingMRel⟩
+  ⟨Fin 2, AscendingMRel.counterModel, inferInstance, AscendingMRel.counterModel_not_ascendingMRel⟩
 
 lemma exists_ascendingMRel_not_forces_N :
   ∃ (κ : Type) (M : Model κ), M.AscendingMRel ∧ ∃ x : M.World, x ⊮[_] ∼◇⊥ :=
-  ⟨Fin 2, D.counterModel, inferInstance, 0, D.counterModel_not_forces⟩
+  ⟨Fin 2, SerialMRel.counterModel, inferInstance, 0, SerialMRel.counterModel_not_forces⟩
 
 end CK
 
 lemma LogicCKD.not_provable_TDia : (#0 🡒 ◇(#0)) ∉ LogicCKD := by
   intro h;
-  apply CK.TDia.counterModel_not_forces (CK.Model.valid_of_mem_LogicCKD h 0)
+  apply CK.AscendingMRel.counterModel_not_forces (CK.Model.valid_of_mem_LogicCKD h 0)
 
 theorem LogicCKD.ssubset_CKTDia : LogicCKD ⊂ LogicCKTDia := by
   apply Set.ssubset_iff_exists.mpr;
@@ -68,6 +68,6 @@ theorem LogicCKD.ssubset_CKTDia : LogicCKD ⊂ LogicCKTDia := by
 
 theorem LogicCKTDia.not_provable_N : (∼◇⊥) ∉ LogicCKTDia := by
   intro h;
-  apply CK.D.counterModel_not_forces (CK.Model.valid_of_mem_LogicCKTDia h 0)
+  apply CK.SerialMRel.counterModel_not_forces (CK.Model.valid_of_mem_LogicCKTDia h 0)
 
 end
