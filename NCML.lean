@@ -13,6 +13,7 @@ public import NCML.CK.Frame.EuclideanMRel
 public import NCML.CK.Frame.FiveBox
 public import NCML.CK.Frame.FiveDia
 public import NCML.CK.Frame.ForwardConfluent
+public import NCML.CK.Frame.Four
 public import NCML.CK.Frame.FourBox
 public import NCML.CK.Frame.FourDia
 public import NCML.CK.Frame.PBox
