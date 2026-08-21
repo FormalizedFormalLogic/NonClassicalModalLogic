@@ -4,6 +4,9 @@ public import NCML.CK.Logic.CKTBox
 public import NCML.CK.Logic.CKTDia
 public import NCML.CK.Logic.CK4Box
 public import NCML.CK.Logic.CK4Dia
+public import NCML.CK.Frame.ReflexiveMRel
+public import NCML.CK.Frame.TransitiveMRel
+public import NCML.CK.Frame.BackwardConfluent
 
 @[expose] public section
 
@@ -137,6 +140,21 @@ lemma exists_not_forces_of_not_mem (h : A ∉ L) :
   exact ⟨P, fun h₁ => havoid A rfl (truthlemma.mp h₁)⟩;
 
 end
+
+variable {L : BDLogic} [L.CK]
+
+instance reflexiveMRel_canonicalModel [L.TBox] : (canonicalModel L).ReflexiveMRel where
+  refl_mRel P := ⟨fun _ hA => P.theory.mdp (P.theory.subset L.tBox) hA, subset_rfl⟩
+
+instance transitiveMRel_canonicalModel [L.FourBox] : (canonicalModel L).TransitiveMRel where
+  trans_mRel {P _P₁ _P₂} MPP₁ MP₁P₂ := ⟨
+    fun _ hA => MP₁P₂.1 (MPP₁.1 (P.theory.mdp (P.theory.subset L.fourBox) hA)),
+    MPP₁.2.trans MP₁P₂.2⟩
+
+/-- - [BDF21, Proposition IV.7] -/
+instance backwardConfluent_canonicalModel : (canonicalModel L).BackwardConfluent where
+  backward_confluent {P P₁ P₂} MPP₁ IP₁P₂ :=
+    ⟨P.erase, CanonicalPair.iRel_erase, fun _ hA => IP₁P₂ (MPP₁.1 hA), by simp⟩
 
 end CK.Hereditary
 
