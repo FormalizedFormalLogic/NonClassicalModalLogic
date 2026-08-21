@@ -31,7 +31,7 @@ instance [F.SymmetricMRel] : F.BDia where
       . apply symm_mRel Mxz;
       . apply refl;
 
-lemma valid_BDia [F.BDia] : F ⊧ (◇(□A) 🡒 A) := by
+lemma frameValidate_BDia_of_frame_BDia [F.BDia] : F ⊧ (◇(□A) 🡒 A) := by
   intro V V_per V_fal x y _ hy;
   by_cases hFallible : F.Fallible y;
   . exact forces_of_fallible hFallible;
@@ -40,7 +40,7 @@ lemma valid_BDia [F.BDia] : F ⊧ (◇(□A) 🡒 A) := by
     obtain ⟨v, u, Iwv, Mvu, Iuy⟩ := hz w Izw;
     exact forces_persistent (hw v u Iwv Mvu) Iuy;
 
-lemma bDia_of_valid_BDia (h : F ⊧ (◇(□(#0)) 🡒 #0)) : F.BDia where
+lemma frame_BDia_of_frameValidate_BDia (h : F ⊧ (◇(□(#0)) 🡒 #0)) : F.BDia where
   bDia x hx := by
     by_contra! hc;
     let M : Model κ := {
@@ -68,14 +68,14 @@ lemma bDia_of_valid_BDia (h : F ⊧ (◇(□(#0)) 🡒 #0)) : F.BDia where
     . exact hc₁ (refl x);
     . exact hx hc₁;
 
-theorem bDia_TFAE : List.TFAE [
+theorem frame_BDia_TFAE : List.TFAE [
   F.BDia,
   ∀ A : BDFormula, F ⊧ (◇(□A) 🡒 A),
   F ⊧ (◇(□(#0)) 🡒 #0),
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_BDia;
+  tfae_have 1 → 2 := by intro h A; exact frameValidate_BDia_of_frame_BDia;
   tfae_have 2 → 3 := fun h => h _
-  tfae_have 3 → 1 := bDia_of_valid_BDia
+  tfae_have 3 → 1 := frame_BDia_of_frameValidate_BDia
   tfae_finish
 
 end Frame

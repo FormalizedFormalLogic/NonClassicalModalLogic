@@ -51,19 +51,20 @@ open CK.Frame
 lemma valid_of_mem_LogicCKB [M.IsCKB] (hA : A ∈ LogicCKB) : M ⊧ A :=
   valid_of_mem_logic (by
     rintro B (⟨C, rfl⟩ | ⟨C, rfl⟩);
-    · exact valid_of_toFrame_valid valid_BBox;
-    · exact valid_of_toFrame_valid valid_BDia;
+    · exact valid_of_toFrame_valid frameValidate_BBox_of_frame_BBox;
+    · exact valid_of_toFrame_valid frameValidate_BDia_of_frame_BDia;
   ) hA
 
 /-- - [Pac24, Lemma 14] -/
 lemma valid_of_mem_LogicIKB [M.IsIKB] (hA : A ∈ LogicIKB) : M ⊧ A :=
   valid_of_mem_logic (by
     rintro B ((((⟨C, D, rfl⟩ | ⟨C, D, rfl⟩) | rfl) | ⟨C, rfl⟩) | ⟨C, rfl⟩);
-    · exact valid_of_toFrame_valid valid_FS_of_forwardConfluent_of_backwardConfluent;
-    · exact valid_of_toFrame_valid valid_DP_of_forwardConfluent;
-    · exact valid_of_toFrame_valid valid_N_of_symmetricMRel;
-    · exact valid_of_toFrame_valid valid_BBox;
-    · exact valid_of_toFrame_valid valid_BDia;
+    · exact valid_of_toFrame_valid
+        frameValidate_FS_of_frame_ForwardConfluent_of_frame_BackwardConfluent;
+    · exact valid_of_toFrame_valid frameValidate_DP_of_frame_ForwardConfluent;
+    · exact valid_of_toFrame_valid frameValidate_N_of_frame_SymmetricMRel;
+    · exact valid_of_toFrame_valid frameValidate_BBox_of_frame_BBox;
+    · exact valid_of_toFrame_valid frameValidate_BDia_of_frame_BDia;
   ) hA
 
 end Model
@@ -191,7 +192,8 @@ instance : CKBcanonicalModel.BackwardConfluent where
       fun B hB => IT₁U (MTT₁ (BDTheory.box_dia_mem (T := T.1) hB));
 
 instance : CKBcanonicalModel.ForwardConfluent :=
-  Frame.forwardConfluent_iff_backwardConfluent_of_symmetricMRel.mpr inferInstance
+  Frame.frame_ForwardConfluent_iff_frame_BackwardConfluent_of_frame_SymmetricMRel.mpr
+    inferInstance
 
 /-- - [Pac24, Lemma 17] -/
 instance : CKBcanonicalModel.IsIKB where

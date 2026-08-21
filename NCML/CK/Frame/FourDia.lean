@@ -37,7 +37,7 @@ instance [F.TransitiveMRel] : F.FourDia where
         . left;
           apply refl;
 
-lemma valid_FourDia [F.FourDia] : F ⊧ (◇◇A 🡒 ◇A) := by
+lemma frameValidate_FourDia_of_frame_FourDia [F.FourDia] : F ⊧ (◇◇A 🡒 ◇A) := by
   intro V V_per V_fal x y Ixy hy z Iyz;
   have hz := forces_persistent hy Iyz;
   obtain ⟨w, Izw, hw⟩ := fourDia z;
@@ -49,7 +49,7 @@ lemma valid_FourDia [F.FourDia] : F ⊧ (◇◇A 🡒 ◇A) := by
   . exact ⟨u₁, Mzu₁, forces_persistent hv₁ Ivu₁⟩;
   . exact ⟨u₁, Mzu₁, forces_of_fallible hFallible⟩;
 
-lemma fourDia_of_valid_FourDia (h : F ⊧ (◇◇(#0) 🡒 ◇(#0))) : F.FourDia where
+lemma frame_FourDia_of_frameValidate_FourDia (h : F ⊧ (◇◇(#0) 🡒 ◇(#0))) : F.FourDia where
   fourDia x := by
     by_contra! hc;
     obtain ⟨z, Mxz, hz⟩ := hc x (refl x);
@@ -86,14 +86,14 @@ lemma fourDia_of_valid_FourDia (h : F ⊧ (◇◇(#0) 🡒 ◇(#0))) : F.FourDia
     . exact hz z (refl z) Mxz;
     . exact hNotFallible z Mxz hz;
 
-theorem fourDia_TFAE : List.TFAE [
+theorem frame_FourDia_TFAE : List.TFAE [
   F.FourDia,
   ∀ A : BDFormula, F ⊧ (◇◇A 🡒 ◇A),
   F ⊧ (◇◇(#0) 🡒 ◇(#0)),
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_FourDia;
+  tfae_have 1 → 2 := by intro h A; exact frameValidate_FourDia_of_frame_FourDia;
   tfae_have 2 → 3 := fun h => h _
-  tfae_have 3 → 1 := fourDia_of_valid_FourDia
+  tfae_have 3 → 1 := frame_FourDia_of_frameValidate_FourDia
   tfae_finish
 
 end Frame

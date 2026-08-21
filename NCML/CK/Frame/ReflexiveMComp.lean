@@ -36,10 +36,10 @@ namespace Frame
 
 variable {F : Frame κ}
 
-lemma valid_TBox_of_reflexiveMComp [F.ReflexiveMComp] : F ⊧ (□A 🡒 A) :=
+lemma frameValidate_TBox_of_frame_ReflexiveMComp [F.ReflexiveMComp] : F ⊧ (□A 🡒 A) :=
   fun _ _ _ => Model.valid_TBox_of_reflexiveMComp
 
-lemma reflexiveMComp_of_valid_TBox (h : F ⊧ (□(#0) 🡒 #0)) : F.ReflexiveMComp where
+lemma frame_ReflexiveMComp_of_frameValidate_TBox (h : F ⊧ (□(#0) 🡒 #0)) : F.ReflexiveMComp where
   reflexive_mComp w := by
     let M : Model κ := {
       toFrame := F,
@@ -64,14 +64,14 @@ lemma reflexiveMComp_of_valid_TBox (h : F ⊧ (□(#0) 🡒 #0)) : F.ReflexiveMC
       exact hw;
 
 /-- `T□` defines the frames on which `≼ ∘ ⊏ ∘ ≼` is reflexive away from the fallible worlds. -/
-theorem reflexiveMComp_TFAE : List.TFAE [
+theorem frame_ReflexiveMComp_TFAE : List.TFAE [
   F.ReflexiveMComp,
   ∀ A : BDFormula, F ⊧ (□A 🡒 A),
   F ⊧ (□(#0) 🡒 #0),
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_TBox_of_reflexiveMComp;
+  tfae_have 1 → 2 := by intro h A; exact frameValidate_TBox_of_frame_ReflexiveMComp;
   tfae_have 2 → 3 := fun h => h _
-  tfae_have 3 → 1 := reflexiveMComp_of_valid_TBox
+  tfae_have 3 → 1 := frame_ReflexiveMComp_of_frameValidate_TBox
   tfae_finish
 
 end Frame

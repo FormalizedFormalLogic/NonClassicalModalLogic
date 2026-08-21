@@ -43,10 +43,10 @@ namespace Frame
 
 variable {F : Frame κ}
 
-lemma valid_TDia_of_ascendingMRel [F.AscendingMRel] : F ⊧ (A 🡒 ◇A) :=
+lemma frameValidate_TDia_of_frame_AscendingMRel [F.AscendingMRel] : F ⊧ (A 🡒 ◇A) :=
   fun _ _ _ => Model.valid_TDia_of_ascendingMRel
 
-lemma ascendingMRel_of_valid_TDia (h : F ⊧ (#0 🡒 ◇(#0))) : F.AscendingMRel where
+lemma frame_AscendingMRel_of_frameValidate_TDia (h : F ⊧ (#0 🡒 ◇(#0))) : F.AscendingMRel where
   ascending_mRel w := by
     let M : Model κ := {
       toFrame := F,
@@ -66,14 +66,14 @@ lemma ascendingMRel_of_valid_TDia (h : F ⊧ (#0 🡒 ◇(#0))) : F.AscendingMRe
     exact h M.val M.val_persistent M.fallible_val w w (refl w) hwA w (refl w);
 
 /-- `T◇` defines the frames whose `⊏` is ascending. -/
-theorem ascendingMRel_TFAE : List.TFAE [
+theorem frame_AscendingMRel_TFAE : List.TFAE [
   F.AscendingMRel,
   ∀ A : BDFormula, F ⊧ (A 🡒 ◇A),
   F ⊧ (#0 🡒 ◇(#0)),
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_TDia_of_ascendingMRel;
+  tfae_have 1 → 2 := by intro h A; exact frameValidate_TDia_of_frame_AscendingMRel;
   tfae_have 2 → 3 := fun h => h _
-  tfae_have 3 → 1 := ascendingMRel_of_valid_TDia
+  tfae_have 3 → 1 := frame_AscendingMRel_of_frameValidate_TDia
   tfae_finish
 
 end Frame

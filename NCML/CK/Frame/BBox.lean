@@ -27,13 +27,13 @@ instance [F.SymmetricMRel] [F.ForwardConfluent] : F.BBox where
     left;
     exact Ixw;
 
-lemma valid_BBox [F.BBox] : F ⊧ (A 🡒 □◇A) := by
+lemma frameValidate_BBox_of_frame_BBox [F.BBox] : F ⊧ (A 🡒 □◇A) := by
   intro V V_per V_fal x y Ixy hyA z w Iyz Mzw v Iwv;
   obtain ⟨u, Mvu, Izu | hu⟩ := bBox Mzw Iwv;
   . exact ⟨u, Mvu, forces_persistent hyA (Trans.trans Iyz Izu)⟩;
   . exact ⟨u, Mvu, forces_of_fallible hu⟩;
 
-lemma bBox_of_valid_BBox (h : F ⊧ (#0 🡒 □◇(#0))) : F.BBox where
+lemma frame_BBox_of_frameValidate_BBox (h : F ⊧ (#0 🡒 □◇(#0))) : F.BBox where
   bBox {x y z} Mxy Iyz := by
     let M : Model κ := {
       toFrame := F,
@@ -52,14 +52,14 @@ lemma bBox_of_valid_BBox (h : F ⊧ (#0 🡒 □◇(#0))) : F.BBox where
     have hxA : x ⊩[M] (#0) := Or.inl (refl x);
     exact h M.val M.val_persistent M.fallible_val x x (refl x) hxA x y (refl x) Mxy z Iyz;
 
-theorem bBox_TFAE : List.TFAE [
+theorem frame_BBox_TFAE : List.TFAE [
   F.BBox,
   ∀ A : BDFormula, F ⊧ (A 🡒 □◇A),
   F ⊧ (#0 🡒 □◇(#0)),
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_BBox;
+  tfae_have 1 → 2 := by intro h A; exact frameValidate_BBox_of_frame_BBox;
   tfae_have 2 → 3 := fun h => h _
-  tfae_have 3 → 1 := bBox_of_valid_BBox
+  tfae_have 3 → 1 := frame_BBox_of_frameValidate_BBox
   tfae_finish
 
 end Frame

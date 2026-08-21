@@ -32,7 +32,7 @@ instance [F.EuclideanMRel] : F.FiveDia where
       . exact eucl_mRel Mxw Mxy;
       . apply refl;
 
-lemma valid_FiveDia [F.FiveDia] : F ⊧ (◇(□A) 🡒 □A) := by
+lemma frameValidate_FiveDia_of_frame_FiveDia [F.FiveDia] : F ⊧ (◇(□A) 🡒 □A) := by
   intro V V_per V_fal x y Ixy hy z w Iyz Mzw;
   by_cases hFallible : F.Fallible w;
   . exact forces_of_fallible hFallible;
@@ -41,7 +41,7 @@ lemma valid_FiveDia [F.FiveDia] : F ⊧ (◇(□A) 🡒 □A) := by
     obtain ⟨v₁, u₁, Iuv₁, Mv₁u₁, Iu₁w⟩ := hv u Mvu;
     exact forces_persistent (hu v₁ u₁ Iuv₁ Mv₁u₁) Iu₁w;
 
-lemma fiveDia_of_valid_FiveDia (h : F ⊧ (◇(□(#0)) 🡒 □(#0))) : F.FiveDia where
+lemma frame_FiveDia_of_frameValidate_FiveDia (h : F ⊧ (◇(□(#0)) 🡒 □(#0))) : F.FiveDia where
   fiveDia {x y} Mxy hy := by
     by_contra! hc;
     let M : Model κ := {
@@ -72,14 +72,14 @@ lemma fiveDia_of_valid_FiveDia (h : F ⊧ (◇(□(#0)) 🡒 □(#0))) : F.FiveD
     . exact hc₁ (refl y);
     . exact hy hc₁;
 
-theorem fiveDia_TFAE : List.TFAE [
+theorem frame_FiveDia_TFAE : List.TFAE [
   F.FiveDia,
   ∀ A : BDFormula, F ⊧ (◇(□A) 🡒 □A),
   F ⊧ (◇(□(#0)) 🡒 □(#0)),
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_FiveDia;
+  tfae_have 1 → 2 := by intro h A; exact frameValidate_FiveDia_of_frame_FiveDia;
   tfae_have 2 → 3 := fun h => h _
-  tfae_have 3 → 1 := fiveDia_of_valid_FiveDia
+  tfae_have 3 → 1 := frame_FiveDia_of_frameValidate_FiveDia
   tfae_finish
 
 end Frame

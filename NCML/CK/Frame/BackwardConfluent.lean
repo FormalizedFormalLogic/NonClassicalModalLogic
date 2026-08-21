@@ -21,7 +21,8 @@ class BackwardConfluent (F : Frame κ) : Prop where
 export BackwardConfluent (backward_confluent)
 
 /-- - [Pac24, Proposition 10] -/
-lemma forwardConfluent_iff_backwardConfluent_of_symmetricMRel [F.SymmetricMRel] :
+lemma frame_ForwardConfluent_iff_frame_BackwardConfluent_of_frame_SymmetricMRel
+  [F.SymmetricMRel] :
   F.ForwardConfluent ↔ F.BackwardConfluent := by
   constructor;
   · intro h;
@@ -40,7 +41,8 @@ lemma forwardConfluent_iff_backwardConfluent_of_symmetricMRel [F.SymmetricMRel] 
 - [Pac24, Theorem 11]
 - [Pac24, Corollary 12]
 -/
-lemma valid_FS_of_forwardConfluent_of_backwardConfluent [F.ForwardConfluent] [F.BackwardConfluent] :
+lemma frameValidate_FS_of_frame_ForwardConfluent_of_frame_BackwardConfluent
+  [F.ForwardConfluent] [F.BackwardConfluent] :
   F ⊧ ((◇A 🡒 □B) 🡒 □(A 🡒 B)) := by
   intro V V_per V_fal x y Ixy hy z w Iyz Mzw v Iwv hvA;
   obtain ⟨u, Izu, Muv⟩ := backward_confluent Mzw Iwv;

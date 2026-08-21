@@ -48,7 +48,8 @@ variable {F : Frame κ}
 - [Pac24, Theorem 11]
 - [Pac24, Corollary 12]
 -/
-lemma valid_DP_of_forwardConfluent [F.ForwardConfluent] : F ⊧ (◇(A ⋎ B) 🡒 (◇A ⋎ ◇B)) := by
+lemma frameValidate_DP_of_frame_ForwardConfluent [F.ForwardConfluent] :
+  F ⊧ (◇(A ⋎ B) 🡒 (◇A ⋎ ◇B)) := by
   intro V V_per V_fal x y _ hy;
   obtain ⟨z, Myz, hz⟩ := Model.dia_iff_forward_of_forwardConfluent.mp hy;
   rcases hz with hz | hz;

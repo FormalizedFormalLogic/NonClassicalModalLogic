@@ -22,7 +22,7 @@ export SymmetricMRel (symm_mRel)
 - [Pac24, Theorem 11]
 - [Pac24, Corollary 12]
 -/
-lemma valid_N_of_symmetricMRel [F.SymmetricMRel] : F ⊧ ∼◇⊥ := by
+lemma frameValidate_N_of_frame_SymmetricMRel [F.SymmetricMRel] : F ⊧ ∼◇⊥ := by
   intro V V_per V_fal x y _ hy;
   obtain ⟨z, Myz, hz⟩ := hy y (refl y);
   exact F.fallible_mRel hz (symm_mRel Myz);

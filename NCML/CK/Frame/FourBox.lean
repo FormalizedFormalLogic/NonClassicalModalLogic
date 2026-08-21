@@ -27,13 +27,13 @@ instance [F.TransitiveMRel] [F.BackwardConfluent] : F.FourBox where
     right;
     exact ⟨v, w, Ixv, trans_mRel Mvz Mzw, refl w⟩;
 
-lemma valid_FourBox [F.FourBox] : F ⊧ (□A 🡒 □□A) := by
+lemma frameValidate_FourBox_of_frame_FourBox [F.FourBox] : F ⊧ (□A 🡒 □□A) := by
   intro V V_per V_fal x y Ixy hy z w Iyz Mzw v u Iwv Mvu;
   rcases fourBox Mzw Iwv Mvu with hu | ⟨v₁, u₁, Izv₁, Mv₁u₁, Iu₁u⟩;
   . exact forces_of_fallible hu;
   . exact forces_persistent (hy v₁ u₁ (Trans.trans Iyz Izv₁) Mv₁u₁) Iu₁u;
 
-lemma fourBox_of_valid_FourBox (h : F ⊧ (□(#0) 🡒 □□(#0))) : F.FourBox where
+lemma frame_FourBox_of_frameValidate_FourBox (h : F ⊧ (□(#0) 🡒 □□(#0))) : F.FourBox where
   fourBox {x y z w} Mxy Iyz Mzw := by
     let M : Model κ := {
       toFrame := F,
@@ -60,14 +60,14 @@ lemma fourBox_of_valid_FourBox (h : F ⊧ (□(#0) 🡒 □□(#0))) : F.FourBox
 
 /-- `4□` defines the frames on which `⊏ ∘ ≼ ∘ ⊏` collapses to `≼ ∘ ⊏ ∘ ≼`, away from the
 fallible worlds. -/
-theorem fourBox_TFAE : List.TFAE [
+theorem frame_FourBox_TFAE : List.TFAE [
   F.FourBox,
   ∀ A : BDFormula, F ⊧ (□A 🡒 □□A),
   F ⊧ (□(#0) 🡒 □□(#0)),
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_FourBox;
+  tfae_have 1 → 2 := by intro h A; exact frameValidate_FourBox_of_frame_FourBox;
   tfae_have 2 → 3 := fun h => h _
-  tfae_have 3 → 1 := fourBox_of_valid_FourBox
+  tfae_have 3 → 1 := frame_FourBox_of_frameValidate_FourBox
   tfae_finish
 
 end Frame

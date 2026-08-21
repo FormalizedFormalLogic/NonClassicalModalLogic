@@ -40,13 +40,13 @@ namespace Frame
 
 variable {F : Frame κ}
 
-lemma valid_D_of_serialMRel [F.SerialMRel] : F ⊧ (□A 🡒 ◇A) :=
+lemma frameValidate_D_of_frame_SerialMRel [F.SerialMRel] : F ⊧ (□A 🡒 ◇A) :=
   fun _ _ _ => Model.valid_D_of_serialMRel
 
-lemma valid_PDia_of_serialMRel [F.SerialMRel] : F ⊧ ◇⊤ :=
+lemma frameValidate_PDia_of_frame_SerialMRel [F.SerialMRel] : F ⊧ ◇⊤ :=
   fun _ _ _ => Model.valid_PDia_of_serialMRel
 
-lemma serialMRel_of_valid_D (h : F ⊧ (□(#0) 🡒 ◇(#0))) : F.SerialMRel where
+lemma frame_SerialMRel_of_frameValidate_D (h : F ⊧ (□(#0) 🡒 ◇(#0))) : F.SerialMRel where
   serial_mRel x := by
     let M : Model κ := {
       toFrame := F,
@@ -58,7 +58,7 @@ lemma serialMRel_of_valid_D (h : F ⊧ (□(#0) 🡒 ◇(#0))) : F.SerialMRel wh
     obtain ⟨z, Mxz, -⟩ := h M.val M.val_persistent M.fallible_val x x (refl x) hxBoxA x (refl x);
     exact ⟨z, Mxz⟩;
 
-lemma serialMRel_of_valid_PDia (h : F ⊧ ◇⊤) : F.SerialMRel where
+lemma frame_SerialMRel_of_frameValidate_PDia (h : F ⊧ ◇⊤) : F.SerialMRel where
   serial_mRel x := by
     let M : Model κ := {
       toFrame := F,
@@ -70,17 +70,17 @@ lemma serialMRel_of_valid_PDia (h : F ⊧ ◇⊤) : F.SerialMRel where
     exact ⟨z, Mxz⟩;
 
 /-- `D` defines the frames whose `⊏` is serial. -/
-theorem serialMRel_TFAE : List.TFAE [
+theorem frame_SerialMRel_TFAE : List.TFAE [
   F.SerialMRel,
   ∀ A : BDFormula, F ⊧ (□A 🡒 ◇A),
   F ⊧ (□(#0) 🡒 ◇(#0)),
   F ⊧ ◇⊤,
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_D_of_serialMRel;
+  tfae_have 1 → 2 := by intro h A; exact frameValidate_D_of_frame_SerialMRel;
   tfae_have 2 → 3 := fun h => h _
-  tfae_have 3 → 1 := serialMRel_of_valid_D
-  tfae_have 1 → 4 := by intro h; exact valid_PDia_of_serialMRel;
-  tfae_have 4 → 1 := serialMRel_of_valid_PDia
+  tfae_have 3 → 1 := frame_SerialMRel_of_frameValidate_D
+  tfae_have 1 → 4 := by intro h; exact frameValidate_PDia_of_frame_SerialMRel;
+  tfae_have 4 → 1 := frame_SerialMRel_of_frameValidate_PDia
   tfae_finish
 
 end Frame

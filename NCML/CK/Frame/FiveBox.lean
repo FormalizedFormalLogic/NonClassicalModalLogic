@@ -33,7 +33,7 @@ instance [F.EuclideanMRel] [F.ForwardConfluent] : F.FiveBox where
       left;
       exact Ivu;
 
-lemma valid_FiveBox [F.FiveBox] : F ⊧ (◇A 🡒 □◇A) := by
+lemma frameValidate_FiveBox_of_frame_FiveBox [F.FiveBox] : F ⊧ (◇A 🡒 □◇A) := by
   intro V V_per V_fal x y Ixy hy z w Iyz Mzw v Iwv;
   obtain ⟨u, Izu, hu⟩ := fiveBox Mzw Iwv;
   obtain ⟨v₁, Muv₁, hv₁⟩ := hy u (Trans.trans Iyz Izu);
@@ -42,7 +42,7 @@ lemma valid_FiveBox [F.FiveBox] : F ⊧ (◇A 🡒 □◇A) := by
   . exact ⟨u₁, Mvu₁, forces_persistent hv₁ Iv₁u₁⟩;
   . exact ⟨u₁, Mvu₁, forces_of_fallible hFallible⟩;
 
-lemma fiveBox_of_valid_FiveBox (h : F ⊧ (◇(#0) 🡒 □◇(#0))) : F.FiveBox where
+lemma frame_FiveBox_of_frameValidate_FiveBox (h : F ⊧ (◇(#0) 🡒 □◇(#0))) : F.FiveBox where
   fiveBox {x y z} Mxy Iyz := by
     by_contra! hc;
     obtain ⟨v, Mxv, hv⟩ := hc x (refl x);
@@ -76,14 +76,14 @@ lemma fiveBox_of_valid_FiveBox (h : F ⊧ (◇(#0) 🡒 □◇(#0))) : F.FiveBox
     . exact hu u (refl u) Mzu;
     . exact hNotFallible u Mzu hu;
 
-theorem fiveBox_TFAE : List.TFAE [
+theorem frame_FiveBox_TFAE : List.TFAE [
   F.FiveBox,
   ∀ A : BDFormula, F ⊧ (◇A 🡒 □◇A),
   F ⊧ (◇(#0) 🡒 □◇(#0)),
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_FiveBox;
+  tfae_have 1 → 2 := by intro h A; exact frameValidate_FiveBox_of_frame_FiveBox;
   tfae_have 2 → 3 := fun h => h _
-  tfae_have 3 → 1 := fiveBox_of_valid_FiveBox
+  tfae_have 3 → 1 := frame_FiveBox_of_frameValidate_FiveBox
   tfae_finish
 
 end Frame

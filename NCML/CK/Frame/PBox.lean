@@ -25,11 +25,11 @@ instance [F.ReflexiveMComp] : F.PBox where
     . exact hFallible;
     . exact F.fallible_iRel (h y z Ixy Myz) Izx;
 
-lemma valid_PBox [F.PBox] : F ⊧ (∼□⊥ : BDFormula) := by
+lemma frameValidate_PBox_of_frame_PBox [F.PBox] : F ⊧ (∼□⊥ : BDFormula) := by
   intro V V_per V_fal x y Ixy hy;
   exact pBox hy;
 
-lemma pBox_of_valid_PBox (h : F ⊧ (∼□⊥ : BDFormula)) : F.PBox where
+lemma frame_PBox_of_frameValidate_PBox (h : F ⊧ (∼□⊥ : BDFormula)) : F.PBox where
   pBox {x} h₁ := by
     let M : Model κ := {
       toFrame := F,
@@ -40,11 +40,11 @@ lemma pBox_of_valid_PBox (h : F ⊧ (∼□⊥ : BDFormula)) : F.PBox where
     exact h M.val M.val_persistent M.fallible_val x x (refl x) h₁;
 
 /-- `P□` defines the frames whose infallible worlds have an infallible `≼ ∘ ⊏`-successor. -/
-theorem pBox_iff_valid_PBox : F.PBox ↔ F ⊧ (∼□⊥ : BDFormula) := by
+theorem frame_PBox_iff_frameValidate_PBox : F.PBox ↔ F ⊧ (∼□⊥ : BDFormula) := by
   constructor;
   . intro _;
-    exact valid_PBox;
-  . exact pBox_of_valid_PBox;
+    exact frameValidate_PBox_of_frame_PBox;
+  . exact frame_PBox_of_frameValidate_PBox;
 
 end Frame
 
