@@ -1,6 +1,6 @@
 module
 
-public import NCML.CK.Frame.T
+public import NCML.CK.Frame.ReflexiveMRel
 public import NCML.CK.Logic.CKTBox
 public import NCML.CK.Logic.CKTDia
 
@@ -21,7 +21,7 @@ namespace Model
 
 open CK.Frame
 
-lemma valid_of_mem_LogicCKT [M.TBox] [M.TDia] (hA : A ∈ LogicCKT) : M ⊧ A :=
+lemma valid_of_mem_LogicCKT [M.T] (hA : A ∈ LogicCKT) : M ⊧ A :=
   valid_of_mem_logic (by
     rintro B (⟨C, rfl⟩ | ⟨C, rfl⟩);
     · exact valid_of_toFrame_valid frameValidate_TBox_of_frame_TBox;
@@ -32,21 +32,20 @@ end Model
 
 variable {L : BDLogic} [L.CK]
 
-instance t_canonicalModel [L.TBox] [L.TDia] : (canonicalModel L).T where
-  t P := by
-    have hbox : □⁻¹P.theory ⊆ P.theory := fun _ hA => P.theory.mdp (P.theory.subset L.tBox) hA;
-    refine ⟨P.erase, CanonicalPair.iRel_erase, ⟨hbox, ?_⟩, hbox, ?_⟩;
-    . exact fun _ hB => CanonicalPair.forbidden_not_mem_theory (P := P) hB;
-    . simp;
+instance reflexiveMRel_canonicalModel [L.TBox] [L.TDia] : (canonicalModel L).ReflexiveMRel where
+  refl_mRel P := ⟨
+    fun _ hA => P.theory.mdp (P.theory.subset L.tBox) hA,
+    fun _ hB => CanonicalPair.forbidden_not_mem_theory hB
+  ⟩
 
 end CK
 
 theorem LogicCKT_TFAE {A : BDFormula} : List.TFAE [
   A ∈ LogicCKT,
-  ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.TBox] → [F.TDia] → F ⊧ A,
   ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.T] → F ⊧ A,
+  ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.ReflexiveMRel] → F ⊧ A,
 ] := by
-  tfae_have 1 → 2 := fun h _ F _ _ V V_per V_fal => CK.Model.valid_of_mem_LogicCKT h
+  tfae_have 1 → 2 := fun h _ F _ V V_per V_fal => CK.Model.valid_of_mem_LogicCKT h
   tfae_have 2 → 3 := fun h _ F _ => h F
   tfae_have 3 → 1 := by
     contrapose!;

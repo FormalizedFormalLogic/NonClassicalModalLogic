@@ -2,6 +2,7 @@ module
 
 public import NCML.CK.Frame.ReturningMRel
 public import NCML.CK.Frame.StrictlyAscendingMRel
+public import NCML.CK.Frame.T
 
 @[expose] public section
 
@@ -23,6 +24,8 @@ instance [F.ReflexiveMRel] : F.ReturningMRel where
 
 instance [F.ReflexiveMRel] : F.StrictlyAscendingMRel where
   strictly_ascending_mRel x := ⟨x, refl_mRel x, refl x⟩
+
+instance [F.ReflexiveMRel] : F.T where
 
 end Frame
 
