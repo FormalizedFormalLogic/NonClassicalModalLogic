@@ -1,7 +1,5 @@
 module  -- shake: keep-all --deprecated_module: ignore
 
-public import NCML.CK.Axioms.BBox
-public import NCML.CK.Axioms.BDia
 public import NCML.CK.CKB_IKB
 public import NCML.CK.Canonical
 public import NCML.CK.Countermodel.BBox
@@ -9,6 +7,8 @@ public import NCML.CK.Countermodel.D
 public import NCML.CK.Countermodel.TBox
 public import NCML.CK.Countermodel.TDia
 public import NCML.CK.Frame.AscendingMRel
+public import NCML.CK.Frame.BBox
+public import NCML.CK.Frame.BDia
 public import NCML.CK.Frame.BackwardConfluent
 public import NCML.CK.Frame.ForwardConfluent
 public import NCML.CK.Frame.FrameClass

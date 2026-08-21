@@ -2,8 +2,8 @@ module
 
 public import NCML.CK.Semantics
 public import NCML.CK.Frame.FrameClass
-public import NCML.CK.Axioms.BBox
-public import NCML.CK.Axioms.BDia
+public import NCML.CK.Frame.BBox
+public import NCML.CK.Frame.BDia
 public import NCML.Hilbert.Logics
 
 @[expose] public section
