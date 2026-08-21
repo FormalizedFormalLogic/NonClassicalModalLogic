@@ -51,10 +51,7 @@ variable {F : Frame κ}
 lemma frameValidate_DP_of_frame_ForwardConfluent [F.ForwardConfluent] :
   F ⊧ (◇(A ⋎ B) 🡒 (◇A ⋎ ◇B)) := by
   intro V V_per V_fal x y _ hy;
-  obtain ⟨z, Myz, hz⟩ := Model.dia_iff_forward_of_forwardConfluent.mp hy;
-  rcases hz with hz | hz;
-  · left; exact Model.dia_iff_forward_of_forwardConfluent.mpr ⟨z, Myz, hz⟩;
-  · right; exact Model.dia_iff_forward_of_forwardConfluent.mpr ⟨z, Myz, hz⟩;
+  grind [Model.dia_iff_forward_of_forwardConfluent];
 
 end Frame
 
