@@ -15,21 +15,19 @@ variable {F : Frame κ}
 /-- The frame condition defined by `P□`: an infallible world has an infallible
 `≼ ∘ ⊏`-successor. -/
 class PBox (F : Frame κ) : Prop where
-  pBox : ∀ {x : F.World}, ¬F.Fallible x → ∃ y z, x ≼ y ∧ y ⊏ z ∧ ¬F.Fallible z
+  pBox : ∀ {x : F.World}, F.Infallible x → ∃ y z, x ≼ y ∧ y ⊏ z ∧ F.Infallible z
 
 export PBox (pBox)
 
 instance [F.TBox] : F.PBox where
   pBox {x} hx := by
     obtain ⟨y, z, Ixy, Myz, Izx⟩ := tBox x hx;
-    refine ⟨y, z, Ixy, Myz, ?_⟩;
-    intro hFallible;
-    exact hx (F.fallible_iRel hFallible Izx);
+    exact ⟨y, z, Ixy, Myz, infallible_iRel hx Izx⟩;
 
 lemma frameValidate_PBox_of_frame_PBox [F.PBox] : F ⊧ (∼□⊥ : BDFormula) := by
   intro V V_per V_fal x y Ixy hy;
-  by_contra hFallible;
-  obtain ⟨z, w, Iyz, Mzw, hw⟩ := pBox hFallible;
+  by_contra hInfallible;
+  obtain ⟨z, w, Iyz, Mzw, hw⟩ := pBox hInfallible;
   exact hw (hy z w Iyz Mzw);
 
 lemma frame_PBox_of_frameValidate_PBox (h : F ⊧ (∼□⊥ : BDFormula)) : F.PBox where
