@@ -2,6 +2,7 @@ module
 
 public import NCML.CK.Frame.ReturningMRel
 public import NCML.CK.Canonical
+public import NCML.CK.Soundness
 
 @[expose] public section
 

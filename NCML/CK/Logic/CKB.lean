@@ -3,6 +3,8 @@ module
 public import NCML.Hilbert.Logics
 public import NCML.Hilbert.Theory
 public import NCML.CK.Frame.FrameClass
+public import NCML.CK.Frame.BBox
+public import NCML.CK.Frame.BDia
 public import NCML.CK.Soundness
 
 @[expose] public section
@@ -20,6 +22,33 @@ namespace CK
 
 open BDFormula
 open scoped BDFormulaSet
+
+namespace Model
+
+variable {κ : Type*} {M : Model κ}
+
+open CK.Frame
+
+/-- - [Pac24, Lemma 14] -/
+lemma valid_of_mem_LogicCKB [M.IsCKB] (hA : A ∈ LogicCKB) : M ⊧ A :=
+  valid_of_mem_logic (by
+    rintro B (⟨C, rfl⟩ | ⟨C, rfl⟩);
+    · exact valid_of_toFrame_valid valid_BBox;
+    · exact valid_of_toFrame_valid valid_BDia;
+  ) hA
+
+/-- - [Pac24, Lemma 14] -/
+lemma valid_of_mem_LogicIKB [M.IsIKB] (hA : A ∈ LogicIKB) : M ⊧ A :=
+  valid_of_mem_logic (by
+    rintro B ((((⟨C, D, rfl⟩ | ⟨C, D, rfl⟩) | rfl) | ⟨C, rfl⟩) | ⟨C, rfl⟩);
+    · exact valid_of_toFrame_valid valid_FS_of_forwardConfluent_of_backwardConfluent;
+    · exact valid_of_toFrame_valid valid_DP_of_forwardConfluent;
+    · exact valid_of_toFrame_valid valid_N_of_symmetricMRel;
+    · exact valid_of_toFrame_valid valid_BBox;
+    · exact valid_of_toFrame_valid valid_BDia;
+  ) hA
+
+end Model
 
 namespace CKBTheory
 

@@ -1,9 +1,6 @@
 module
 
 public import NCML.CK.Semantics
-public import NCML.CK.Frame.FrameClass
-public import NCML.CK.Frame.BBox
-public import NCML.CK.Frame.BDia
 public import NCML.Hilbert.Logics
 
 @[expose] public section
@@ -13,8 +10,6 @@ namespace CK
 variable {κ : Type*} {M : Model κ}
 
 namespace Model
-
-open CK.Frame
 
 lemma valid_of_mem_logic (h𝔸 : ∀ B ∈ 𝔸, M ⊧ B) (hA : A ∈ ProvableBDHilbert.logic 𝔸) : M ⊧ A := by
   replace hA : ProvableBDHilbert 𝔸 A := hA;
@@ -38,25 +33,6 @@ lemma valid_of_mem_logic (h𝔸 : ∀ B ∈ 𝔸, M ⊧ B) (hA : A ∈ ProvableB
   | _ => grind;
 
 lemma valid_of_mem_LogicCK (hA : A ∈ LogicCK) : M ⊧ A := valid_of_mem_logic (by simp) hA
-
-/-- - [Pac24, Lemma 14] -/
-lemma valid_of_mem_LogicCKB [M.IsCKB] (hA : A ∈ LogicCKB) : M ⊧ A :=
-  valid_of_mem_logic (by
-    rintro B (⟨C, rfl⟩ | ⟨C, rfl⟩);
-    · exact valid_of_toFrame_valid valid_BBox;
-    · exact valid_of_toFrame_valid valid_BDia;
-  ) hA
-
-/-- - [Pac24, Lemma 14] -/
-lemma valid_of_mem_LogicIKB [M.IsIKB] (hA : A ∈ LogicIKB) : M ⊧ A :=
-  valid_of_mem_logic (by
-    rintro B ((((⟨C, D, rfl⟩ | ⟨C, D, rfl⟩) | rfl) | ⟨C, rfl⟩) | ⟨C, rfl⟩);
-    · exact valid_of_toFrame_valid valid_FS_of_forwardConfluent_of_backwardConfluent;
-    · exact valid_of_toFrame_valid valid_DP_of_forwardConfluent;
-    · exact valid_of_toFrame_valid valid_N_of_symmetricMRel;
-    · exact valid_of_toFrame_valid valid_BBox;
-    · exact valid_of_toFrame_valid valid_BDia;
-  ) hA
 
 end Model
 

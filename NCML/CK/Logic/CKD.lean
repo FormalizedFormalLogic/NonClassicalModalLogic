@@ -2,6 +2,7 @@ module
 
 public import NCML.CK.Frame.SerialMRel
 public import NCML.CK.Canonical
+public import NCML.CK.Soundness
 
 @[expose] public section
 
