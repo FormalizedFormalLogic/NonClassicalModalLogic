@@ -46,40 +46,40 @@ def hereditaryCanonicalModel (L : BDLogic) [L.CK] : Model (CanonicalPair L) wher
   val_persistent h IXY := IXY h
   fallible_val h := by rw [CanonicalPair.theory_eq_univ_of_bot_mem h]; trivial
 
-namespace Hereditary
+namespace CanonicalPair
 
 section
 
 variable {L : BDLogic} [L.CK] {A : BDFormula} {X : CanonicalPair L}
 
-lemma exists_mRel_of_box_not_mem (h : □A ∉ X.theory) :
+lemma hereditary_exists_mRel_of_box_not_mem (h : □A ∉ X.theory) :
   ∃ Y : CanonicalPair L, (hereditaryCanonicalModel L).mRel X.erase Y ∧ A ∉ Y.theory := by
   obtain ⟨Y, h₁, -, havoid⟩ :=
-    CanonicalPair.exists_avoiding (L := L) (T := □⁻¹X.theory) (Z := {A}) orDirected_singleton
+    exists_avoiding (L := L) (T := □⁻¹X.theory) (Z := {A}) orDirected_singleton
       (by rintro C rfl; exact h);
   exact ⟨Y, ⟨h₁, by simp⟩, havoid A rfl⟩;
 
-private lemma avoid_diaDisjSet_impSet [L.FourDia] (h : ◇A ∈ X.theory) :
+private lemma hereditary_avoid_diaDisjSet_impSet [L.FourDia] (h : ◇A ∈ X.theory) :
   ∀ C ∈ diaDisjSet X.forbidden, C ∉ BDTheory.impSet (□⁻¹X.theory) A := by
   rintro C ⟨D, hD, rfl⟩ hmem;
   have h₁ : (◇A 🡒 ◇◇D) ∈ X.theory := X.theory.mdp (BDTheory.provable_mem kDia) hmem;
   have h₂ : ◇◇D ∈ X.theory := X.theory.mdp h₁ h;
   exact X.avoid (◇D) ⟨D, hD, rfl⟩ (X.theory.mdp (X.theory.subset L.fourDia) h₂);
 
-lemma exists_mRel_of_dia_mem [L.FourDia] (h : ◇A ∈ X.theory) :
+lemma hereditary_exists_mRel_of_dia_mem [L.FourDia] (h : ◇A ∈ X.theory) :
   ∃ Y : CanonicalPair L, (hereditaryCanonicalModel L).mRel X Y ∧ A ∈ Y.theory := by
   obtain ⟨Y, hY, hmdp, hprime, hof, havoid⟩ :=
     exists_prime_mdpClosed_avoiding (L := L) (T := BDTheory.impSet (□⁻¹X.theory) A)
-      (Z := diaDisjSet X.forbidden) orDirected_diaDisjSet (avoid_diaDisjSet_impSet h);
+      (Z := diaDisjSet X.forbidden) orDirected_diaDisjSet (hereditary_avoid_diaDisjSet_impSet h);
   exact ⟨⟨Y, X.forbidden, havoid⟩, ⟨BDTheory.subset_impSet.trans hY, subset_rfl⟩,
     hY BDTheory.self_mem_impSet⟩;
 
-lemma exists_iRel_of_dia_not_mem [L.TDia] (h : ◇A ∉ X.theory) :
+lemma hereditary_exists_iRel_of_dia_not_mem [L.TDia] (h : ◇A ∉ X.theory) :
   ∃ Y : CanonicalPair L, (hereditaryCanonicalModel L).iRel X Y ∧
   ∀ Z : CanonicalPair L, (hereditaryCanonicalModel L).mRel Y Z → A ∉ Z.theory := by
-  refine ⟨⟨X.theory, {A}, CanonicalPair.avoid_diaDisjSet_of_dia_not_mem h⟩, subset_rfl, ?_⟩;
+  refine ⟨⟨X.theory, {A}, avoid_diaDisjSet_of_dia_not_mem h⟩, subset_rfl, ?_⟩;
   intro Z MYZ;
-  exact CanonicalPair.forbidden_not_mem_theory (MYZ.2 rfl);
+  exact forbidden_not_mem_theory (MYZ.2 rfl);
 
 end
 
@@ -88,7 +88,7 @@ section
 variable {L : BDLogic} [L.CK] [L.TDia] [L.FourDia] {A : BDFormula} {X : CanonicalPair L}
 
 /-- - [BDF21, Lemma IV.9] -/
-lemma truthlemma : X ⊩[hereditaryCanonicalModel L] A ↔ A ∈ X.theory := by
+lemma hereditary_truthlemma : X ⊩[hereditaryCanonicalModel L] A ↔ A ∈ X.theory := by
   induction A generalizing X with
   | atom a => exact Iff.rfl;
   | falsum => exact Iff.rfl;
@@ -119,7 +119,7 @@ lemma truthlemma : X ⊩[hereditaryCanonicalModel L] A ↔ A ∈ X.theory := by
     constructor;
     · intro h;
       by_contra! hc;
-      obtain ⟨Y, MXY, h₁⟩ := exists_mRel_of_box_not_mem hc;
+      obtain ⟨Y, MXY, h₁⟩ := hereditary_exists_mRel_of_box_not_mem hc;
       exact h₁ (ih.mp (h X.erase Y CanonicalPair.iRel_erase MXY));
     · intro h Y Z IXY MYZ;
       exact ih.mpr (MYZ.1 (IXY h));
@@ -127,35 +127,46 @@ lemma truthlemma : X ⊩[hereditaryCanonicalModel L] A ↔ A ∈ X.theory := by
     constructor;
     · intro h;
       by_contra! hc;
-      obtain ⟨Y, IXY, hblock⟩ := exists_iRel_of_dia_not_mem hc;
+      obtain ⟨Y, IXY, hblock⟩ := hereditary_exists_iRel_of_dia_not_mem hc;
       obtain ⟨Z, MYZ, h₁⟩ := h Y IXY;
       exact hblock Z MYZ (ih.mp h₁);
     · intro h Y IXY;
-      obtain ⟨Z, MYZ, h₁⟩ := exists_mRel_of_dia_mem (IXY h);
+      obtain ⟨Z, MYZ, h₁⟩ := hereditary_exists_mRel_of_dia_mem (IXY h);
       exact ⟨Z, MYZ, ih.mpr h₁⟩;
 
-lemma exists_not_forces_of_not_mem (h : A ∉ L) :
+end
+
+end CanonicalPair
+
+section
+
+variable {L : BDLogic} [L.CK] [L.TDia] [L.FourDia] {A : BDFormula}
+
+lemma hereditary_exists_not_forces_of_not_mem (h : A ∉ L) :
   ∃ X : CanonicalPair L, X ⊮[hereditaryCanonicalModel L] A := by
   obtain ⟨X, -, -, havoid⟩ :=
     CanonicalPair.exists_avoiding (L := L) (T := L) (Z := {A}) orDirected_singleton
       (by rintro C rfl; exact h);
-  exact ⟨X, fun h₁ => havoid A rfl (truthlemma.mp h₁)⟩;
+  exact ⟨X, fun h₁ => havoid A rfl (CanonicalPair.hereditary_truthlemma.mp h₁)⟩;
 
 end
 
 variable {L : BDLogic} [L.CK]
 
-instance reflexiveMRel_canonicalModel [L.TBox] : (hereditaryCanonicalModel L).ReflexiveMRel where
+instance reflexiveMRel_hereditaryCanonicalModel [L.TBox] :
+    (hereditaryCanonicalModel L).ReflexiveMRel where
   refl_mRel X := ⟨fun _ hA => X.theory.mdp (X.theory.subset L.tBox) hA, subset_rfl⟩
 
-instance transitiveMRel_canonicalModel [L.FourBox] : (hereditaryCanonicalModel L).TransitiveMRel where
+instance transitiveMRel_hereditaryCanonicalModel [L.FourBox] :
+    (hereditaryCanonicalModel L).TransitiveMRel where
   trans_mRel {X _ _} MXY MYZ := ⟨
     fun _ hA => MYZ.1 (MXY.1 (X.theory.mdp (X.theory.subset L.fourBox) hA)),
     MXY.2.trans MYZ.2
   ⟩
 
 /-- - [BDF21, Proposition IV.7] -/
-instance backwardConfluent_canonicalModel : (hereditaryCanonicalModel L).BackwardConfluent where
+instance backwardConfluent_hereditaryCanonicalModel :
+    (hereditaryCanonicalModel L).BackwardConfluent where
   backward_confluent {X Y Z} MXY IYZ := by
     use X.erase;
     and_intros;
@@ -163,8 +174,6 @@ instance backwardConfluent_canonicalModel : (hereditaryCanonicalModel L).Backwar
     . intro A hA;
       exact IYZ (MXY.1 hA);
     . tauto;
-
-end Hereditary
 
 end CK
 
