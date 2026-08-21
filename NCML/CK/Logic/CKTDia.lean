@@ -19,7 +19,8 @@ namespace Model
 open CK.Frame
 
 lemma valid_of_mem_LogicCKTDia [M.TDia] (hA : A ∈ LogicCKTDia) : M ⊧ A :=
-  valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TDia) hA
+  valid_of_mem_logic
+    (by rintro B ⟨C, rfl⟩; exact valid_of_toFrame_valid frameValidate_TDia_of_frame_TDia) hA
 
 end Model
 

@@ -18,7 +18,8 @@ namespace Model
 open CK.Frame
 
 lemma valid_of_mem_LogicCKTBox [M.TBox] (hA : A ∈ LogicCKTBox) : M ⊧ A :=
-  valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TBox) hA
+  valid_of_mem_logic
+    (by rintro B ⟨C, rfl⟩; exact valid_of_toFrame_valid frameValidate_TBox_of_frame_TBox) hA
 
 end Model
 

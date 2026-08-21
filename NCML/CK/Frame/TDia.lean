@@ -6,7 +6,7 @@ public import NCML.CK.Frame.SerialMRel
 
 namespace CK
 
-variable {κ : Type*} {M : Model κ}
+variable {κ : Type*}
 variable {A : BDFormula}
 
 namespace Frame
@@ -25,28 +25,13 @@ instance [F.TDia] : F.SerialMRel where
     obtain ⟨z, Mxz, _⟩ := tDia x;
     exact ⟨z, Mxz⟩;
 
-end Frame
-
-namespace Model
-
-open CK.Frame
-
-lemma valid_TDia [M.TDia] : M ⊧ (A 🡒 ◇A) := by
-  intro x y Ixy hyA u Iyu;
+lemma frameValidate_TDia_of_frame_TDia [F.TDia] : F ⊧ (A 🡒 ◇A) := by
+  intro V V_per V_fal x y Ixy hyA u Iyu;
   obtain ⟨z, Muz, hz⟩ := tDia u;
   have huA : u ⊩[_] A := forces_persistent hyA Iyu;
   rcases hz with Iuz | hzFallible;
   · exact ⟨z, Muz, forces_persistent huA Iuz⟩;
   · exact ⟨z, Muz, forces_of_fallible hzFallible⟩;
-
-end Model
-
-namespace Frame
-
-variable {F : Frame κ}
-
-lemma frameValidate_TDia_of_frame_TDia [F.TDia] : F ⊧ (A 🡒 ◇A) :=
-  fun _ _ _ => Model.valid_TDia
 
 lemma frame_TDia_of_frameValidate_TDia (h : F ⊧ (#0 🡒 ◇(#0))) : F.TDia where
   tDia x := by

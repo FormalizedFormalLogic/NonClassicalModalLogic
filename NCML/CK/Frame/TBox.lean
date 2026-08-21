@@ -6,7 +6,7 @@ public import NCML.CK.Semantics
 
 namespace CK
 
-variable {κ : Type*} {M : Model κ}
+variable {κ : Type*}
 variable {A : BDFormula}
 
 namespace Frame
@@ -20,26 +20,11 @@ class TBox (F : Frame κ) : Prop where
 
 export TBox (tBox)
 
-end Frame
-
-namespace Model
-
-open CK.Frame
-
-lemma valid_TBox [M.TBox] : M ⊧ (□A 🡒 A) := by
-  intro x y Ixy hyBoxA;
+lemma frameValidate_TBox_of_frame_TBox [F.TBox] : F ⊧ (□A 🡒 A) := by
+  intro V V_per V_fal x y Ixy hyBoxA;
   rcases tBox y with hFallible | ⟨z, w, Iyz, Mzw, Iwy⟩;
   · exact forces_of_fallible hFallible;
   · exact forces_persistent (hyBoxA z w Iyz Mzw) Iwy;
-
-end Model
-
-namespace Frame
-
-variable {F : Frame κ}
-
-lemma frameValidate_TBox_of_frame_TBox [F.TBox] : F ⊧ (□A 🡒 A) :=
-  fun _ _ _ => Model.valid_TBox
 
 lemma frame_TBox_of_frameValidate_TBox (h : F ⊧ (□(#0) 🡒 #0)) : F.TBox where
   tBox x := by
