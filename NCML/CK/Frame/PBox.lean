@@ -12,8 +12,6 @@ namespace Frame
 
 variable {F : Frame κ}
 
-/-- The frame condition defined by `P□`: an infallible world has an infallible
-`≼ ∘ ⊏`-successor. -/
 class PBox (F : Frame κ) : Prop where
   pBox : ∀ {x : F.World}, F.Infallible x → ∃ y z, x ≼ y ∧ y ⊏ z ∧ F.Infallible z
 
@@ -41,7 +39,6 @@ lemma frame_PBox_of_frameValidate_PBox (h : F ⊧ (∼□⊥ : BDFormula)) : F.P
     }
     exact hx (h M.val M.val_persistent M.fallible_val x x (refl x) hc);
 
-/-- `P□` defines the frames whose infallible worlds have an infallible `≼ ∘ ⊏`-successor. -/
 theorem frame_PBox_iff_frameValidate_PBox : F.PBox ↔ F ⊧ (∼□⊥ : BDFormula) := by
   constructor;
   . intro _;

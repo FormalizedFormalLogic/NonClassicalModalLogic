@@ -13,8 +13,6 @@ namespace Frame
 
 variable {F : Frame κ}
 
-/-- The frame condition defined by `B◇`: every world has a `≼`-successor all of whose
-`⊏`-successors return to it, unless it is fallible. -/
 class BDia (F : Frame κ) : Prop where
   bDia : ∀ x : F.World, F.Infallible x → ∃ y, x ≼ y ∧ ∀ z, y ⊏ z → ∃ w v, z ≼ w ∧ w ⊏ v ∧ v ≼ x
 export BDia (bDia)

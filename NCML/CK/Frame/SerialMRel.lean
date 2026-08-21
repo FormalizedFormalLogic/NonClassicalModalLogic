@@ -51,7 +51,6 @@ lemma frame_SerialMRel_of_frameValidate_PDia (h : F ⊧ ◇⊤) : F.SerialMRel w
     obtain ⟨y, Mxy, -⟩ := h M.val M.val_persistent M.fallible_val x x (refl x);
     exact ⟨y, Mxy⟩;
 
-/-- `D` defines the frames whose `⊏` is serial. -/
 theorem frame_SerialMRel_TFAE : List.TFAE [
   F.SerialMRel,
   ∀ A : BDFormula, F ⊧ (□A 🡒 ◇A),

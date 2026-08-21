@@ -13,8 +13,6 @@ namespace Frame
 
 variable {F : Frame κ}
 
-/-- The frame condition defined by `T◇`: every world has a `⊏`-successor that it `≼`-precedes,
-unless that successor is fallible. -/
 class TDia (F : Frame κ) : Prop where
   tDia : ∀ x : F.World, ∃ z, x ⊏ z ∧ (F.Infallible z → x ≼ z)
 
@@ -52,7 +50,6 @@ lemma frame_TDia_of_frameValidate_TDia (h : F ⊧ (#0 🡒 ◇(#0))) : F.TDia wh
     have hxA : x ⊩[M] (#0) := fun _ => refl _
     exact h M.val M.val_persistent M.fallible_val x x (refl x) hxA x (refl x);
 
-/-- `T◇` defines the frames whose `⊏` is ascending. -/
 theorem frame_TDia_TFAE : List.TFAE [
   F.TDia,
   ∀ A : BDFormula, F ⊧ (A 🡒 ◇A),

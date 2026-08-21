@@ -13,9 +13,6 @@ namespace Frame
 
 variable {F : Frame κ}
 
-/-- The frame condition defined by `4◇`: every world has a `≼`-successor from which two
-`⊏`-steps, with a `≼`-step in between, are covered by a single `⊏`-step from the world
-itself, up to `≼` and fallibility. -/
 class FourDia (F : Frame κ) : Prop where
   fourDia : ∀ x : F.World, ∃ y, x ≼ y ∧ ∀ z, y ⊏ z → ∃ w, z ≼ w ∧
     ∀ v, w ⊏ v → ∃ u, x ⊏ u ∧ (F.Infallible u → v ≼ u)

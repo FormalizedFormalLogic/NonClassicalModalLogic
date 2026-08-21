@@ -14,9 +14,6 @@ namespace Frame
 
 variable {F : Frame κ}
 
-/-- The frame condition defined by `5□`: whenever `z` is reached by a `⊏`-step followed by a
-`≼`-step, some `≼`-successor of the origin has all its `⊏`-successors covered by `⊏`-successors
-of `z`, up to `≼` and fallibility. -/
 class FiveBox (F : Frame κ) : Prop where
   fiveBox : ∀ {x y z : F.World}, x ⊏ y → y ≼ z →
     ∃ w, x ≼ w ∧ ∀ v, w ⊏ v → ∃ u, z ⊏ u ∧ (F.Infallible u → v ≼ u)

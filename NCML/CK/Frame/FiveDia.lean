@@ -13,8 +13,6 @@ namespace Frame
 
 variable {F : Frame κ}
 
-/-- The frame condition defined by `5◇`: for an infallible `⊏`-successor `y` of `x`, some
-`≼`-successor of `x` has all its `⊏`-successors returning to `y` through a `≼ ∘ ⊏`-step. -/
 class FiveDia (F : Frame κ) : Prop where
   fiveDia : ∀ {x y : F.World}, x ⊏ y → F.Infallible y →
     ∃ z, x ≼ z ∧ ∀ w, z ⊏ w → ∃ v u, w ≼ v ∧ v ⊏ u ∧ u ≼ y

@@ -14,8 +14,6 @@ namespace Frame
 
 variable {F : Frame κ}
 
-/-- The frame condition defined by `B□`: a `⊏`-step followed by a `≼`-step can always be
-reversed by a `⊏`-step, up to `≼` and fallibility. -/
 class BBox (F : Frame κ) : Prop where
   bBox : ∀ {x y z : F.World}, x ⊏ y → y ≼ z → ∃ w, z ⊏ w ∧ (F.Infallible w → x ≼ w)
 

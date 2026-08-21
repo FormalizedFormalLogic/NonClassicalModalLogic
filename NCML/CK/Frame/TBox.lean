@@ -13,8 +13,6 @@ namespace Frame
 
 variable {F : Frame κ}
 
-/-- The frame condition defined by `T□`: `≼ ∘ ⊏ ∘ ≼` is reflexive away from the fallible
-worlds. -/
 class TBox (F : Frame κ) : Prop where
   tBox : ∀ x : F.World, F.Infallible x → ∃ y z, x ≼ y ∧ y ⊏ z ∧ z ≼ x
 
@@ -48,7 +46,6 @@ lemma frame_TBox_of_frameValidate_TBox (h : F ⊧ (□(#0) 🡒 #0)) : F.TBox wh
     have hxBoxA : x ⊩[M] □(#0) := fun y z Ixy Myz _ => ⟨y, z, Ixy, Myz, refl z⟩;
     exact h M.val M.val_persistent M.fallible_val x x (refl x) hxBoxA hx;
 
-/-- `T□` defines the frames on which `≼ ∘ ⊏ ∘ ≼` is reflexive away from the fallible worlds. -/
 theorem frame_TBox_TFAE : List.TFAE [
   F.TBox,
   ∀ A : BDFormula, F ⊧ (□A 🡒 A),

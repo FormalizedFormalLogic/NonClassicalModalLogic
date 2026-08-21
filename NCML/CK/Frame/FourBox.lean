@@ -14,8 +14,6 @@ namespace Frame
 
 variable {F : Frame κ}
 
-/-- The frame condition defined by `4□`: two `⊏`-steps with a `≼`-step in between are
-covered by a single `≼ ∘ ⊏`-step, up to `≼` and fallibility. -/
 class FourBox (F : Frame κ) : Prop where
   fourBox : ∀ {x y z w : F.World}, x ⊏ y → y ≼ z → z ⊏ w →
     F.Infallible w → ∃ v u, x ≼ v ∧ v ⊏ u ∧ u ≼ w
@@ -58,8 +56,6 @@ lemma frame_FourBox_of_frameValidate_FourBox (h : F ⊧ (□(#0) 🡒 □□(#0)
       h M.val M.val_persistent M.fallible_val x x (refl x) hxBoxA;
     exact hxBoxBoxA x y (refl x) Mxy z w Iyz Mzw;
 
-/-- `4□` defines the frames on which `⊏ ∘ ≼ ∘ ⊏` collapses to `≼ ∘ ⊏ ∘ ≼`, away from the
-fallible worlds. -/
 theorem frame_FourBox_TFAE : List.TFAE [
   F.FourBox,
   ∀ A : BDFormula, F ⊧ (□A 🡒 □□A),
