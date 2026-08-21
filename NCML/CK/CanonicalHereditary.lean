@@ -84,11 +84,57 @@ variable {L : BDLogic} [L.CK] [L.TDia] [L.FourDia] {A : BDFormula} {P : Canonica
 
 /-- - [BDF21, Lemma IV.9] -/
 lemma truthlemma : P ⊩[canonicalModel L] A ↔ A ∈ P.theory := by
-  sorry
+  induction A generalizing P with
+  | atom a => exact Iff.rfl;
+  | falsum => exact Iff.rfl;
+  | and A B ihA ihB =>
+    constructor;
+    · rintro ⟨hA, hB⟩;
+      exact BDTheory.and_mem (ihA.mp hA) (ihB.mp hB);
+    · intro h;
+      constructor;
+      . exact ihA.mpr (P.theory.mdp (BDTheory.provable_mem andElim₁) h);
+      . exact ihB.mpr (P.theory.mdp (BDTheory.provable_mem andElim₂) h);
+  | or A B ihA ihB =>
+    constructor;
+    · rintro (hA | hB);
+      · exact P.theory.mdp (BDTheory.provable_mem orIntro₁) (ihA.mp hA);
+      · exact P.theory.mdp (BDTheory.provable_mem orIntro₂) (ihB.mp hB);
+    · intro h;
+      rcases P.theory.prime h <;> grind;
+  | imply A B ihA ihB =>
+    constructor;
+    · intro h;
+      by_contra! hc;
+      obtain ⟨P₁, IPP₁, h₁, h₂⟩ := CanonicalPair.exists_iRel_of_imply_not_mem hc;
+      exact h₂ (ihB.mp (h P₁ IPP₁ (ihA.mpr h₁)));
+    · intro h P₁ IPP₁ h₁;
+      exact ihB.mpr (P₁.theory.mdp (IPP₁ h) (ihA.mp h₁));
+  | box A ih =>
+    constructor;
+    · intro h;
+      by_contra! hc;
+      obtain ⟨P₁, MPP₁, h₁⟩ := exists_mRel_of_box_not_mem hc;
+      exact h₁ (ih.mp (h P.erase P₁ CanonicalPair.iRel_erase MPP₁));
+    · intro h P₁ P₂ IPP₁ MP₁P₂;
+      exact ih.mpr (MP₁P₂.1 (IPP₁ h));
+  | dia A ih =>
+    constructor;
+    · intro h;
+      by_contra! hc;
+      obtain ⟨P₁, IPP₁, hblock⟩ := exists_iRel_of_dia_not_mem hc;
+      obtain ⟨P₂, MP₁P₂, h₁⟩ := h P₁ IPP₁;
+      exact hblock P₂ MP₁P₂ (ih.mp h₁);
+    · intro h P₁ IPP₁;
+      obtain ⟨P₂, MP₁P₂, h₁⟩ := exists_mRel_of_dia_mem (IPP₁ h);
+      exact ⟨P₂, MP₁P₂, ih.mpr h₁⟩;
 
 lemma exists_not_forces_of_not_mem (h : A ∉ L) :
   ∃ P : CanonicalPair L, P ⊮[canonicalModel L] A := by
-  sorry
+  obtain ⟨P, -, -, havoid⟩ :=
+    CanonicalPair.exists_avoiding (L := L) (T := L) (Z := {A}) orDirected_singleton
+      (by rintro C rfl; exact h);
+  exact ⟨P, fun h₁ => havoid A rfl (truthlemma.mp h₁)⟩;
 
 end
 
