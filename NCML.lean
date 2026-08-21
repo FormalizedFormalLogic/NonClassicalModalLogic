@@ -3,6 +3,7 @@ module  -- shake: keep-all --deprecated_module: ignore
 public import NCML.CK.Axioms.BBox
 public import NCML.CK.Axioms.BDia
 public import NCML.CK.Axioms.D
+public import NCML.CK.Axioms.PDia
 public import NCML.CK.Axioms.TBox
 public import NCML.CK.Axioms.TDia
 public import NCML.CK.CKB_IKB
