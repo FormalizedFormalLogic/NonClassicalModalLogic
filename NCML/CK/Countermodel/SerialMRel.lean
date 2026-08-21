@@ -1,6 +1,6 @@
 module
 
-public import NCML.CK.Axioms.D
+public import NCML.CK.Logic.CKD
 
 /-! A CK-model with a serial `⊏` on which `∼◇⊥` fails. -/
 
@@ -10,7 +10,7 @@ namespace CK
 
 open Model BDFormula
 
-namespace D
+namespace SerialMRel
 
 def counterModel : Model (Fin 2) where
   iRel' x y := x = y
@@ -36,15 +36,15 @@ lemma counterModel_not_forces : 0 ⊮[counterModel] ∼◇⊥ := by
   have h₂ : (0 : Fin 2) = 1 := h 0 rfl h₁;
   contradiction;
 
-end D
+end SerialMRel
 
 lemma exists_serialMRel_not_forces_N :
   ∃ (κ : Type) (M : Model κ), M.SerialMRel ∧ ∃ x : M.World, x ⊮[_] ∼◇⊥ :=
-  ⟨Fin 2, D.counterModel, inferInstance, 0, D.counterModel_not_forces⟩
+  ⟨Fin 2, SerialMRel.counterModel, inferInstance, 0, SerialMRel.counterModel_not_forces⟩
 
 end CK
 
 theorem LogicCKD.not_provable_N : (∼◇⊥) ∉ LogicCKD :=
-  fun h => CK.D.counterModel_not_forces (CK.Model.valid_of_mem_LogicCKD h 0)
+  fun h => CK.SerialMRel.counterModel_not_forces (CK.Model.valid_of_mem_LogicCKD h 0)
 
 end

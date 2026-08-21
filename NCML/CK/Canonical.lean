@@ -1,7 +1,6 @@
 module
 
 public import NCML.CK.Semantics
-public import NCML.CK.Soundness
 public import NCML.Hilbert.Theory
 
 @[expose] public section
@@ -10,10 +9,9 @@ public import NCML.Hilbert.Theory
 # The pair canonical model
 
 For a logic `L`, the canonical model whose worlds are the pairs `(T, Θ)` of a prime MP-closed
-theory `T` of `L` and a set `Θ` of formulas omitted by every `⊏`-successor, its truth lemma, and
-the completeness of `CK` for the class of all CK-models.
+theory `T` of `L` and a set `Θ` of formulas omitted by every `⊏`-successor, and its truth lemma.
 
-- [MdP05, Definition 3, Lemma 3, Theorem 1]
+- [MdP05, Definition 3, Lemma 3, Theorem 2]
 -/
 
 open BDFormula ProvableBDHilbert
@@ -261,16 +259,5 @@ lemma exists_not_forces_of_not_mem (h : A ∉ L) :
 end
 
 end CK
-
-/-- - [MdP05, Theorem 1] -/
-theorem LogicCK.mem_iff_valid {A : BDFormula} :
-  A ∈ LogicCK ↔ ∀ {κ : Type 0}, ∀ M : CK.Model κ, M ⊧ A := by
-  constructor;
-  · intro h _ M;
-    exact CK.Model.valid_of_mem_LogicCK h;
-  · contrapose!;
-    intro h;
-    obtain ⟨P, h₁⟩ := CK.exists_not_forces_of_not_mem (L := LogicCK) h;
-    exact ⟨_, CK.canonicalModel LogicCK, fun hM => h₁ (hM P)⟩;
 
 end

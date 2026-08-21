@@ -39,17 +39,15 @@ variable {x y : F.World}
 
 abbrev Fallible : F.World → Prop := F.Fallible'
 
-@[grind =>]
-lemma fallible_iRel (h : F.Fallible x) (Ixy : x ≼ y) : F.Fallible y :=
-  F.fallible_iRel' h Ixy
+abbrev Infallible : F.World → Prop := fun x => ¬F.Fallible x
 
-@[grind =>]
-lemma fallible_mRel (h : F.Fallible x) (Mxy : x ⊏ y) : F.Fallible y :=
-  F.fallible_mRel' h Mxy
+@[grind =>] lemma fallible_iRel (h : F.Fallible x) (Ixy : x ≼ y) : F.Fallible y := F.fallible_iRel' h Ixy
+@[grind =>] lemma infallible_iRel (h : F.Infallible y) (Ixy : x ≼ y) : F.Infallible x := by grind;
 
-@[grind =>]
-lemma fallible_exists_mRel (h : F.Fallible x) : ∃ y, x ⊏ y :=
-  F.fallible_exists_mRel' h
+@[grind =>] lemma fallible_mRel (h : F.Fallible x) (Mxy : x ⊏ y) : F.Fallible y := F.fallible_mRel' h Mxy
+@[grind =>] lemma infallible_mRel (h : F.Infallible y) (Mxy : x ⊏ y) : F.Infallible x := by grind;
+
+@[grind =>] lemma fallible_exists_mRel (h : F.Fallible x) : ∃ y, x ⊏ y := F.fallible_exists_mRel' h
 
 end Frame
 

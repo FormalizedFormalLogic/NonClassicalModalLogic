@@ -1,7 +1,7 @@
 module
 
-public import NCML.CK.Axioms.TBox
-public import NCML.CK.Countermodel.D
+public import NCML.CK.Logic.CKTBox
+public import NCML.CK.Countermodel.SerialMRel
 
 /-! CK-models refuting `◇⊤`, `D` and `∼◇⊥` over `CK + T□`. -/
 
@@ -11,7 +11,7 @@ namespace CK
 
 open Model BDFormula
 
-namespace TBox
+namespace ReturningMRel
 
 def counterModel : Model (Fin 2) where
   iRel' x y := x ≤ y
@@ -41,28 +41,28 @@ lemma counterModel_not_forces_PDia : 0 ⊮[counterModel] ◇⊤ := by
 lemma counterModel_not_forces_D : 0 ⊮[counterModel] (□⊤ 🡒 ◇⊤) :=
   fun h => counterModel_not_forces_PDia (h 0 (le_refl 0) fun _ _ _ _ => forces_top)
 
-end TBox
+end ReturningMRel
 
-instance : D.counterModel.ReturningMRel where
+instance : SerialMRel.counterModel.ReturningMRel where
   returning_mRel x := ⟨x, rfl, le_refl x⟩
 
 theorem exists_returningMRel_not_serialMRel :
   ∃ (κ : Type) (M : Model κ), M.ReturningMRel ∧ ¬ M.SerialMRel :=
-  ⟨Fin 2, TBox.counterModel, inferInstance, TBox.counterModel_not_serialMRel⟩
+  ⟨Fin 2, ReturningMRel.counterModel, inferInstance, ReturningMRel.counterModel_not_serialMRel⟩
 
-lemma exists_reflexiveMComp_not_forces_N :
-  ∃ (κ : Type) (M : Model κ), M.ReflexiveMComp ∧ ∃ x : M.World, x ⊮[_] ∼◇⊥ :=
-  ⟨Fin 2, D.counterModel, inferInstance, 0, D.counterModel_not_forces⟩
+lemma exists_tBox_not_forces_N :
+  ∃ (κ : Type) (M : Model κ), M.TBox ∧ ∃ x : M.World, x ⊮[_] ∼◇⊥ :=
+  ⟨Fin 2, SerialMRel.counterModel, inferInstance, 0, SerialMRel.counterModel_not_forces⟩
 
 end CK
 
 theorem LogicCKTBox.not_provable_PDia : ◇⊤ ∉ LogicCKTBox :=
-  fun h => CK.TBox.counterModel_not_forces_PDia (CK.Model.valid_of_mem_LogicCKTBox h 0)
+  fun h => CK.ReturningMRel.counterModel_not_forces_PDia (CK.Model.valid_of_mem_LogicCKTBox h 0)
 
 lemma LogicCKTBox.not_provable_D : □⊤ 🡒 ◇⊤ ∉ LogicCKTBox :=
-  fun h => CK.TBox.counterModel_not_forces_D (CK.Model.valid_of_mem_LogicCKTBox h 0)
+  fun h => CK.ReturningMRel.counterModel_not_forces_D (CK.Model.valid_of_mem_LogicCKTBox h 0)
 
 theorem LogicCKTBox.not_provable_N : ∼◇⊥ ∉ LogicCKTBox :=
-  fun h => CK.D.counterModel_not_forces (CK.Model.valid_of_mem_LogicCKTBox h 0)
+  fun h => CK.SerialMRel.counterModel_not_forces (CK.Model.valid_of_mem_LogicCKTBox h 0)
 
 end

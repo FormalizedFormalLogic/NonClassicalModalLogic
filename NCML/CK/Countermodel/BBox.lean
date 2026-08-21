@@ -1,6 +1,6 @@
 module
 
-public import NCML.CK.Axioms.BBox
+public import NCML.CK.Frame.BBox
 
 @[expose] public section
 

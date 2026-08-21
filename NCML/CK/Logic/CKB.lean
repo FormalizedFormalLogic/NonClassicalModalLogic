@@ -2,7 +2,9 @@ module
 
 public import NCML.Hilbert.Logics
 public import NCML.Hilbert.Theory
-public import NCML.CK.Confluence
+public import NCML.CK.Frame.BackwardConfluent
+public import NCML.CK.Frame.BBox
+public import NCML.CK.Frame.BDia
 public import NCML.CK.Soundness
 
 @[expose] public section
@@ -10,16 +12,62 @@ public import NCML.CK.Soundness
 /-!
 # `CKB` and `IKB` prove the same formulas
 
-The canonical model for `CKB` (`CK.CKBcanonicalModel`), whose worlds are the `CKB`-theories
-(`CKBTheory`).
+The frame classes of `CKB`, `IK` and `IKB`, and the canonical model for `CKB`
+(`CK.CKBcanonicalModel`), whose worlds are the `CKB`-theories (`CKBTheory`).
 
-- [Pac24, Theorem 13, Section 3.2]
+- [Pac24, Definition 7, Theorem 13, Section 3.2]
 -/
 
 namespace CK
 
 open BDFormula
 open scoped BDFormulaSet
+
+namespace Frame
+
+variable {κ : Type*} {F : Frame κ}
+
+/-- - [Pac24, Definition 7] -/
+class IsCKB (F : Frame κ) : Prop extends SymmetricMRel F, ForwardConfluent F, BackwardConfluent F
+
+/-- - [Pac24, Definition 7] -/
+class IsIK (F : Frame κ) : Prop extends ForwardConfluent F, BackwardConfluent F where
+  infallible : ∀ x : F.World, F.Infallible x
+
+/-- - [Pac24, Definition 7] -/
+class IsIKB (F : Frame κ) : Prop extends IsIK F, SymmetricMRel F
+
+instance [F.IsIKB] : F.IsCKB where
+
+end Frame
+
+namespace Model
+
+variable {κ : Type*} {M : Model κ}
+
+open CK.Frame
+
+/-- - [Pac24, Lemma 14] -/
+lemma valid_of_mem_LogicCKB [M.IsCKB] (hA : A ∈ LogicCKB) : M ⊧ A :=
+  valid_of_mem_logic (by
+    rintro B (⟨C, rfl⟩ | ⟨C, rfl⟩);
+    · exact valid_of_toFrame_valid frameValidate_BBox_of_frame_BBox;
+    · exact valid_of_toFrame_valid frameValidate_BDia_of_frame_BDia;
+  ) hA
+
+/-- - [Pac24, Lemma 14] -/
+lemma valid_of_mem_LogicIKB [M.IsIKB] (hA : A ∈ LogicIKB) : M ⊧ A :=
+  valid_of_mem_logic (by
+    rintro B ((((⟨C, D, rfl⟩ | ⟨C, D, rfl⟩) | rfl) | ⟨C, rfl⟩) | ⟨C, rfl⟩);
+    · exact valid_of_toFrame_valid
+        frameValidate_FS_of_frame_ForwardConfluent_of_frame_BackwardConfluent;
+    · exact valid_of_toFrame_valid frameValidate_DP_of_frame_ForwardConfluent;
+    · exact valid_of_toFrame_valid frameValidate_N_of_frame_SymmetricMRel;
+    · exact valid_of_toFrame_valid frameValidate_BBox_of_frame_BBox;
+    · exact valid_of_toFrame_valid frameValidate_BDia_of_frame_BDia;
+  ) hA
+
+end Model
 
 namespace CKBTheory
 
@@ -144,11 +192,12 @@ instance : CKBcanonicalModel.BackwardConfluent where
       fun B hB => IT₁U (MTT₁ (BDTheory.box_dia_mem (T := T.1) hB));
 
 instance : CKBcanonicalModel.ForwardConfluent :=
-  Frame.forwardConfluent_iff_backwardConfluent_of_symmetricMRel.mpr inferInstance
+  Frame.frame_ForwardConfluent_iff_frame_BackwardConfluent_of_frame_SymmetricMRel.mpr
+    inferInstance
 
 /-- - [Pac24, Lemma 17] -/
 instance : CKBcanonicalModel.IsIKB where
-  not_fallible _ h := h.elim
+  infallible _ h := h.elim
 
 section Diamond
 
