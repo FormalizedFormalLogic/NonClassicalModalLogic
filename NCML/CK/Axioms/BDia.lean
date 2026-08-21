@@ -14,19 +14,20 @@ namespace Frame
 variable {F : Frame κ}
 
 class ReturningMComp (F : Frame κ) : Prop where
-  returning_mComp : ∀ w : F.World,
-    F.Fallible w ∨ ∃ y, w ≼ y ∧ ∀ z, y ⊏ z → ∃ u v, z ≼ u ∧ u ⊏ v ∧ v ≼ w
-
+  returning_mComp : ∀ x : F.World,
+    F.Fallible x ∨
+    ∃ y, x ≼ y ∧ ∀ z, y ⊏ z → ∃ u v, z ≼ u ∧ u ⊏ v ∧ v ≼ x
 export ReturningMComp (returning_mComp)
+
 
 class StrictlyReturningMComp (F : Frame κ) : Prop where
   strictly_returning_mComp : ∀ w : F.World,
     ∃ y, w ≼ y ∧ ∀ z, y ⊏ z → ∃ u v, z ≼ u ∧ u ⊏ v ∧ v ≼ w
-
 export StrictlyReturningMComp (strictly_returning_mComp)
 
+
 instance [F.StrictlyReturningMComp] : F.ReturningMComp where
-  returning_mComp w := Or.inr $ strictly_returning_mComp w;
+  returning_mComp x := Or.inr $ strictly_returning_mComp x;
 
 instance [F.SymmetricMRel] : F.StrictlyReturningMComp where
   strictly_returning_mComp w := by

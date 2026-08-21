@@ -12,13 +12,13 @@ variable {κ : Type*} {F : Frame κ}
 
 /-- - [Pac24, Definition 5] -/
 class ForwardConfluent (F : Frame κ) : Prop where
-  forward_confluent : ∀ {x y x₁ : F.World}, x ⊏ y → x ≼ x₁ → ∃ y₁, y ≼ y₁ ∧ x₁ ⊏ y₁
+  forward_confluent : ∀ {x y z : F.World}, x ⊏ y → x ≼ z → ∃ w, y ≼ w ∧ z ⊏ w
 
 export ForwardConfluent (forward_confluent)
 
 /-- - [Pac24, Definition 5] -/
 class BackwardConfluent (F : Frame κ) : Prop where
-  backward_confluent : ∀ {x y y₁ : F.World}, x ⊏ y → y ≼ y₁ → ∃ x₁, x ≼ x₁ ∧ x₁ ⊏ y₁
+  backward_confluent : ∀ {x y z : F.World}, x ⊏ y → y ≼ z → ∃ w, x ≼ w ∧ w ⊏ z
 
 export BackwardConfluent (backward_confluent)
 
@@ -45,20 +45,14 @@ lemma forwardConfluent_iff_backwardConfluent_of_symmetricMRel [F.SymmetricMRel] 
   constructor;
   · intro h;
     constructor;
-    intro x y y₁ Mxy Iyy₁;
-    obtain ⟨x₁, Ixx₁, My₁x₁⟩ := h.forward_confluent (symm_mRel Mxy) Iyy₁;
-    use x₁;
-    constructor;
-    . assumption;
-    . exact symm_mRel My₁x₁;
+    intro x y z Mxy Iyz;
+    obtain ⟨w, Ixw, Mzw⟩ := h.forward_confluent (symm_mRel Mxy) Iyz;
+    exact ⟨w, Ixw, symm_mRel Mzw⟩;
   · intro h;
     constructor;
-    intro x y x₁ Mxy Ixx₁;
-    obtain ⟨y₁, Iyy₁, My₁x₁⟩ := h.backward_confluent (symm_mRel Mxy) Ixx₁;
-    use y₁;
-    constructor;
-    . assumption;
-    . exact symm_mRel My₁x₁;
+    intro x y z Mxy Ixz;
+    obtain ⟨w, Iyw, Mwz⟩ := h.backward_confluent (symm_mRel Mxy) Ixz;
+    exact ⟨w, Iyw, symm_mRel Mwz⟩;
 
 end Frame
 
