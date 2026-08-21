@@ -1,0 +1,31 @@
+module
+
+public import NCML.CK.Frame.AscendingMRel
+
+@[expose] public section
+
+namespace CK
+
+variable {κ : Type*}
+
+namespace Frame
+
+variable {F : Frame κ}
+
+class StrictlyAscendingMRel (F : Frame κ) : Prop where
+  strictly_ascending_mRel : ∀ x : F.World, ∃ z, x ⊏ z ∧ x ≼ z
+
+export StrictlyAscendingMRel (strictly_ascending_mRel)
+
+instance [F.StrictlyAscendingMRel] : F.AscendingMRel where
+  ascending_mRel x := by
+    obtain ⟨z, Mxz, Ixz⟩ := strictly_ascending_mRel x;
+    refine ⟨z, Mxz, ?_⟩;
+    left;
+    exact Ixz;
+
+end Frame
+
+end CK
+
+end

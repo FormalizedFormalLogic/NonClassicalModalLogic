@@ -1,6 +1,6 @@
 module
 
-public import NCML.CK.Axioms.TDia
+public import NCML.CK.Logic.CKTDia
 public import NCML.CK.Countermodel.D
 
 /-! CK-models refuting `T◇` over `CK + D`, and `∼◇⊥` over `CK + T◇`. -/
