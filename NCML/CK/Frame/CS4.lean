@@ -16,7 +16,7 @@ namespace Frame
 
 variable {F : Frame κ}
 
-/-- - [BDF21, Definition II.7] -/
+/-- - [BDFD21, Definition II.7] -/
 class CS4 (F : Frame κ) : Prop extends ReflexiveMRel F, TransitiveMRel F, BackwardConfluent F
 
 instance [F.CS4] : F.T where

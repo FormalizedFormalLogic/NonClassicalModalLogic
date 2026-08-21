@@ -17,7 +17,7 @@ public import NCML.CK.Frame.CS4
 For a logic `L`, the canonical model on `CanonicalPair L` whose `⊏` hands the forbidden set on to
 every `⊏`-successor rather than blocking it, and its truth lemma.
 
-- [BDF21, Definition IV.4]
+- [BDFD21, Definition IV.4]
 -/
 
 open ProvableBDHilbert
@@ -27,7 +27,7 @@ namespace CK
 
 /-- The canonical model of `L` whose `⊏` hands `forbidden` on to every successor.
 
-- [BDF21, Definition IV.4]
+- [BDFD21, Definition IV.4]
 -/
 def hereditaryCanonicalModel (L : BDLogic) [L.CK] : Model (CanonicalPair L) where
   iRel' X Y := X.theory ⊆ Y.theory
@@ -88,7 +88,7 @@ section
 
 variable {L : BDLogic} [L.CK] [L.TDia] [L.FourDia] {A : BDFormula} {X : CanonicalPair L}
 
-/-- - [BDF21, Lemma IV.9] -/
+/-- - [BDFD21, Lemma IV.9] -/
 lemma hereditary_truthlemma : X ⊩[hereditaryCanonicalModel L] A ↔ A ∈ X.theory := by
   induction A generalizing X with
   | atom a => exact Iff.rfl;
@@ -165,7 +165,7 @@ instance transitiveMRel_hereditaryCanonicalModel [L.FourBox] :
     MXY.2.trans MYZ.2
   ⟩
 
-/-- - [BDF21, Proposition IV.7] -/
+/-- - [BDFD21, Proposition IV.7] -/
 instance backwardConfluent_hereditaryCanonicalModel :
     (hereditaryCanonicalModel L).BackwardConfluent where
   backward_confluent {X Y Z} MXY IYZ := by
