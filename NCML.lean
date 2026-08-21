@@ -10,6 +10,7 @@ public import NCML.CK.Countermodel.TDia
 public import NCML.CK.Frame.BBox
 public import NCML.CK.Frame.BDia
 public import NCML.CK.Frame.BackwardConfluent
+public import NCML.CK.Frame.CS4
 public import NCML.CK.Frame.EuclideanMRel
 public import NCML.CK.Frame.FiveBox
 public import NCML.CK.Frame.FiveDia
