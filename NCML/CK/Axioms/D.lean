@@ -34,8 +34,8 @@ lemma valid_D_of_serialMRel [M.SerialMRel] : M ⊧ (□A 🡒 ◇A) := by
 
 lemma valid_PDia_of_serialMRel [M.SerialMRel] : M ⊧ ◇⊤ := by
   intro x y Ixy;
-  obtain ⟨z, Mxz⟩ := serial_mRel y;
-  exact ⟨z, Mxz, by grind⟩;
+  obtain ⟨z, Myz⟩ := serial_mRel y;
+  exact ⟨z, Myz, by grind⟩;
 
 lemma valid_of_mem_LogicCKD [M.SerialMRel] (hA : A ∈ LogicCKD) : M ⊧ A :=
   valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_D_of_serialMRel) hA
