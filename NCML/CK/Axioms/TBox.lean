@@ -39,9 +39,9 @@ open CK.Frame
 
 lemma valid_TBox_of_reflexiveMComp [M.ReflexiveMComp] : M ⊧ (□A 🡒 A) := by
   intro x y Ixy hyBoxA;
-  rcases reflexive_mComp y with hFallible | ⟨y₁, z₁, Iyy₁, My₁z₁, Iz₁y⟩;
+  rcases reflexive_mComp y with hFallible | ⟨z, w, Iyz, Mzw, Iwy⟩;
   · exact forces_of_fallible hFallible;
-  · exact forces_persistent (hyBoxA y₁ z₁ Iyy₁ My₁z₁) Iz₁y;
+  · exact forces_persistent (hyBoxA z w Iyz Mzw) Iwy;
 
 lemma valid_of_mem_LogicCKTBox [M.ReflexiveMComp] (hA : A ∈ LogicCKTBox) : M ⊧ A :=
   valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TBox_of_reflexiveMComp) hA
