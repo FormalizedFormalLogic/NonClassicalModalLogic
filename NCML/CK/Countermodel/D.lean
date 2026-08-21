@@ -1,6 +1,6 @@
 module
 
-public import NCML.CK.Axioms.D
+public import NCML.CK.Logic.CKD
 
 /-! A CK-model with a serial `⊏` on which `∼◇⊥` fails. -/
 

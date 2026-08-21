@@ -1,6 +1,7 @@
 module
 
-public import NCML.CK.Axioms.D
+public import NCML.CK.Frame.SerialMRel
+public import NCML.CK.Canonical
 
 @[expose] public section
 
