@@ -39,71 +39,74 @@ namespace CanonicalPair
 
 section
 
-variable {L : BDLogic} [L.CK] {A B : BDFormula} {P : CanonicalPair L}
+variable {L : BDLogic} [L.CK] {A B : BDFormula} {X : CanonicalPair L}
 
-/-- The formulas that, together with `□⁻¹P.theory`, entail a disjunction of formulas forbidden
-by `P`. -/
-def blocked (P : CanonicalPair L) : BDFormulaSet :=
-  { A | ∃ B : BDFormula, □B ∈ P.theory ∧ ∃ C ∈ disjSet P.forbidden, (A 🡒 B 🡒 C) ∈ LogicCK }
+/-- The formulas that, together with `□⁻¹X.theory`, entail a disjunction of formulas forbidden
+by `X`. -/
+def blocked (X : CanonicalPair L) : BDFormulaSet :=
+  { A | ∃ B : BDFormula, □B ∈ X.theory ∧ ∃ C ∈ disjSet X.forbidden, (A 🡒 B 🡒 C) ∈ LogicCK }
 
-/-- The formulas that CK-entail `◇B` for some `B ∈ P.blocked`. -/
-def diaBlocked (P : CanonicalPair L) : BDFormulaSet :=
-  { A | ∃ B ∈ P.blocked, (A 🡒 ◇B) ∈ LogicCK }
+/-- The formulas that CK-entail `◇B` for some `B ∈ X.blocked`. -/
+def diaBlocked (X : CanonicalPair L) : BDFormulaSet :=
+  { A | ∃ B ∈ X.blocked, (A 🡒 ◇B) ∈ LogicCK }
 
-private lemma or_mem_blocked (h₁ : A ∈ P.blocked) (h₂ : B ∈ P.blocked) : A ⋎ B ∈ P.blocked := by
+private lemma or_mem_blocked (h₁ : A ∈ X.blocked) (h₂ : B ∈ X.blocked) : A ⋎ B ∈ X.blocked := by
   obtain ⟨B₁, hB₁, C₁, ⟨K₁, hK₁ne, hK₁sub, rfl⟩, d₁⟩ := h₁;
   obtain ⟨B₂, hB₂, C₂, ⟨K₂, hK₂ne, hK₂sub, rfl⟩, d₂⟩ := h₂;
-  refine ⟨B₁ ⋏ B₂, P.theory.mdp (P.theory.mdp (BDTheory.provable_mem box_and_intro) hB₁) hB₂,
-    ⋁(K₁ ++ K₂), ⟨K₁ ++ K₂, by simp [hK₁ne], ?_, rfl⟩, ?_⟩;
-  · intro C hC;
-    rcases List.mem_append.mp hC with hC | hC;
-    · exact hK₁sub C hC;
-    · exact hK₂sub C hC;
-  · exact or_imp
+  refine ⟨B₁ ⋏ B₂, ?_, ⋁(K₁ ++ K₂), ?_, ?_⟩;
+  . exact X.theory.mdp (X.theory.mdp (BDTheory.provable_mem box_and_intro) hB₁) hB₂;
+  . use K₁ ++ K₂;
+    and_intros;
+    . simp_all;
+    . grind;
+    . rfl;
+  . exact or_imp
       (imp_trans (imp_trans d₁ (imp_comp_right andElim₁)) (imp_comp_left ldisj_append_left))
       (imp_trans (imp_trans d₂ (imp_comp_right andElim₂)) (imp_comp_left ldisj_append_right));
 
 omit [L.CK] in
-private lemma mem_blocked_of_imp (h₁ : (A 🡒 B) ∈ LogicCK) (h₂ : B ∈ P.blocked) : A ∈ P.blocked := by
+private lemma mem_blocked_of_imp (h₁ : (A 🡒 B) ∈ LogicCK) (h₂ : B ∈ X.blocked) : A ∈ X.blocked := by
   obtain ⟨C, hC, D, hD, d⟩ := h₂;
   exact ⟨C, hC, D, hD, imp_trans h₁ d⟩;
 
-private lemma disjSet_blocked_subset : disjSet P.blocked ⊆ P.blocked :=
+private lemma disjSet_blocked_subset : disjSet X.blocked ⊆ X.blocked :=
   disjSet_subset_of_or_mem or_mem_blocked mem_blocked_of_imp
 
-private lemma or_mem_diaBlocked (h₁ : A ∈ P.diaBlocked) (h₂ : B ∈ P.diaBlocked) :
-  A ⋎ B ∈ P.diaBlocked := by
+private lemma or_mem_diaBlocked (h₁ : A ∈ X.diaBlocked) (h₂ : B ∈ X.diaBlocked) :
+  A ⋎ B ∈ X.diaBlocked := by
   obtain ⟨A₁, hA₁, dA⟩ := h₁;
   obtain ⟨B₁, hB₁, dB⟩ := h₂;
-  exact ⟨A₁ ⋎ B₁, or_mem_blocked hA₁ hB₁,
-    or_imp (imp_trans dA (dia_mono orIntro₁)) (imp_trans dB (dia_mono orIntro₂))⟩;
+  use A₁ ⋎ B₁;
+  and_intros;
+  . exact or_mem_blocked hA₁ hB₁;
+  . exact or_imp (imp_trans dA (dia_mono orIntro₁)) (imp_trans dB (dia_mono orIntro₂));
 
 omit [L.CK] in
-private lemma mem_diaBlocked_of_imp (h₁ : (A 🡒 B) ∈ LogicCK) (h₂ : B ∈ P.diaBlocked) :
-  A ∈ P.diaBlocked := by
+private lemma mem_diaBlocked_of_imp (h₁ : (A 🡒 B) ∈ LogicCK) (h₂ : B ∈ X.diaBlocked) :
+  A ∈ X.diaBlocked := by
   obtain ⟨C, hC, d⟩ := h₂;
   exact ⟨C, hC, imp_trans h₁ d⟩;
 
-private lemma disjSet_diaBlocked_subset : disjSet P.diaBlocked ⊆ P.diaBlocked :=
+private lemma disjSet_diaBlocked_subset : disjSet X.diaBlocked ⊆ X.diaBlocked :=
   disjSet_subset_of_or_mem or_mem_diaBlocked mem_diaBlocked_of_imp
 
-private lemma orDirected_diaBlocked : OrDirected L P.diaBlocked :=
+private lemma orDirected_diaBlocked : OrDirected L X.diaBlocked :=
   orDirected_of_or_mem or_mem_diaBlocked
 
 omit [L.CK] in
-private lemma dia_mem_diaBlocked (h : A ∈ P.blocked) : ◇A ∈ P.diaBlocked := ⟨A, h, imp_id⟩
+private lemma dia_mem_diaBlocked (h : A ∈ X.blocked) : ◇A ∈ X.diaBlocked := ⟨A, h, imp_id⟩
 
-private lemma avoid_diaBlocked : ∀ A ∈ P.diaBlocked, A ∉ P.theory := by
+private lemma avoid_diaBlocked : ∀ A ∈ X.diaBlocked, A ∉ X.theory := by
   rintro A ⟨B, hB, d⟩ hmem;
-  have h₁ : ◇B ∈ P.theory := P.theory.mdp (BDTheory.provable_mem d) hmem;
+  have h₁ : ◇B ∈ X.theory := X.theory.mdp (BDTheory.provable_mem d) hmem;
   obtain ⟨C, hC, D, hD, d₂⟩ := hB;
-  have h₂ : ◇(C 🡒 D) ∈ P.theory := P.theory.mdp (BDTheory.provable_mem (dia_mono d₂)) h₁;
-  have h₃ : (◇(C 🡒 D) 🡒 ◇D) ∈ P.theory := P.theory.mdp (BDTheory.provable_mem dia_mdp) hC;
-  have h₄ : ◇D ∈ P.theory := P.theory.mdp h₃ h₂;
-  exact P.avoid (◇D) ⟨D, hD, rfl⟩ h₄;
+  have h₂ : ◇(C 🡒 D) ∈ X.theory := X.theory.mdp (BDTheory.provable_mem (dia_mono d₂)) h₁;
+  have h₃ : (◇(C 🡒 D) 🡒 ◇D) ∈ X.theory := X.theory.mdp (BDTheory.provable_mem dia_mdp) hC;
+  have h₄ : ◇D ∈ X.theory := X.theory.mdp h₃ h₂;
+  exact X.avoid (◇D) ⟨D, hD, rfl⟩ h₄;
 
 private lemma avoid_diaDisjSet_diaBlocked [L.FourDia] {T : BDTheory} [T.Mdp] [T.Of L]
-  (h : ∀ A ∈ P.diaBlocked, A ∉ T) : ∀ A ∈ diaDisjSet P.diaBlocked, A ∉ T := by
+  (h : ∀ A ∈ X.diaBlocked, A ∉ T) : ∀ A ∈ diaDisjSet X.diaBlocked, A ∉ T := by
   rintro A ⟨C, hC, rfl⟩ hmem;
   obtain ⟨D, hD, d⟩ := disjSet_diaBlocked_subset hC;
   have : T.Of LogicCK := BDTheory.of_logicCK (L := L);
@@ -111,13 +114,13 @@ private lemma avoid_diaDisjSet_diaBlocked [L.FourDia] {T : BDTheory} [T.Mdp] [T.
   exact h (◇D) (dia_mem_diaBlocked hD) (T.mdp (T.subset L.fourDia) h₁);
 
 private lemma avoid_diaDisjSet_blocked {T : BDTheory}
-  (h : ∀ A ∈ P.diaBlocked, A ∉ T) : ∀ A ∈ diaDisjSet P.blocked, A ∉ T := by
+  (h : ∀ A ∈ X.diaBlocked, A ∉ T) : ∀ A ∈ diaDisjSet X.blocked, A ∉ T := by
   rintro A ⟨C, hC, rfl⟩;
   exact h (◇C) (dia_mem_diaBlocked (disjSet_blocked_subset hC));
 
-private lemma avoid_disjSet_mdpClosure_union {P₁ : CanonicalPair L}
-  (h : ∀ A ∈ P.blocked, A ∉ P₁.theory) :
-  ∀ A ∈ disjSet P.forbidden, A ∉ BDTheory.mdpClosure (P₁.theory ∪ □⁻¹P.theory) := by
+private lemma avoid_disjSet_mdpClosure_union {Y : CanonicalPair L}
+  (h : ∀ A ∈ X.blocked, A ∉ Y.theory) :
+  ∀ A ∈ disjSet X.forbidden, A ∉ BDTheory.mdpClosure (Y.theory ∪ □⁻¹X.theory) := by
   rintro A ⟨K, hne, hsub, rfl⟩ hmem;
   obtain ⟨D, hD, E, hE, d⟩ := BDTheory.mdpClosure_union_finite_char hmem;
   exact h D ⟨E, hE, ⋁K, ⟨K, hne, hsub, rfl⟩, d⟩ hD;
@@ -129,25 +132,25 @@ end CanonicalPair
 variable {L : BDLogic} [L.CK]
 
 instance fourDia_canonicalModel [L.FourDia] : (canonicalModel L).FourDia where
-  fourDia P := by
-    obtain ⟨Y, hPY, hmdpY, hprimeY, hofY, havoidY⟩ :=
-      exists_prime_mdpClosed_avoiding (L := L) (T := P.theory) (Z := P.diaBlocked)
+  fourDia X := by
+    obtain ⟨T, hXT, hmdpT, hprimeT, hofT, havoidT⟩ :=
+      exists_prime_mdpClosed_avoiding (L := L) (T := X.theory) (Z := X.diaBlocked)
         CanonicalPair.orDirected_diaBlocked CanonicalPair.avoid_diaBlocked;
-    refine ⟨⟨Y, P.diaBlocked, CanonicalPair.avoid_diaDisjSet_diaBlocked havoidY⟩, hPY, ?_⟩;
-    intro P₁ MQP₁;
-    obtain ⟨Y₁, hP₁Y₁, hmdpY₁, hprimeY₁, hofY₁, havoidY₁⟩ :=
-      exists_prime_mdpClosed_avoiding (L := L) (T := P₁.theory) (Z := P.diaBlocked)
-        CanonicalPair.orDirected_diaBlocked MQP₁.2;
-    refine ⟨⟨Y₁, P.blocked, CanonicalPair.avoid_diaDisjSet_blocked havoidY₁⟩, hP₁Y₁, ?_⟩;
-    intro P₂ MQ₁P₂;
-    have : BDTheory.Of L (P₂.theory ∪ □⁻¹P.theory) :=
-      ⟨P₂.theory.subset.trans Set.subset_union_left⟩;
-    obtain ⟨Q₂, h₁, -, havoid₂⟩ :=
+    refine ⟨⟨T, X.diaBlocked, CanonicalPair.avoid_diaDisjSet_diaBlocked havoidT⟩, hXT, ?_⟩;
+    intro Z MYZ;
+    obtain ⟨T₁, hZT₁, hmdpT₁, hprimeT₁, hofT₁, havoidT₁⟩ :=
+      exists_prime_mdpClosed_avoiding (L := L) (T := Z.theory) (Z := X.diaBlocked)
+        CanonicalPair.orDirected_diaBlocked MYZ.2;
+    refine ⟨⟨T₁, X.blocked, CanonicalPair.avoid_diaDisjSet_blocked havoidT₁⟩, hZT₁, ?_⟩;
+    intro V MWV;
+    have : BDTheory.Of L (V.theory ∪ □⁻¹X.theory) :=
+      ⟨V.theory.subset.trans Set.subset_union_left⟩;
+    obtain ⟨U, h₁, -, havoid₂⟩ :=
       CanonicalPair.exists_avoiding (L := L)
-        (T := BDTheory.mdpClosure (P₂.theory ∪ □⁻¹P.theory)) orDirected_disjSet
-        (CanonicalPair.avoid_disjSet_mdpClosure_union MQ₁P₂.2);
-    have h₂ : P₂.theory ∪ □⁻¹P.theory ⊆ Q₂.theory := BDTheory.subset_mdpClosure.trans h₁;
-    exact ⟨Q₂,
+        (T := BDTheory.mdpClosure (V.theory ∪ □⁻¹X.theory)) orDirected_disjSet
+        (CanonicalPair.avoid_disjSet_mdpClosure_union MWV.2);
+    have h₂ : V.theory ∪ □⁻¹X.theory ⊆ U.theory := BDTheory.subset_mdpClosure.trans h₁;
+    exact ⟨U,
       CanonicalPair.mRel_of_avoid_disjSet (Set.subset_union_right.trans h₂) havoid₂,
       fun _ => Set.subset_union_left.trans h₂⟩;
 

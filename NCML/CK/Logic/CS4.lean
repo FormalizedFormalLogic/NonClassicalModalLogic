@@ -49,14 +49,14 @@ theorem LogicCS4_TFAE {A : BDFormula} : List.TFAE [
   tfae_have 3 → 1 := by
     contrapose!;
     intro h;
-    obtain ⟨P, h₁⟩ := CK.Hereditary.exists_not_forces_of_not_mem h;
+    obtain ⟨X, h₁⟩ := CK.Hereditary.exists_not_forces_of_not_mem h;
     refine ⟨_, (CK.hereditaryCanonicalModel LogicCS4).toFrame, ?_⟩;
     and_intros;
     . infer_instance;
     . infer_instance;
     . infer_instance;
     . by_contra! hF;
-      exact h₁ $ CK.Model.valid_of_toFrame_valid hF P;
+      exact h₁ $ CK.Model.valid_of_toFrame_valid hF X;
   tfae_finish
 
 end

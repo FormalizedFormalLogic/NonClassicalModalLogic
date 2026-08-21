@@ -29,67 +29,67 @@ namespace CK
 - [BDF21, Definition IV.4]
 -/
 def hereditaryCanonicalModel (L : BDLogic) [L.CK] : Model (CanonicalPair L) where
-  iRel' P Q := P.theory ⊆ Q.theory
+  iRel' X Y := X.theory ⊆ Y.theory
   iRel_preorder := {
     refl := fun _ => subset_rfl,
     trans := fun _ _ _ => subset_trans
   }
-  mRel' P Q := □⁻¹P.theory ⊆ Q.theory ∧ P.forbidden ⊆ Q.forbidden
-  Fallible' P := ⊥ ∈ P.theory
-  fallible_iRel' h IPQ := IPQ h
-  fallible_mRel' h MPQ := MPQ.1 (by rw [CanonicalPair.theory_eq_univ_of_bot_mem h]; trivial)
+  mRel' X Y := □⁻¹X.theory ⊆ Y.theory ∧ X.forbidden ⊆ Y.forbidden
+  Fallible' X := ⊥ ∈ X.theory
+  fallible_iRel' h IXY := IXY h
+  fallible_mRel' h MXY := MXY.1 (by rw [CanonicalPair.theory_eq_univ_of_bot_mem h]; trivial)
   fallible_exists_mRel' h :=
     ⟨CanonicalPair.univ L, Set.subset_univ _, by
       rw [CanonicalPair.forbidden_eq_empty_of_bot_mem h];
       exact Set.empty_subset _⟩
-  val P a := (#a) ∈ P.theory
-  val_persistent h IPQ := IPQ h
+  val X a := (#a) ∈ X.theory
+  val_persistent h IXY := IXY h
   fallible_val h := by rw [CanonicalPair.theory_eq_univ_of_bot_mem h]; trivial
 
 namespace Hereditary
 
 section
 
-variable {L : BDLogic} [L.CK] {A : BDFormula} {P : CanonicalPair L}
+variable {L : BDLogic} [L.CK] {A : BDFormula} {X : CanonicalPair L}
 
-lemma exists_mRel_of_box_not_mem (h : □A ∉ P.theory) :
-  ∃ Q : CanonicalPair L, (hereditaryCanonicalModel L).mRel P.erase Q ∧ A ∉ Q.theory := by
-  obtain ⟨Q, h₁, -, havoid⟩ :=
-    CanonicalPair.exists_avoiding (L := L) (T := □⁻¹P.theory) (Z := {A}) orDirected_singleton
+lemma exists_mRel_of_box_not_mem (h : □A ∉ X.theory) :
+  ∃ Y : CanonicalPair L, (hereditaryCanonicalModel L).mRel X.erase Y ∧ A ∉ Y.theory := by
+  obtain ⟨Y, h₁, -, havoid⟩ :=
+    CanonicalPair.exists_avoiding (L := L) (T := □⁻¹X.theory) (Z := {A}) orDirected_singleton
       (by rintro C rfl; exact h);
-  exact ⟨Q, ⟨h₁, by simp⟩, havoid A rfl⟩;
+  exact ⟨Y, ⟨h₁, by simp⟩, havoid A rfl⟩;
 
-private lemma avoid_diaDisjSet_impSet [L.FourDia] (h : ◇A ∈ P.theory) :
-  ∀ C ∈ diaDisjSet P.forbidden, C ∉ BDTheory.impSet (□⁻¹P.theory) A := by
+private lemma avoid_diaDisjSet_impSet [L.FourDia] (h : ◇A ∈ X.theory) :
+  ∀ C ∈ diaDisjSet X.forbidden, C ∉ BDTheory.impSet (□⁻¹X.theory) A := by
   rintro C ⟨D, hD, rfl⟩ hmem;
-  have h₁ : (◇A 🡒 ◇◇D) ∈ P.theory := P.theory.mdp (BDTheory.provable_mem kDia) hmem;
-  have h₂ : ◇◇D ∈ P.theory := P.theory.mdp h₁ h;
-  exact P.avoid (◇D) ⟨D, hD, rfl⟩ (P.theory.mdp (P.theory.subset L.fourDia) h₂);
+  have h₁ : (◇A 🡒 ◇◇D) ∈ X.theory := X.theory.mdp (BDTheory.provable_mem kDia) hmem;
+  have h₂ : ◇◇D ∈ X.theory := X.theory.mdp h₁ h;
+  exact X.avoid (◇D) ⟨D, hD, rfl⟩ (X.theory.mdp (X.theory.subset L.fourDia) h₂);
 
-lemma exists_mRel_of_dia_mem [L.FourDia] (h : ◇A ∈ P.theory) :
-  ∃ Q : CanonicalPair L, (hereditaryCanonicalModel L).mRel P Q ∧ A ∈ Q.theory := by
+lemma exists_mRel_of_dia_mem [L.FourDia] (h : ◇A ∈ X.theory) :
+  ∃ Y : CanonicalPair L, (hereditaryCanonicalModel L).mRel X Y ∧ A ∈ Y.theory := by
   obtain ⟨Y, hY, hmdp, hprime, hof, havoid⟩ :=
-    exists_prime_mdpClosed_avoiding (L := L) (T := BDTheory.impSet (□⁻¹P.theory) A)
-      (Z := diaDisjSet P.forbidden) orDirected_diaDisjSet (avoid_diaDisjSet_impSet h);
-  exact ⟨⟨Y, P.forbidden, havoid⟩, ⟨BDTheory.subset_impSet.trans hY, subset_rfl⟩,
+    exists_prime_mdpClosed_avoiding (L := L) (T := BDTheory.impSet (□⁻¹X.theory) A)
+      (Z := diaDisjSet X.forbidden) orDirected_diaDisjSet (avoid_diaDisjSet_impSet h);
+  exact ⟨⟨Y, X.forbidden, havoid⟩, ⟨BDTheory.subset_impSet.trans hY, subset_rfl⟩,
     hY BDTheory.self_mem_impSet⟩;
 
-lemma exists_iRel_of_dia_not_mem [L.TDia] (h : ◇A ∉ P.theory) :
-  ∃ Q : CanonicalPair L, (hereditaryCanonicalModel L).iRel P Q ∧
-  ∀ P₁ : CanonicalPair L, (hereditaryCanonicalModel L).mRel Q P₁ → A ∉ P₁.theory := by
-  refine ⟨⟨P.theory, {A}, CanonicalPair.avoid_diaDisjSet_of_dia_not_mem h⟩, subset_rfl, ?_⟩;
-  intro P₁ MQP₁;
-  exact CanonicalPair.forbidden_not_mem_theory (MQP₁.2 rfl);
+lemma exists_iRel_of_dia_not_mem [L.TDia] (h : ◇A ∉ X.theory) :
+  ∃ Y : CanonicalPair L, (hereditaryCanonicalModel L).iRel X Y ∧
+  ∀ Z : CanonicalPair L, (hereditaryCanonicalModel L).mRel Y Z → A ∉ Z.theory := by
+  refine ⟨⟨X.theory, {A}, CanonicalPair.avoid_diaDisjSet_of_dia_not_mem h⟩, subset_rfl, ?_⟩;
+  intro Z MYZ;
+  exact CanonicalPair.forbidden_not_mem_theory (MYZ.2 rfl);
 
 end
 
 section
 
-variable {L : BDLogic} [L.CK] [L.TDia] [L.FourDia] {A : BDFormula} {P : CanonicalPair L}
+variable {L : BDLogic} [L.CK] [L.TDia] [L.FourDia] {A : BDFormula} {X : CanonicalPair L}
 
 /-- - [BDF21, Lemma IV.9] -/
-lemma truthlemma : P ⊩[hereditaryCanonicalModel L] A ↔ A ∈ P.theory := by
-  induction A generalizing P with
+lemma truthlemma : X ⊩[hereditaryCanonicalModel L] A ↔ A ∈ X.theory := by
+  induction A generalizing X with
   | atom a => exact Iff.rfl;
   | falsum => exact Iff.rfl;
   | and A B ihA ihB =>
@@ -98,66 +98,71 @@ lemma truthlemma : P ⊩[hereditaryCanonicalModel L] A ↔ A ∈ P.theory := by
       exact BDTheory.and_mem (ihA.mp hA) (ihB.mp hB);
     · intro h;
       constructor;
-      . exact ihA.mpr (P.theory.mdp (BDTheory.provable_mem andElim₁) h);
-      . exact ihB.mpr (P.theory.mdp (BDTheory.provable_mem andElim₂) h);
+      . exact ihA.mpr (X.theory.mdp (BDTheory.provable_mem andElim₁) h);
+      . exact ihB.mpr (X.theory.mdp (BDTheory.provable_mem andElim₂) h);
   | or A B ihA ihB =>
     constructor;
     · rintro (hA | hB);
-      · exact P.theory.mdp (BDTheory.provable_mem orIntro₁) (ihA.mp hA);
-      · exact P.theory.mdp (BDTheory.provable_mem orIntro₂) (ihB.mp hB);
+      · exact X.theory.mdp (BDTheory.provable_mem orIntro₁) (ihA.mp hA);
+      · exact X.theory.mdp (BDTheory.provable_mem orIntro₂) (ihB.mp hB);
     · intro h;
-      rcases P.theory.prime h <;> grind;
+      rcases X.theory.prime h <;> grind;
   | imply A B ihA ihB =>
     constructor;
     · intro h;
       by_contra! hc;
-      obtain ⟨Q, IPQ, h₁, h₂⟩ := CanonicalPair.exists_iRel_of_imply_not_mem hc;
-      exact h₂ (ihB.mp (h Q IPQ (ihA.mpr h₁)));
-    · intro h Q IPQ h₁;
-      exact ihB.mpr (Q.theory.mdp (IPQ h) (ihA.mp h₁));
+      obtain ⟨Y, IXY, h₁, h₂⟩ := CanonicalPair.exists_iRel_of_imply_not_mem hc;
+      exact h₂ (ihB.mp (h Y IXY (ihA.mpr h₁)));
+    · intro h Y IXY h₁;
+      exact ihB.mpr (Y.theory.mdp (IXY h) (ihA.mp h₁));
   | box A ih =>
     constructor;
     · intro h;
       by_contra! hc;
-      obtain ⟨Q, MPQ, h₁⟩ := exists_mRel_of_box_not_mem hc;
-      exact h₁ (ih.mp (h P.erase Q CanonicalPair.iRel_erase MPQ));
-    · intro h Q P₁ IPQ MQP₁;
-      exact ih.mpr (MQP₁.1 (IPQ h));
+      obtain ⟨Y, MXY, h₁⟩ := exists_mRel_of_box_not_mem hc;
+      exact h₁ (ih.mp (h X.erase Y CanonicalPair.iRel_erase MXY));
+    · intro h Y Z IXY MYZ;
+      exact ih.mpr (MYZ.1 (IXY h));
   | dia A ih =>
     constructor;
     · intro h;
       by_contra! hc;
-      obtain ⟨Q, IPQ, hblock⟩ := exists_iRel_of_dia_not_mem hc;
-      obtain ⟨P₁, MQP₁, h₁⟩ := h Q IPQ;
-      exact hblock P₁ MQP₁ (ih.mp h₁);
-    · intro h Q IPQ;
-      obtain ⟨P₁, MQP₁, h₁⟩ := exists_mRel_of_dia_mem (IPQ h);
-      exact ⟨P₁, MQP₁, ih.mpr h₁⟩;
+      obtain ⟨Y, IXY, hblock⟩ := exists_iRel_of_dia_not_mem hc;
+      obtain ⟨Z, MYZ, h₁⟩ := h Y IXY;
+      exact hblock Z MYZ (ih.mp h₁);
+    · intro h Y IXY;
+      obtain ⟨Z, MYZ, h₁⟩ := exists_mRel_of_dia_mem (IXY h);
+      exact ⟨Z, MYZ, ih.mpr h₁⟩;
 
 lemma exists_not_forces_of_not_mem (h : A ∉ L) :
-  ∃ P : CanonicalPair L, P ⊮[hereditaryCanonicalModel L] A := by
-  obtain ⟨P, -, -, havoid⟩ :=
+  ∃ X : CanonicalPair L, X ⊮[hereditaryCanonicalModel L] A := by
+  obtain ⟨X, -, -, havoid⟩ :=
     CanonicalPair.exists_avoiding (L := L) (T := L) (Z := {A}) orDirected_singleton
       (by rintro C rfl; exact h);
-  exact ⟨P, fun h₁ => havoid A rfl (truthlemma.mp h₁)⟩;
+  exact ⟨X, fun h₁ => havoid A rfl (truthlemma.mp h₁)⟩;
 
 end
 
 variable {L : BDLogic} [L.CK]
 
 instance reflexiveMRel_canonicalModel [L.TBox] : (hereditaryCanonicalModel L).ReflexiveMRel where
-  refl_mRel P := ⟨fun _ hA => P.theory.mdp (P.theory.subset L.tBox) hA, subset_rfl⟩
+  refl_mRel X := ⟨fun _ hA => X.theory.mdp (X.theory.subset L.tBox) hA, subset_rfl⟩
 
 instance transitiveMRel_canonicalModel [L.FourBox] : (hereditaryCanonicalModel L).TransitiveMRel where
-  trans_mRel {P _ _} MPQ MQP₁ := ⟨
-    fun _ hA => MQP₁.1 (MPQ.1 (P.theory.mdp (P.theory.subset L.fourBox) hA)),
-    MPQ.2.trans MQP₁.2
+  trans_mRel {X _ _} MXY MYZ := ⟨
+    fun _ hA => MYZ.1 (MXY.1 (X.theory.mdp (X.theory.subset L.fourBox) hA)),
+    MXY.2.trans MYZ.2
   ⟩
 
 /-- - [BDF21, Proposition IV.7] -/
 instance backwardConfluent_canonicalModel : (hereditaryCanonicalModel L).BackwardConfluent where
-  backward_confluent {P Q P₁} MPQ IQP₁ :=
-    ⟨P.erase, CanonicalPair.iRel_erase, fun _ hA => IQP₁ (MPQ.1 hA), by simp⟩
+  backward_confluent {X Y Z} MXY IYZ := by
+    use X.erase;
+    and_intros;
+    . exact CanonicalPair.iRel_erase;
+    . intro A hA;
+      exact IYZ (MXY.1 hA);
+    . tauto;
 
 end Hereditary
 

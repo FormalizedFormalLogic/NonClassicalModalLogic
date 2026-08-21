@@ -36,13 +36,13 @@ end Model
 variable {L : BDLogic} [L.CK]
 
 instance fourBox_canonicalModel [L.FourBox] : (canonicalModel L).FourBox where
-  fourBox {P Q P₁ Q₁} MPQ IQP₁ MP₁Q₁ _ := by
-    refine ⟨P.erase, Q₁.erase, CanonicalPair.iRel_erase, ⟨?_, by simp⟩, subset_rfl⟩;
+  fourBox {X Y Z W} MXY IYZ MZW _ := by
+    refine ⟨X.erase, W.erase, CanonicalPair.iRel_erase, ⟨?_, by simp⟩, subset_rfl⟩;
     intro A hA;
-    have h₁ : □□A ∈ P.theory := P.theory.mdp (P.theory.subset L.fourBox) hA;
-    have h₂ : □A ∈ Q.theory := MPQ.1 h₁;
-    have h₃ : □A ∈ P₁.theory := IQP₁ h₂;
-    exact MP₁Q₁.1 h₃;
+    have h₁ : □□A ∈ X.theory := X.theory.mdp (X.theory.subset L.fourBox) hA;
+    have h₂ : □A ∈ Y.theory := MXY.1 h₁;
+    have h₃ : □A ∈ Z.theory := IYZ h₂;
+    exact MZW.1 h₃;
 
 end CK
 
