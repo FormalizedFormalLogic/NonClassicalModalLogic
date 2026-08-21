@@ -20,9 +20,7 @@ export StrictlyAscendingMRel (strictly_ascending_mRel)
 instance [F.StrictlyAscendingMRel] : F.TDia where
   tDia x := by
     obtain ⟨z, Mxz, Ixz⟩ := strictly_ascending_mRel x;
-    refine ⟨z, Mxz, ?_⟩;
-    left;
-    exact Ixz;
+    exact ⟨z, Mxz, fun _ => Ixz⟩;
 
 end Frame
 
