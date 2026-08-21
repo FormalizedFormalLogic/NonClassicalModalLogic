@@ -16,7 +16,7 @@ variable {F : Frame κ}
 /-- The frame condition defined by `B◇`: every world has a `≼`-successor all of whose
 `⊏`-successors return to it, unless it is fallible. -/
 class BDia (F : Frame κ) : Prop where
-  bDia : ∀ x, ¬F.Fallible x → ∃ y, x ≼ y ∧ ∀ z, y ⊏ z → ∃ w v, z ≼ w ∧ w ⊏ v ∧ v ≼ x
+  bDia : ∀ x : F.World, F.Infallible x → ∃ y, x ≼ y ∧ ∀ z, y ⊏ z → ∃ w v, z ≼ w ∧ w ⊏ v ∧ v ≼ x
 export BDia (bDia)
 
 instance [F.SymmetricMRel] : F.BDia where
@@ -45,28 +45,20 @@ lemma frame_BDia_of_frameValidate_BDia (h : F ⊧ (◇(□(#0)) 🡒 #0)) : F.BD
     by_contra! hc;
     let M : Model κ := {
       toFrame := F,
-      val := fun y _ => ¬(y ≼ x) ∨ F.Fallible y,
+      val := fun y _ => F.Infallible y → ¬(y ≼ x),
       val_persistent := by
-        rintro y z a (hy | hy) Iyz;
-        . left;
-          intro hzx;
-          exact hy $ Trans.trans Iyz hzx;
-        . right;
-          exact F.fallible_iRel hy Iyz;
-      fallible_val := by
-        rintro y a hy;
-        right;
-        exact hy;
+        rintro y z a h Iyz Iz hzx;
+        exact h (infallible_iRel Iz Iyz) $ Trans.trans Iyz hzx;
+      fallible_val := by grind;
     }
     have hDiaBox : x ⊩[M] ◇(□(#0)) := by
       intro y Ixy;
       obtain ⟨z, Myz, hz⟩ := hc y Ixy;
       refine ⟨z, Myz, ?_⟩;
-      intro w v Izw Mwv;
-      exact Or.inl $ hz w v Izw Mwv;
-    rcases h M.val M.val_persistent M.fallible_val x x (refl x) hDiaBox with hc₁ | hc₁;
-    . exact hc₁ (refl x);
-    . exact hx hc₁;
+      intro w v Izw Mwv _;
+      exact hz w v Izw Mwv;
+    have hc₁ := h M.val M.val_persistent M.fallible_val x x (refl x) hDiaBox hx;
+    exact hc₁ (refl x);
 
 theorem frame_BDia_TFAE : List.TFAE [
   F.BDia,

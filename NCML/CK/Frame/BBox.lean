@@ -17,19 +17,29 @@ variable {F : Frame κ}
 /-- The frame condition defined by `B□`: a `⊏`-step followed by a `≼`-step can always be
 reversed by a `⊏`-step, up to `≼` and fallibility. -/
 class BBox (F : Frame κ) : Prop where
-  bBox : ∀ {x y z}, x ⊏ y → y ≼ z → ∃ w, z ⊏ w ∧ (x ≼ w ∨ F.Fallible w)
-export BBox (bBox)
+  bBox : ∀ {x y z : F.World}, x ⊏ y → y ≼ z → ∃ w, z ⊏ w ∧ (F.Infallible w → x ≼ w)
+
+lemma BBox.bBox' [F.BBox] : ∀ {x y z : F.World}, x ⊏ y → y ≼ z →
+  ∃ w, z ⊏ w ∧ (x ≼ w ∨ F.Fallible w) := by
+  intro x y z Mxy Iyz;
+  obtain ⟨w, Mzw, hw⟩ := bBox Mxy Iyz;
+  refine ⟨w, Mzw, ?_⟩;
+  by_cases hFallible : F.Fallible w;
+  . right;
+    exact hFallible;
+  . left;
+    exact hw hFallible;
+
+export BBox (bBox bBox')
 
 instance [F.SymmetricMRel] [F.ForwardConfluent] : F.BBox where
   bBox Mxy Iyz := by
     obtain ⟨w, Ixw, Mzw⟩ := forward_confluent (symm_mRel Mxy) Iyz;
-    refine ⟨w, Mzw, ?_⟩;
-    left;
-    exact Ixw;
+    exact ⟨w, Mzw, fun _ => Ixw⟩;
 
 lemma frameValidate_BBox_of_frame_BBox [F.BBox] : F ⊧ (A 🡒 □◇A) := by
   intro V V_per V_fal x y Ixy hyA z w Iyz Mzw v Iwv;
-  obtain ⟨u, Mvu, Izu | hu⟩ := bBox Mzw Iwv;
+  obtain ⟨u, Mvu, Izu | hu⟩ := bBox' Mzw Iwv;
   . exact ⟨u, Mvu, forces_persistent hyA (Trans.trans Iyz Izu)⟩;
   . exact ⟨u, Mvu, forces_of_fallible hu⟩;
 
@@ -37,19 +47,15 @@ lemma frame_BBox_of_frameValidate_BBox (h : F ⊧ (#0 🡒 □◇(#0))) : F.BBox
   bBox {x y z} Mxy Iyz := by
     let M : Model κ := {
       toFrame := F,
-      val := fun w _ => x ≼ w ∨ F.Fallible w,
+      val := fun w _ => F.Infallible w → x ≼ w,
       val_persistent := by
-        rintro w v a (Ixw | hw) Iwv;
-        . left;
-          exact Trans.trans Ixw Iwv;
-        . right;
-          exact F.fallible_iRel hw Iwv;
-      fallible_val := by
-        rintro w a hw;
-        right;
-        exact hw;
+        rintro w v a h Iwv Iv;
+        trans w;
+        . exact h $ infallible_iRel Iv Iwv;
+        . assumption;
+      fallible_val := by grind;
     }
-    have hxA : x ⊩[M] (#0) := Or.inl (refl x);
+    have hxA : x ⊩[M] (#0) := fun _ => refl x;
     exact h M.val M.val_persistent M.fallible_val x x (refl x) hxA x y (refl x) Mxy z Iyz;
 
 theorem frame_BBox_TFAE : List.TFAE [
