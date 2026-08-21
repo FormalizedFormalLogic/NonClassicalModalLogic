@@ -1,6 +1,7 @@
 module
 
-public import NCML.CK.Confluence
+public import NCML.CK.Frame.SymmetricMRel
+public import NCML.CK.Frame.ForwardConfluent
 
 @[expose] public section
 

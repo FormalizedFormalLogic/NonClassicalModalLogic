@@ -1,6 +1,6 @@
 module
 
-public import NCML.CK.Confluence
+public import NCML.CK.Frame.SymmetricMRel
 
 @[expose] public section
 

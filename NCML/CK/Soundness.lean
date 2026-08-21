@@ -1,7 +1,7 @@
 module
 
 public import NCML.CK.Semantics
-public import NCML.CK.Confluence
+public import NCML.CK.Frame.FrameClass
 public import NCML.CK.Axioms.BBox
 public import NCML.CK.Axioms.BDia
 public import NCML.Hilbert.Logics

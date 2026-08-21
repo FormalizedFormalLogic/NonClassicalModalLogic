@@ -2,7 +2,7 @@ module
 
 public import NCML.Hilbert.Logics
 public import NCML.Hilbert.Theory
-public import NCML.CK.Confluence
+public import NCML.CK.Frame.FrameClass
 public import NCML.CK.Soundness
 
 @[expose] public section
