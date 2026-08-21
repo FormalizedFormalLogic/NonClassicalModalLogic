@@ -50,7 +50,7 @@ theorem LogicCS4_TFAE {A : BDFormula} : List.TFAE [
     contrapose!;
     intro h;
     obtain ⟨P, h₁⟩ := CK.Hereditary.exists_not_forces_of_not_mem h;
-    refine ⟨_, (CK.Hereditary.canonicalModel LogicCS4).toFrame, ?_⟩;
+    refine ⟨_, (CK.hereditaryCanonicalModel LogicCS4).toFrame, ?_⟩;
     and_intros;
     . infer_instance;
     . infer_instance;
