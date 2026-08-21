@@ -21,11 +21,10 @@ export PBox (pBox)
 
 instance [F.TBox] : F.PBox where
   pBox {x} hx := by
-    rcases tBox x with hFallible | ⟨y, z, Ixy, Myz, Izx⟩;
-    . exact absurd hFallible hx;
-    . refine ⟨y, z, Ixy, Myz, ?_⟩;
-      intro hFallible;
-      exact hx (F.fallible_iRel hFallible Izx);
+    obtain ⟨y, z, Ixy, Myz, Izx⟩ := tBox x hx;
+    refine ⟨y, z, Ixy, Myz, ?_⟩;
+    intro hFallible;
+    exact hx (F.fallible_iRel hFallible Izx);
 
 lemma frameValidate_PBox_of_frame_PBox [F.PBox] : F ⊧ (∼□⊥ : BDFormula) := by
   intro V V_per V_fal x y Ixy hy;

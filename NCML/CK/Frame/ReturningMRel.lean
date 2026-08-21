@@ -18,9 +18,8 @@ class ReturningMRel (F : Frame κ) : Prop where
 export ReturningMRel (returning_mRel)
 
 instance [F.ReturningMRel] : F.TBox where
-  tBox x := by
+  tBox x _hx := by
     obtain ⟨y, Ixy, Myx⟩ := returning_mRel x;
-    right;
     exact ⟨y, x, Ixy, Myx, refl x⟩;
 
 end Frame
