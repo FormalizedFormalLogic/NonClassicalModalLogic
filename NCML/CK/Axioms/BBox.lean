@@ -16,7 +16,7 @@ variable {F : Frame κ}
 /-- The frame condition defined by `B□`: a `⊏`-step followed by a `≼`-step can always be
 reversed by a `⊏`-step, up to `≼` and fallibility. -/
 class BBox (F : Frame κ) : Prop where
-  bBox : ∀ {x y z : F.World}, x ⊏ y → y ≼ z → ∃ w, z ⊏ w ∧ (x ≼ w ∨ F.Fallible w)
+  bBox : ∀ {x y z}, x ⊏ y → y ≼ z → ∃ w, z ⊏ w ∧ (x ≼ w ∨ F.Fallible w)
 export BBox (bBox)
 
 instance [F.SymmetricMRel] [F.ForwardConfluent] : F.BBox where
