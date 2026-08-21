@@ -46,7 +46,7 @@ theorem LogicCKD_TFAE {A : BDFormula} : List.TFAE [
   ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.SerialMRel] → F ⊧ A,
 ] := by
   tfae_have 1 → 2 := LogicCKD.eq_CKPDia ▸ id
-  tfae_have 2 → 3 := fun h _ F _ val vp fv =>
+  tfae_have 2 → 3 := fun h _ F _ V V_per V_fal =>
     CK.Model.valid_of_mem_LogicCKD (LogicCKD.eq_CKPDia ▸ h)
   tfae_have 3 → 1 := by
     contrapose!;

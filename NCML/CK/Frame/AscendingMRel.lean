@@ -47,23 +47,23 @@ lemma frameValidate_TDia_of_frame_AscendingMRel [F.AscendingMRel] : F ⊧ (A �
   fun _ _ _ => Model.valid_TDia_of_ascendingMRel
 
 lemma frame_AscendingMRel_of_frameValidate_TDia (h : F ⊧ (#0 🡒 ◇(#0))) : F.AscendingMRel where
-  ascending_mRel w := by
+  ascending_mRel x := by
     let M : Model κ := {
       toFrame := F,
-      val := fun x _ => w ≼ x ∨ F.Fallible x,
+      val := fun y _ => x ≼ y ∨ F.Fallible y,
       val_persistent := by
-        rintro x y a (Iwx | hx) Ixy;
+        rintro y z a (Ixy | hy) Iyz;
         . left;
-          exact Trans.trans Iwx Ixy;
+          exact Trans.trans Ixy Iyz;
         . right;
-          exact F.fallible_iRel hx Ixy;
+          exact F.fallible_iRel hy Iyz;
       fallible_val := by
-        rintro x a hx;
+        rintro y a hy;
         right;
-        exact hx;
+        exact hy;
     }
-    have hwA : w ⊩[M] (#0) := Or.inl (refl w);
-    exact h M.val M.val_persistent M.fallible_val w w (refl w) hwA w (refl w);
+    have hxA : x ⊩[M] (#0) := Or.inl (refl x);
+    exact h M.val M.val_persistent M.fallible_val x x (refl x) hxA x (refl x);
 
 /-- `T◇` defines the frames whose `⊏` is ascending. -/
 theorem frame_AscendingMRel_TFAE : List.TFAE [
