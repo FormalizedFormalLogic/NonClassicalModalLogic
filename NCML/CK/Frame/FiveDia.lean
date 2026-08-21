@@ -16,7 +16,7 @@ variable {F : Frame κ}
 /-- The frame condition defined by `5◇`: for an infallible `⊏`-successor `y` of `x`, some
 `≼`-successor of `x` has all its `⊏`-successors returning to `y` through a `≼ ∘ ⊏`-step. -/
 class FiveDia (F : Frame κ) : Prop where
-  fiveDia : ∀ {x y : F.World}, x ⊏ y → ¬F.Fallible y →
+  fiveDia : ∀ {x y : F.World}, x ⊏ y → F.Infallible y →
     ∃ z, x ≼ z ∧ ∀ w, z ⊏ w → ∃ v u, w ≼ v ∧ v ⊏ u ∧ u ≼ y
 export FiveDia (fiveDia)
 
@@ -46,31 +46,21 @@ lemma frame_FiveDia_of_frameValidate_FiveDia (h : F ⊧ (◇(□(#0)) 🡒 □(#
     by_contra! hc;
     let M : Model κ := {
       toFrame := F,
-      val := fun z _ => ¬(z ≼ y) ∨ F.Fallible z,
+      val := fun z _ => F.Infallible z → ¬(z ≼ y),
       val_persistent := by
-        rintro z z₁ a (hz | hz) Izz₁;
-        . left;
-          intro hz₁y;
-          exact hz $ Trans.trans Izz₁ hz₁y;
-        . right;
-          exact F.fallible_iRel hz Izz₁;
-      fallible_val := by
-        rintro z a hz;
-        right;
-        exact hz;
+        rintro z z₁ a hz Izz₁ Iz₁ hz₁y;
+        exact hz (infallible_iRel Iz₁ Izz₁) (Trans.trans Izz₁ hz₁y);
+      fallible_val := by grind;
     }
     have hxDiaBox : x ⊩[M] ◇(□(#0)) := by
       intro z Ixz;
       obtain ⟨w, Mzw, hw⟩ := hc z Ixz;
       use w, Mzw;
-      intro v u Iwv Mvu;
-      left;
+      intro v u Iwv Mvu _;
       exact hw v u Iwv Mvu;
     have hxBox : x ⊩[M] □(#0) :=
       h M.val M.val_persistent M.fallible_val x x (refl x) hxDiaBox;
-    rcases hxBox x y (refl x) Mxy with hc₁ | hc₁;
-    . exact hc₁ (refl y);
-    . exact hy hc₁;
+    exact hxBox x y (refl x) Mxy hy (refl y);
 
 theorem frame_FiveDia_TFAE : List.TFAE [
   F.FiveDia,
