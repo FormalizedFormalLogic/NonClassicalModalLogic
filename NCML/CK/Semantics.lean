@@ -109,7 +109,7 @@ def Model.Valid (M : Model κ) (A : BDFormula) := ∀ x : M.World, x ⊩[M] A
 infixl:80 " ⊧ " => Model.Valid
 
 def Frame.Valid (F : Frame κ) (A : BDFormula) : Prop :=
-  ∀ val val_persistent fallible_val, (Model.mk F val val_persistent fallible_val) ⊧ A
+  ∀ V V_per V_fal, (Model.mk F V V_per V_fal) ⊧ A
 infixl:80 " ⊧ " => Frame.Valid
 
 lemma Model.valid_of_toFrame_valid {M : Model κ} {A : BDFormula} (h : M.toFrame ⊧ A) : M ⊧ A :=

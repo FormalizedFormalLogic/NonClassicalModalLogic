@@ -109,7 +109,7 @@ theorem LogicCKTBox_TFAE {A : BDFormula} : List.TFAE [
   ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.ReflexiveMComp] → F ⊧ A,
   ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.ReturningMRel] → F ⊧ A,
 ] := by
-  tfae_have 1 → 2 := fun h _ F _ val vp fv => CK.Model.valid_of_mem_LogicCKTBox h
+  tfae_have 1 → 2 := fun h _ F _ V V_per V_fal => CK.Model.valid_of_mem_LogicCKTBox h
   tfae_have 2 → 3 := fun h _ F _ => h F
   tfae_have 3 → 1 := by
     contrapose!;
