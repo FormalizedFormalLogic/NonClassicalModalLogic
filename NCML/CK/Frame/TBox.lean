@@ -13,10 +13,12 @@ namespace Frame
 
 variable {F : Frame κ}
 
-class ReflexiveMComp (F : Frame κ) : Prop where
-  reflexive_mComp : ∀ x : F.World, F.Fallible x ∨ ∃ y z, x ≼ y ∧ y ⊏ z ∧ z ≼ x
+/-- The frame condition defined by `T□`: `≼ ∘ ⊏ ∘ ≼` is reflexive away from the fallible
+worlds. -/
+class TBox (F : Frame κ) : Prop where
+  tBox : ∀ x : F.World, F.Fallible x ∨ ∃ y z, x ≼ y ∧ y ⊏ z ∧ z ≼ x
 
-export ReflexiveMComp (reflexive_mComp)
+export TBox (tBox)
 
 end Frame
 
@@ -24,9 +26,9 @@ namespace Model
 
 open CK.Frame
 
-lemma valid_TBox_of_reflexiveMComp [M.ReflexiveMComp] : M ⊧ (□A 🡒 A) := by
+lemma valid_TBox [M.TBox] : M ⊧ (□A 🡒 A) := by
   intro x y Ixy hyBoxA;
-  rcases reflexive_mComp y with hFallible | ⟨z, w, Iyz, Mzw, Iwy⟩;
+  rcases tBox y with hFallible | ⟨z, w, Iyz, Mzw, Iwy⟩;
   · exact forces_of_fallible hFallible;
   · exact forces_persistent (hyBoxA z w Iyz Mzw) Iwy;
 
@@ -36,11 +38,11 @@ namespace Frame
 
 variable {F : Frame κ}
 
-lemma frameValidate_TBox_of_frame_ReflexiveMComp [F.ReflexiveMComp] : F ⊧ (□A 🡒 A) :=
-  fun _ _ _ => Model.valid_TBox_of_reflexiveMComp
+lemma frameValidate_TBox_of_frame_TBox [F.TBox] : F ⊧ (□A 🡒 A) :=
+  fun _ _ _ => Model.valid_TBox
 
-lemma frame_ReflexiveMComp_of_frameValidate_TBox (h : F ⊧ (□(#0) 🡒 #0)) : F.ReflexiveMComp where
-  reflexive_mComp x := by
+lemma frame_TBox_of_frameValidate_TBox (h : F ⊧ (□(#0) 🡒 #0)) : F.TBox where
+  tBox x := by
     let M : Model κ := {
       toFrame := F,
       val := fun y _ => (∃ z w, x ≼ z ∧ z ⊏ w ∧ w ≼ y) ∨ F.Fallible y,
@@ -64,14 +66,14 @@ lemma frame_ReflexiveMComp_of_frameValidate_TBox (h : F ⊧ (□(#0) 🡒 #0)) :
       exact hx;
 
 /-- `T□` defines the frames on which `≼ ∘ ⊏ ∘ ≼` is reflexive away from the fallible worlds. -/
-theorem frame_ReflexiveMComp_TFAE : List.TFAE [
-  F.ReflexiveMComp,
+theorem frame_TBox_TFAE : List.TFAE [
+  F.TBox,
   ∀ A : BDFormula, F ⊧ (□A 🡒 A),
   F ⊧ (□(#0) 🡒 #0),
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact frameValidate_TBox_of_frame_ReflexiveMComp;
+  tfae_have 1 → 2 := by intro h A; exact frameValidate_TBox_of_frame_TBox;
   tfae_have 2 → 3 := fun h => h _
-  tfae_have 3 → 1 := frame_ReflexiveMComp_of_frameValidate_TBox
+  tfae_have 3 → 1 := frame_TBox_of_frameValidate_TBox
   tfae_finish
 
 end Frame

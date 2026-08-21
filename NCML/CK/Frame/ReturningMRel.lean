@@ -1,6 +1,6 @@
 module
 
-public import NCML.CK.Frame.ReflexiveMComp
+public import NCML.CK.Frame.TBox
 
 @[expose] public section
 
@@ -17,8 +17,8 @@ class ReturningMRel (F : Frame κ) : Prop where
 
 export ReturningMRel (returning_mRel)
 
-instance [F.ReturningMRel] : F.ReflexiveMComp where
-  reflexive_mComp x := by
+instance [F.ReturningMRel] : F.TBox where
+  tBox x := by
     obtain ⟨y, Ixy, Myx⟩ := returning_mRel x;
     right;
     exact ⟨y, x, Ixy, Myx, refl x⟩;

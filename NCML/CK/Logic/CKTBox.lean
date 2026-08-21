@@ -17,8 +17,8 @@ namespace Model
 
 open CK.Frame
 
-lemma valid_of_mem_LogicCKTBox [M.ReflexiveMComp] (hA : A ∈ LogicCKTBox) : M ⊧ A :=
-  valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TBox_of_reflexiveMComp) hA
+lemma valid_of_mem_LogicCKTBox [M.TBox] (hA : A ∈ LogicCKTBox) : M ⊧ A :=
+  valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TBox) hA
 
 end Model
 
@@ -36,7 +36,7 @@ end CK
 
 theorem LogicCKTBox_TFAE {A : BDFormula} : List.TFAE [
   A ∈ LogicCKTBox,
-  ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.ReflexiveMComp] → F ⊧ A,
+  ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.TBox] → F ⊧ A,
   ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.ReturningMRel] → F ⊧ A,
 ] := by
   tfae_have 1 → 2 := fun h _ F _ V V_per V_fal => CK.Model.valid_of_mem_LogicCKTBox h

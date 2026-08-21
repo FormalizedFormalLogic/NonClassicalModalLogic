@@ -16,11 +16,11 @@ public import NCML.CK.Frame.ForwardConfluent
 public import NCML.CK.Frame.FourBox
 public import NCML.CK.Frame.FourDia
 public import NCML.CK.Frame.PBox
-public import NCML.CK.Frame.ReflexiveMComp
 public import NCML.CK.Frame.ReturningMRel
 public import NCML.CK.Frame.SerialMRel
 public import NCML.CK.Frame.StrictlyAscendingMRel
 public import NCML.CK.Frame.SymmetricMRel
+public import NCML.CK.Frame.TBox
 public import NCML.CK.Frame.TransitiveMRel
 public import NCML.CK.Logic.CK
 public import NCML.CK.Logic.CKB

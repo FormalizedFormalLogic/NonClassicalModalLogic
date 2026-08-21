@@ -50,8 +50,8 @@ theorem exists_returningMRel_not_serialMRel :
   ∃ (κ : Type) (M : Model κ), M.ReturningMRel ∧ ¬ M.SerialMRel :=
   ⟨Fin 2, ReturningMRel.counterModel, inferInstance, ReturningMRel.counterModel_not_serialMRel⟩
 
-lemma exists_reflexiveMComp_not_forces_N :
-  ∃ (κ : Type) (M : Model κ), M.ReflexiveMComp ∧ ∃ x : M.World, x ⊮[_] ∼◇⊥ :=
+lemma exists_tBox_not_forces_N :
+  ∃ (κ : Type) (M : Model κ), M.TBox ∧ ∃ x : M.World, x ⊮[_] ∼◇⊥ :=
   ⟨Fin 2, SerialMRel.counterModel, inferInstance, 0, SerialMRel.counterModel_not_forces⟩
 
 end CK

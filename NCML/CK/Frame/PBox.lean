@@ -1,6 +1,6 @@
 module
 
-public import NCML.CK.Frame.ReflexiveMComp
+public import NCML.CK.Frame.TBox
 
 @[expose] public section
 
@@ -19,9 +19,9 @@ class PBox (F : Frame κ) : Prop where
 
 export PBox (pBox)
 
-instance [F.ReflexiveMComp] : F.PBox where
+instance [F.TBox] : F.PBox where
   pBox {x} h := by
-    rcases reflexive_mComp x with hFallible | ⟨y, z, Ixy, Myz, Izx⟩;
+    rcases tBox x with hFallible | ⟨y, z, Ixy, Myz, Izx⟩;
     . exact hFallible;
     . exact F.fallible_iRel (h y z Ixy Myz) Izx;
 
