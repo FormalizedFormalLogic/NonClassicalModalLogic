@@ -75,15 +75,6 @@ lemma dia_iff_forward_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] ◇A �
     obtain ⟨y₁, Iyy₁, Mx₁y₁⟩ := forward_confluent Mxy Ixx₁;
     exact ⟨y₁, Mx₁y₁, forces_persistent hyA Iyy₁⟩;
 
-lemma valid_BDia_of_symmetricMRel [M.SymmetricMRel] : M ⊧ (◇(□A) 🡒 A) := by
-  intro x y _ hy;
-  obtain ⟨z, Mxy, hz⟩ := hy y (refl y);
-  exact hz z y (refl z) (symm_mRel Mxy);
-
-lemma valid_BBox_of_symmetricMRel_of_forwardConfluent [M.SymmetricMRel] [M.ForwardConfluent] : M ⊧ (A 🡒 □◇A) := by
-  intro x;
-  grind [forward_confluent, symm_mRel];
-
 end Model
 
 namespace Frame
