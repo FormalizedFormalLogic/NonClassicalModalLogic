@@ -9,6 +9,7 @@ public import NCML.CK.Frame.AscendingMRel
 public import NCML.CK.Frame.BBox
 public import NCML.CK.Frame.BDia
 public import NCML.CK.Frame.BackwardConfluent
+public import NCML.CK.Frame.EuclideanMRel
 public import NCML.CK.Frame.ForwardConfluent
 public import NCML.CK.Frame.FrameClass
 public import NCML.CK.Frame.ReflexiveMComp
