@@ -178,7 +178,7 @@ lemma exists_mRel_of_dia_mem (h : ◇A ∈ P.theory) :
   exact ⟨P₁, mRel_of_avoid_disjSet (BDTheory.subset_impSet.trans h₁) havoid,
     h₁ BDTheory.self_mem_impSet⟩;
 
-private lemma avoid_diaDisjSet_of_dia_not_mem (h : ◇A ∉ P.theory) :
+lemma avoid_diaDisjSet_of_dia_not_mem (h : ◇A ∉ P.theory) :
   ∀ C ∈ diaDisjSet {A}, C ∉ P.theory := by
   rintro C ⟨D, ⟨K, hne, hsub, rfl⟩, rfl⟩ hmem;
   have h₁ : (◇(⋁K) 🡒 ◇A) ∈ LogicCK := dia_mono (ldisj_imp (by
