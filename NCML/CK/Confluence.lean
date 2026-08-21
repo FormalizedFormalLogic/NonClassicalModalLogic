@@ -110,13 +110,13 @@ lemma valid_DP_of_forwardConfluent [F.ForwardConfluent] : F ⊧ (◇(A ⋎ B) �
 -/
 lemma valid_FS_of_forwardConfluent_of_backwardConfluent [F.ForwardConfluent] [F.BackwardConfluent] :
   F ⊧ ((◇A 🡒 □B) 🡒 □(A 🡒 B)) := by
-  intro val val_persistent fallible_val x y Ixy hy v u Iyv Mvu w Iuw hwA;
-  obtain ⟨v₁, Ivv₁, Mv₁w⟩ := backward_confluent Mvu Iuw;
-  have hv₁diaA : v₁ ⊩[_] ◇A := by
-    intro v₂ Iv₁v₂;
-    obtain ⟨w₁, Iww₁, Mv₂w₁⟩ := forward_confluent Mv₁w Iv₁v₂;
-    exact ⟨w₁, Mv₂w₁, forces_persistent hwA Iww₁⟩;
-  exact hy v₁ (Trans.trans Iyv Ivv₁) hv₁diaA v₁ w (refl v₁) Mv₁w;
+  intro V V_per V_fal x y Ixy hy z w Iyz Mzw v Iwv hvA;
+  obtain ⟨u, Izu, Muv⟩ := backward_confluent Mzw Iwv;
+  have huDiaA : u ⊩[_] ◇A := by
+    intro x₁ Iux₁;
+    obtain ⟨y₁, Ivy₁, Mx₁y₁⟩ := forward_confluent Muv Iux₁;
+    exact ⟨y₁, Mx₁y₁, forces_persistent hvA Ivy₁⟩;
+  exact hy u (Trans.trans Iyz Izu) huDiaA u v (refl u) Muv;
 
 end Frame
 

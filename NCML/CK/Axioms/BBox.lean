@@ -18,43 +18,43 @@ class CircularMComp (F : Frame κ) : Prop where
 export CircularMComp (circular_mComp)
 
 class StrictlyCircularMComp (F : Frame κ) : Prop where
-  strictly_circular_mComp : ∀ {x y z : F.World}, x ⊏ y → y ≼ z → ∃ v, z ⊏ v ∧ x ≼ v
+  strictly_circular_mComp : ∀ {x y z : F.World}, x ⊏ y → y ≼ z → ∃ w, z ⊏ w ∧ x ≼ w
 export StrictlyCircularMComp (strictly_circular_mComp)
 
 instance [F.StrictlyCircularMComp] : F.CircularMComp where
-  circular_mComp Mxz Izu := by
-    obtain ⟨v, Muv, Ixv⟩ := strictly_circular_mComp Mxz Izu;
-    exact ⟨v, Muv, Or.inl Ixv⟩;
+  circular_mComp Mxy Iyz := by
+    obtain ⟨w, Mzw, Ixw⟩ := strictly_circular_mComp Mxy Iyz;
+    exact ⟨w, Mzw, Or.inl Ixw⟩;
 
 instance [F.SymmetricMRel] [F.ForwardConfluent] : F.StrictlyCircularMComp where
-  strictly_circular_mComp Mxz Izu := by
-    obtain ⟨v, Ixv, Muv⟩ := forward_confluent (symm_mRel Mxz) Izu;
-    exact ⟨v, Muv, Ixv⟩;
+  strictly_circular_mComp Mxy Iyz := by
+    obtain ⟨w, Ixw, Mzw⟩ := forward_confluent (symm_mRel Mxy) Iyz;
+    exact ⟨w, Mzw, Ixw⟩;
 
 lemma valid_BBox_of_circularMComp [F.CircularMComp] : F ⊧ (A 🡒 □◇A) := by
-  intro val val_persistent fallible_val x y Ixy hyA y₁ z Iyy₁ My₁z u Izu;
-  obtain ⟨v, Muv, Iy₁v | hv⟩ := circular_mComp My₁z Izu;
-  . exact ⟨v, Muv, forces_persistent hyA (Trans.trans Iyy₁ Iy₁v)⟩;
-  . exact ⟨v, Muv, forces_of_fallible hv⟩;
+  intro val val_persistent fallible_val x y Ixy hyA z w Iyz Mzw v Iwv;
+  obtain ⟨u, Mvu, Izu | hu⟩ := circular_mComp Mzw Iwv;
+  . exact ⟨u, Mvu, forces_persistent hyA (Trans.trans Iyz Izu)⟩;
+  . exact ⟨u, Mvu, forces_of_fallible hu⟩;
 
 lemma circularMComp_of_valid_BBox (h : F ⊧ (#0 🡒 □◇(#0))) : F.CircularMComp where
-  circular_mComp {x z u} Mxz Izu := by
+  circular_mComp {x y z} Mxy Iyz := by
     let M : Model κ := {
       toFrame := F,
-      val := fun p _ => x ≼ p ∨ F.Fallible p,
+      val := fun w _ => x ≼ w ∨ F.Fallible w,
       val_persistent := by
-        rintro p q a (Ixp | hp) Ipq;
+        rintro w v a (Ixw | hw) Iwv;
         . left;
-          exact Trans.trans Ixp Ipq;
+          exact Trans.trans Ixw Iwv;
         . right;
-          exact F.fallible_iRel hp Ipq;
+          exact F.fallible_iRel hw Iwv;
       fallible_val := by
-        rintro p a hp;
+        rintro w a hw;
         right;
-        exact hp;
+        exact hw;
     }
     have hxA : x ⊩[M] (#0) := Or.inl (refl x);
-    exact h M.val M.val_persistent M.fallible_val x x (refl x) hxA x z (refl x) Mxz u Izu;
+    exact h M.val M.val_persistent M.fallible_val x x (refl x) hxA x y (refl x) Mxy z Iyz;
 
 /-- `B□` defines the frames on which a `⊏`-step followed by a `≼`-step can always be
 reversed by a `⊏`-step, up to `≼` and fallibility. -/

@@ -35,8 +35,8 @@ lemma counterModel_not_forwardConfluent : ¬counterModel.ForwardConfluent := by
 
 lemma counterModel_not_circularMComp : ¬counterModel.CircularMComp := by
   rintro ⟨h⟩;
-  obtain ⟨v, M2v, -⟩ := h (x := 0) (y := 1) (z := 2) (by tauto) (by tauto);
-  simp [counterModel, Frame.mRel] at M2v;
+  obtain ⟨w, M2w, -⟩ := h (x := 0) (y := 1) (z := 2) (by tauto) (by tauto);
+  simp [counterModel, Frame.mRel] at M2w;
 
 lemma counterModel_not_forces : 0 ⊮[counterModel] (#0 🡒 □◇(#0)) := by
   by_contra! h;

@@ -16,13 +16,13 @@ variable {F : Frame κ}
 class ReturningMComp (F : Frame κ) : Prop where
   returning_mComp : ∀ x : F.World,
     F.Fallible x ∨
-    ∃ y, x ≼ y ∧ ∀ z, y ⊏ z → ∃ u v, z ≼ u ∧ u ⊏ v ∧ v ≼ x
+    ∃ y, x ≼ y ∧ ∀ z, y ⊏ z → ∃ w v, z ≼ w ∧ w ⊏ v ∧ v ≼ x
 export ReturningMComp (returning_mComp)
 
 
 class StrictlyReturningMComp (F : Frame κ) : Prop where
-  strictly_returning_mComp : ∀ w : F.World,
-    ∃ y, w ≼ y ∧ ∀ z, y ⊏ z → ∃ u v, z ≼ u ∧ u ⊏ v ∧ v ≼ w
+  strictly_returning_mComp : ∀ x : F.World,
+    ∃ y, x ≼ y ∧ ∀ z, y ⊏ z → ∃ w v, z ≼ w ∧ w ⊏ v ∧ v ≼ x
 export StrictlyReturningMComp (strictly_returning_mComp)
 
 
@@ -30,50 +30,56 @@ instance [F.StrictlyReturningMComp] : F.ReturningMComp where
   returning_mComp x := Or.inr $ strictly_returning_mComp x;
 
 instance [F.SymmetricMRel] : F.StrictlyReturningMComp where
-  strictly_returning_mComp w := by
-    refine ⟨w, refl w, ?_⟩;
-    intro z Iwz;
-    exact ⟨z, w, refl z, symm_mRel Iwz, refl w⟩;
+  strictly_returning_mComp x := by
+    use x;
+    and_intros;
+    . apply refl;
+    . intro z Mxz;
+      use z, x;
+      and_intros;
+      . apply refl;
+      . apply symm_mRel Mxz;
+      . apply refl;
 
 lemma valid_BDia_of_returningMComp [F.ReturningMComp] : F ⊧ (◇(□A) 🡒 A) := by
-  intro val val_persistent fallible_val x w _ hw;
-  rcases returning_mComp w with hFallible | ⟨y, Iwy, hy⟩;
+  intro val val_persistent fallible_val x y _ hy;
+  rcases returning_mComp y with hFallible | ⟨z, Iyz, hz⟩;
   . exact forces_of_fallible hFallible;
-  . obtain ⟨z, Iyz, hz⟩ := hw y Iwy;
-    obtain ⟨u, v, Izu, Muv, Ivw⟩ := hy z Iyz;
-    exact forces_persistent (hz u v Izu Muv) Ivw;
+  . obtain ⟨w, Izw, hw⟩ := hy z Iyz;
+    obtain ⟨v, u, Iwv, Mvu, Iuy⟩ := hz w Izw;
+    exact forces_persistent (hw v u Iwv Mvu) Iuy;
 
 lemma returningMComp_of_valid_BDia (h : F ⊧ (◇(□(#0)) 🡒 #0)) : F.ReturningMComp where
-  returning_mComp w := by
-    by_cases hw : F.Fallible w;
+  returning_mComp x := by
+    by_cases hx : F.Fallible x;
     . left;
-      exact hw;
+      exact hx;
     . right;
       by_contra! hc;
       let M : Model κ := {
         toFrame := F,
-        val := fun p _ => ¬(p ≼ w) ∨ F.Fallible p,
+        val := fun y _ => ¬(y ≼ x) ∨ F.Fallible y,
         val_persistent := by
-          rintro p q a (hp | hp) Ipq;
+          rintro y z a (hy | hy) Iyz;
           . left;
-            intro hqw;
-            exact hp $ Trans.trans Ipq hqw;
+            intro hzx;
+            exact hy $ Trans.trans Iyz hzx;
           . right;
-            exact F.fallible_iRel hp Ipq;
+            exact F.fallible_iRel hy Iyz;
         fallible_val := by
-          rintro p a hp;
+          rintro y a hy;
           right;
-          exact hp;
+          exact hy;
       }
-      have hDiaBox : w ⊩[M] ◇(□(#0)) := by
-        intro y Iwy;
-        obtain ⟨z, Myz, hz⟩ := hc y Iwy;
+      have hDiaBox : x ⊩[M] ◇(□(#0)) := by
+        intro y Ixy;
+        obtain ⟨z, Myz, hz⟩ := hc y Ixy;
         refine ⟨z, Myz, ?_⟩;
-        intro u v Izu Muv;
-        exact Or.inl $ hz u v Izu Muv;
-      rcases h M.val M.val_persistent M.fallible_val w w (refl w) hDiaBox with hc₁ | hc₁;
-      . exact hc₁ (refl w);
-      . exact hw hc₁;
+        intro w v Izw Mwv;
+        exact Or.inl $ hz w v Izw Mwv;
+      rcases h M.val M.val_persistent M.fallible_val x x (refl x) hDiaBox with hc₁ | hc₁;
+      . exact hc₁ (refl x);
+      . exact hx hc₁;
 
 /-- `B◇` defines the frames on which every world has a `≼`-successor all of whose `⊏`-successors
 return to it. -/
