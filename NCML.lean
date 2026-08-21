@@ -28,6 +28,7 @@ public import NCML.CK.Frame.TDia
 public import NCML.CK.Frame.TransitiveMRel
 public import NCML.CK.Logic.CK
 public import NCML.CK.Logic.CK4Box
+public import NCML.CK.Logic.CK4Dia
 public import NCML.CK.Logic.CKB
 public import NCML.CK.Logic.CKD
 public import NCML.CK.Logic.CKT
