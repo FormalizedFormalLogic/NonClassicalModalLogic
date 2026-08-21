@@ -2,7 +2,7 @@ module
 
 public import NCML.Hilbert.Logics
 public import NCML.Hilbert.Theory
-public import NCML.CK.Frame.FrameClass
+public import NCML.CK.Frame.BackwardConfluent
 public import NCML.CK.Frame.BBox
 public import NCML.CK.Frame.BDia
 public import NCML.CK.Soundness
@@ -12,16 +12,34 @@ public import NCML.CK.Soundness
 /-!
 # `CKB` and `IKB` prove the same formulas
 
-The canonical model for `CKB` (`CK.CKBcanonicalModel`), whose worlds are the `CKB`-theories
-(`CKBTheory`).
+The frame classes of `CKB`, `IK` and `IKB`, and the canonical model for `CKB`
+(`CK.CKBcanonicalModel`), whose worlds are the `CKB`-theories (`CKBTheory`).
 
-- [Pac24, Theorem 13, Section 3.2]
+- [Pac24, Definition 7, Theorem 13, Section 3.2]
 -/
 
 namespace CK
 
 open BDFormula
 open scoped BDFormulaSet
+
+namespace Frame
+
+variable {κ : Type*} {F : Frame κ}
+
+/-- - [Pac24, Definition 7] -/
+class IsCKB (F : Frame κ) : Prop extends SymmetricMRel F, ForwardConfluent F, BackwardConfluent F
+
+/-- - [Pac24, Definition 7] -/
+class IsIK (F : Frame κ) : Prop extends ForwardConfluent F, BackwardConfluent F where
+  not_fallible : ∀ x : F.World, ¬ F.Fallible x
+
+/-- - [Pac24, Definition 7] -/
+class IsIKB (F : Frame κ) : Prop extends IsIK F, SymmetricMRel F
+
+instance [F.IsIKB] : F.IsCKB where
+
+end Frame
 
 namespace Model
 
