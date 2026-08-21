@@ -11,6 +11,7 @@ public import NCML.CK.Frame.BDia
 public import NCML.CK.Frame.BackwardConfluent
 public import NCML.CK.Frame.EuclideanMRel
 public import NCML.CK.Frame.ForwardConfluent
+public import NCML.CK.Frame.FourBox
 public import NCML.CK.Frame.FrameClass
 public import NCML.CK.Frame.PBox
 public import NCML.CK.Frame.ReflexiveMComp
