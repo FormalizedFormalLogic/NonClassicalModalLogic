@@ -6,9 +6,12 @@ public import NCML.CK.Semantics
 
 namespace CK
 
+variable {κ : Type*}
+variable {A B : BDFormula}
+
 namespace Frame
 
-variable {κ : Type*} {F : Frame κ}
+variable {F : Frame κ}
 
 /-- - [Pac24, Definition 5] -/
 class ForwardConfluent (F : Frame κ) : Prop where
@@ -60,8 +63,8 @@ namespace Model
 
 open CK.Frame
 
-variable {κ : Type*} {M : Model κ}
-variable {x : M.World} {A B : BDFormula}
+variable {M : Model κ}
+variable {x : M.World}
 
 /-- - [Pac24, Proposition 6] -/
 lemma dia_iff_forward_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] ◇A ↔ ∃ y, x ⊏ y ∧ y ⊩[_] A := by
@@ -71,59 +74,6 @@ lemma dia_iff_forward_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] ◇A �
   · rintro ⟨y, Mxy, hyA⟩ x₁ Ixx₁;
     obtain ⟨y₁, Iyy₁, Mx₁y₁⟩ := forward_confluent Mxy Ixx₁;
     exact ⟨y₁, Mx₁y₁, forces_persistent hyA Iyy₁⟩;
-
-/--
-- [dGSC25]
-- [Pac24, Theorem 11]
--/
-lemma forces_N_of_symmetricMRel [M.SymmetricMRel] : x ⊩[_] ∼◇⊥ := by
-  intro y _ hy;
-  obtain ⟨z, Myz, hz⟩ := hy y (refl y);
-  exact M.fallible_mRel hz (symm_mRel Myz);
-
-/--
-- [Pac24, Corollary 12]
--/
-lemma valid_N_of_symmetricMRel [M.SymmetricMRel] : M ⊧ ∼◇⊥ := fun
-  _ => forces_N_of_symmetricMRel
-
-
-/--
-- [dGSC25]
-- [Pac24, Theorem 11]
--/
-lemma forces_DP_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] (◇(A ⋎ B) 🡒 (◇A ⋎ ◇B)) := by
-  intro y _ hy;
-  obtain ⟨z, Myz, hz⟩ := Model.dia_iff_forward_of_forwardConfluent.mp hy;
-  rcases hz with hz | hz;
-  · exact Or.inl (Model.dia_iff_forward_of_forwardConfluent.mpr ⟨z, Myz, hz⟩);
-  · exact Or.inr (Model.dia_iff_forward_of_forwardConfluent.mpr ⟨z, Myz, hz⟩);
-
-/--
-- [Pac24, Corollary 12]
--/
-lemma valid_DP_of_forwardConfluent [M.ForwardConfluent] : M ⊧ (◇(A ⋎ B) 🡒 (◇A ⋎ ◇B)) := fun
-  _ => forces_DP_of_forwardConfluent
-
-/--
-- [dGSC25]
-- [Pac24, Theorem 11]
--/
-lemma forces_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] [M.BackwardConfluent] :
-  x ⊩[_] ((◇A 🡒 □B) 🡒 □(A 🡒 B)) := by
-  intro y Ixy hy v u Iyv Mvu w Iuw hwA;
-  obtain ⟨v₁, Ivv₁, Mv₁w⟩ := backward_confluent Mvu Iuw;
-  have hv₁diaA : v₁ ⊩[_] ◇A := by
-    intro v₂ Iv₁v₂;
-    obtain ⟨w₁, Iww₁, Mv₂w₁⟩ := forward_confluent Mv₁w Iv₁v₂;
-    exact ⟨w₁, Mv₂w₁, forces_persistent hwA Iww₁⟩;
-  exact hy v₁ (Trans.trans Iyv Ivv₁) hv₁diaA v₁ w (refl v₁) Mv₁w;
-
-/--
-- [Pac24, Corollary 12]
--/
-lemma valid_FS_of_forwardConfluent_of_backwardConfluent [M.ForwardConfluent] [M.BackwardConfluent] : M ⊧ ((◇A 🡒 □B) 🡒 □(A 🡒 B)) := fun
-  _ => forces_FS_of_forwardConfluent_of_backwardConfluent
 
 lemma valid_BDia_of_symmetricMRel [M.SymmetricMRel] : M ⊧ (◇(□A) 🡒 A) := by
   intro x y _ hy;
@@ -135,6 +85,49 @@ lemma valid_BBox_of_symmetricMRel_of_forwardConfluent [M.SymmetricMRel] [M.Forwa
   grind [forward_confluent, symm_mRel];
 
 end Model
+
+namespace Frame
+
+variable {F : Frame κ}
+
+/--
+- [dGSC25]
+- [Pac24, Theorem 11]
+- [Pac24, Corollary 12]
+-/
+lemma valid_N_of_symmetricMRel [F.SymmetricMRel] : F ⊧ ∼◇⊥ := by
+  intro val val_persistent fallible_val x y _ hy;
+  obtain ⟨z, Myz, hz⟩ := hy y (refl y);
+  exact F.fallible_mRel hz (symm_mRel Myz);
+
+/--
+- [dGSC25]
+- [Pac24, Theorem 11]
+- [Pac24, Corollary 12]
+-/
+lemma valid_DP_of_forwardConfluent [F.ForwardConfluent] : F ⊧ (◇(A ⋎ B) 🡒 (◇A ⋎ ◇B)) := by
+  intro val val_persistent fallible_val x y _ hy;
+  obtain ⟨z, Myz, hz⟩ := Model.dia_iff_forward_of_forwardConfluent.mp hy;
+  rcases hz with hz | hz;
+  · exact Or.inl (Model.dia_iff_forward_of_forwardConfluent.mpr ⟨z, Myz, hz⟩);
+  · exact Or.inr (Model.dia_iff_forward_of_forwardConfluent.mpr ⟨z, Myz, hz⟩);
+
+/--
+- [dGSC25]
+- [Pac24, Theorem 11]
+- [Pac24, Corollary 12]
+-/
+lemma valid_FS_of_forwardConfluent_of_backwardConfluent [F.ForwardConfluent] [F.BackwardConfluent] :
+  F ⊧ ((◇A 🡒 □B) 🡒 □(A 🡒 B)) := by
+  intro val val_persistent fallible_val x y Ixy hy v u Iyv Mvu w Iuw hwA;
+  obtain ⟨v₁, Ivv₁, Mv₁w⟩ := backward_confluent Mvu Iuw;
+  have hv₁diaA : v₁ ⊩[_] ◇A := by
+    intro v₂ Iv₁v₂;
+    obtain ⟨w₁, Iww₁, Mv₂w₁⟩ := forward_confluent Mv₁w Iv₁v₂;
+    exact ⟨w₁, Mv₂w₁, forces_persistent hwA Iww₁⟩;
+  exact hy v₁ (Trans.trans Iyv Ivv₁) hv₁diaA v₁ w (refl v₁) Mv₁w;
+
+end Frame
 
 end CK
 
