@@ -36,6 +36,15 @@ end Model
 
 variable {L : BDLogic} [L.CK]
 
+/-- No forbidden formula of a pair belongs to its theory, when `L` proves `T◇`. -/
+lemma CanonicalPair.forbidden_not_mem_theory [L.TDia] {P : CanonicalPair L} {B : BDFormula}
+  (hB : B ∈ P.forbidden) : B ∉ P.theory := by
+  intro h;
+  have h₁ : ◇B ∈ P.theory := P.theory.mdp (P.theory.subset L.tDia) h;
+  have h₂ : ◇(⋁[B]) ∈ P.theory :=
+    P.theory.mdp (BDTheory.provable_mem (dia_mono (imp_ldisj (by simp)))) h₁;
+  exact P.avoid (◇(⋁[B])) ⟨⋁[B], ⟨[B], by simp, by grind, rfl⟩, rfl⟩ h₂;
+
 private lemma avoid_disjSet_mdpClosure [L.TDia] (P : CanonicalPair L) :
   ∀ C ∈ disjSet P.forbidden, C ∉ BDTheory.mdpClosure (P.theory ∪ □⁻¹P.theory) := by
   rintro C ⟨K, hne, hsub, rfl⟩ hmem;
