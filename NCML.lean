@@ -16,6 +16,7 @@ public import NCML.CK.Frame.ReturningMRel
 public import NCML.CK.Frame.SerialMRel
 public import NCML.CK.Frame.StrictlyAscendingMRel
 public import NCML.CK.Frame.SymmetricMRel
+public import NCML.CK.Frame.TransitiveMRel
 public import NCML.CK.Logic.CK
 public import NCML.CK.Logic.CKB
 public import NCML.CK.Logic.CKD
