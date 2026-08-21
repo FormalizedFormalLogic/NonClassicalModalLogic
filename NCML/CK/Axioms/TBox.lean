@@ -56,28 +56,28 @@ lemma valid_TBox_of_reflexiveMComp [F.ReflexiveMComp] : F ⊧ (□A 🡒 A) :=
   fun _ _ _ => Model.valid_TBox_of_reflexiveMComp
 
 lemma reflexiveMComp_of_valid_TBox (h : F ⊧ (□(#0) 🡒 #0)) : F.ReflexiveMComp where
-  reflexive_mComp w := by
+  reflexive_mComp x := by
     let M : Model κ := {
       toFrame := F,
-      val := fun x _ => (∃ u v, w ≼ u ∧ u ⊏ v ∧ v ≼ x) ∨ F.Fallible x,
+      val := fun y _ => (∃ z w, x ≼ z ∧ z ⊏ w ∧ w ≼ y) ∨ F.Fallible y,
       val_persistent := by
-        rintro x y a (⟨u, v, Iwu, Muv, Ivx⟩ | hx) Ixy;
+        rintro y z a (⟨w, v, Ixw, Mwv, Ivy⟩ | hy) Iyz;
         . left;
-          exact ⟨u, v, Iwu, Muv, Trans.trans Ivx Ixy⟩;
+          exact ⟨w, v, Ixw, Mwv, Trans.trans Ivy Iyz⟩;
         . right;
-          exact F.fallible_iRel hx Ixy;
+          exact F.fallible_iRel hy Iyz;
       fallible_val := by
-        rintro x a hx;
+        rintro y a hy;
         right;
-        exact hx;
+        exact hy;
     }
-    have hwBoxA : w ⊩[M] □(#0) := fun y z Iwy Myz => Or.inl ⟨y, z, Iwy, Myz, refl z⟩;
-    obtain ⟨u, v, Iwu, Muv, Ivw⟩ | hw :=
-      h M.val M.val_persistent M.fallible_val w w (refl w) hwBoxA;
+    have hxBoxA : x ⊩[M] □(#0) := fun y z Ixy Myz => Or.inl ⟨y, z, Ixy, Myz, refl z⟩;
+    obtain ⟨y, z, Ixy, Myz, Izx⟩ | hx :=
+      h M.val M.val_persistent M.fallible_val x x (refl x) hxBoxA;
     . right;
-      exact ⟨u, v, Iwu, Muv, Ivw⟩;
+      exact ⟨y, z, Ixy, Myz, Izx⟩;
     . left;
-      exact hw;
+      exact hx;
 
 /-- `T□` defines the frames on which `≼ ∘ ⊏ ∘ ≼` is reflexive away from the fallible worlds. -/
 theorem reflexiveMComp_TFAE : List.TFAE [
