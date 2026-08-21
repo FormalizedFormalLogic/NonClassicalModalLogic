@@ -32,7 +32,7 @@ class IsCKB (F : Frame κ) : Prop extends SymmetricMRel F, ForwardConfluent F, B
 
 /-- - [Pac24, Definition 7] -/
 class IsIK (F : Frame κ) : Prop extends ForwardConfluent F, BackwardConfluent F where
-  not_fallible : ∀ x : F.World, ¬ F.Fallible x
+  infallible : ∀ x : F.World, F.Infallible x
 
 /-- - [Pac24, Definition 7] -/
 class IsIKB (F : Frame κ) : Prop extends IsIK F, SymmetricMRel F
@@ -197,7 +197,7 @@ instance : CKBcanonicalModel.ForwardConfluent :=
 
 /-- - [Pac24, Lemma 17] -/
 instance : CKBcanonicalModel.IsIKB where
-  not_fallible _ h := h.elim
+  infallible _ h := h.elim
 
 section Diamond
 
