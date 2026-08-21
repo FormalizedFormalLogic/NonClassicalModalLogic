@@ -32,7 +32,7 @@ instance [F.SymmetricMRel] [F.ForwardConfluent] : F.StrictlyCircularMComp where
     exact ⟨w, Mzw, Ixw⟩;
 
 lemma valid_BBox_of_circularMComp [F.CircularMComp] : F ⊧ (A 🡒 □◇A) := by
-  intro val val_persistent fallible_val x y Ixy hyA z w Iyz Mzw v Iwv;
+  intro V V_per V_fal x y Ixy hyA z w Iyz Mzw v Iwv;
   obtain ⟨u, Mvu, Izu | hu⟩ := circular_mComp Mzw Iwv;
   . exact ⟨u, Mvu, forces_persistent hyA (Trans.trans Iyz Izu)⟩;
   . exact ⟨u, Mvu, forces_of_fallible hu⟩;

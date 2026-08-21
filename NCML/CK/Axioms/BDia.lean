@@ -42,7 +42,7 @@ instance [F.SymmetricMRel] : F.StrictlyReturningMComp where
       . apply refl;
 
 lemma valid_BDia_of_returningMComp [F.ReturningMComp] : F ⊧ (◇(□A) 🡒 A) := by
-  intro val val_persistent fallible_val x y _ hy;
+  intro V V_per V_fal x y _ hy;
   rcases returning_mComp y with hFallible | ⟨z, Iyz, hz⟩;
   . exact forces_of_fallible hFallible;
   . obtain ⟨w, Izw, hw⟩ := hy z Iyz;

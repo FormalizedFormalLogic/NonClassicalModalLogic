@@ -87,7 +87,7 @@ variable {F : Frame κ}
 - [Pac24, Corollary 12]
 -/
 lemma valid_N_of_symmetricMRel [F.SymmetricMRel] : F ⊧ ∼◇⊥ := by
-  intro val val_persistent fallible_val x y _ hy;
+  intro V V_per V_fal x y _ hy;
   obtain ⟨z, Myz, hz⟩ := hy y (refl y);
   exact F.fallible_mRel hz (symm_mRel Myz);
 
@@ -97,7 +97,7 @@ lemma valid_N_of_symmetricMRel [F.SymmetricMRel] : F ⊧ ∼◇⊥ := by
 - [Pac24, Corollary 12]
 -/
 lemma valid_DP_of_forwardConfluent [F.ForwardConfluent] : F ⊧ (◇(A ⋎ B) 🡒 (◇A ⋎ ◇B)) := by
-  intro val val_persistent fallible_val x y _ hy;
+  intro V V_per V_fal x y _ hy;
   obtain ⟨z, Myz, hz⟩ := Model.dia_iff_forward_of_forwardConfluent.mp hy;
   rcases hz with hz | hz;
   · left; exact Model.dia_iff_forward_of_forwardConfluent.mpr ⟨z, Myz, hz⟩;
