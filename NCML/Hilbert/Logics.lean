@@ -49,6 +49,13 @@ abbrev LogicCK4 : BDLogic := ProvableBDHilbert.logic (
   { ◇◇A 🡒 ◇A | (A) }
 )
 
+abbrev LogicCS4 : BDLogic := ProvableBDHilbert.logic (
+  { □A 🡒 A | (A) } ∪
+  { A 🡒 ◇A | (A) } ∪
+  { □A 🡒 □□A | (A) } ∪
+  { ◇◇A 🡒 ◇A | (A) }
+)
+
 namespace BDLogic
 
 class CK (L : BDLogic) : Prop extends Mdp L, Nec L where
@@ -71,6 +78,7 @@ lemma LogicCK.subset_CKPDia : LogicCK ⊆ LogicCKPDia := .logic_monotone (by gri
 lemma LogicCK.subset_CK4Box : LogicCK ⊆ LogicCK4Box := .logic_monotone (by grind)
 lemma LogicCK.subset_CK4Dia : LogicCK ⊆ LogicCK4Dia := .logic_monotone (by grind)
 lemma LogicCK.subset_CK4 : LogicCK ⊆ LogicCK4 := .logic_monotone (by grind)
+lemma LogicCK.subset_CS4 : LogicCK ⊆ LogicCS4 := .logic_monotone (by grind)
 
 lemma ProvableBDHilbert.provable_D_of_PDia
     {𝔸 : Set BDFormula} {A : BDFormula} (h : ⊢ᴴ[CK;𝔸] (◇⊤ : BDFormula)) :
@@ -201,5 +209,17 @@ open ProvableBDHilbert
 @[simp, grind .] lemma provable_FourDia : (◇◇A 🡒 ◇A) ∈ LogicCK4 := axm (by grind)
 
 end LogicCK4
+
+
+namespace LogicCS4
+
+open ProvableBDHilbert
+
+@[simp, grind .] lemma provable_TBox : (□A 🡒 A) ∈ LogicCS4 := axm (by grind)
+@[simp, grind .] lemma provable_TDia : (A 🡒 ◇A) ∈ LogicCS4 := axm (by grind)
+@[simp, grind .] lemma provable_FourBox : (□A 🡒 □□A) ∈ LogicCS4 := axm (by grind)
+@[simp, grind .] lemma provable_FourDia : (◇◇A 🡒 ◇A) ∈ LogicCS4 := axm (by grind)
+
+end LogicCS4
 
 end
