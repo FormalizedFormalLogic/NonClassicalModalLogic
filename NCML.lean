@@ -4,6 +4,7 @@ public import NCML.CK.Canonical
 public import NCML.CK.Countermodel.BBox
 public import NCML.CK.Countermodel.ReturningMRel
 public import NCML.CK.Countermodel.SerialMRel
+public import NCML.CK.Countermodel.T
 public import NCML.CK.Countermodel.TDia
 public import NCML.CK.Frame.BBox
 public import NCML.CK.Frame.BDia
@@ -15,6 +16,7 @@ public import NCML.CK.Frame.ForwardConfluent
 public import NCML.CK.Frame.FourBox
 public import NCML.CK.Frame.FourDia
 public import NCML.CK.Frame.PBox
+public import NCML.CK.Frame.ReflexiveMRel
 public import NCML.CK.Frame.ReturningMRel
 public import NCML.CK.Frame.SerialMRel
 public import NCML.CK.Frame.StrictlyAscendingMRel
