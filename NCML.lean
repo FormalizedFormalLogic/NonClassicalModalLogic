@@ -36,6 +36,7 @@ public import NCML.CK.Logic.CKD
 public import NCML.CK.Logic.CKT
 public import NCML.CK.Logic.CKTBox
 public import NCML.CK.Logic.CKTDia
+public import NCML.CK.Logic.CS4
 public import NCML.CK.Semantics
 public import NCML.CK.Soundness
 public import NCML.Formula
