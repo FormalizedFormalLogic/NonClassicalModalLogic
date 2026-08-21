@@ -7,6 +7,7 @@ public import NCML.CK.Logic.CK4Dia
 public import NCML.CK.Frame.ReflexiveMRel
 public import NCML.CK.Frame.TransitiveMRel
 public import NCML.CK.Frame.BackwardConfluent
+public import NCML.CK.Frame.CS4
 
 @[expose] public section
 
@@ -174,6 +175,9 @@ instance backwardConfluent_hereditaryCanonicalModel :
     . intro A hA;
       exact IYZ (MXY.1 hA);
     . tauto;
+
+instance cs4_hereditaryCanonicalModel [L.TBox] [L.FourBox] :
+    (hereditaryCanonicalModel L).CS4 where
 
 end CK
 
