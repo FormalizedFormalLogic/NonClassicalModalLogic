@@ -18,18 +18,27 @@ variable {F : Frame κ}
 covered by a single `≼ ∘ ⊏`-step, up to `≼` and fallibility. -/
 class FourBox (F : Frame κ) : Prop where
   fourBox : ∀ {x y z w : F.World}, x ⊏ y → y ≼ z → z ⊏ w →
-    F.Fallible w ∨ ∃ v u, x ≼ v ∧ v ⊏ u ∧ u ≼ w
-export FourBox (fourBox)
+    F.Infallible w → ∃ v u, x ≼ v ∧ v ⊏ u ∧ u ≼ w
+
+lemma FourBox.fourBox' [F.FourBox] : ∀ {x y z w : F.World}, x ⊏ y → y ≼ z → z ⊏ w →
+  F.Fallible w ∨ ∃ v u, x ≼ v ∧ v ⊏ u ∧ u ≼ w := by
+  intro x y z w Mxy Iyz Mzw;
+  by_cases hFallible : F.Fallible w;
+  . left;
+    exact hFallible;
+  . right;
+    exact fourBox Mxy Iyz Mzw hFallible;
+
+export FourBox (fourBox fourBox')
 
 instance [F.TransitiveMRel] [F.BackwardConfluent] : F.FourBox where
-  fourBox {x y z w} Mxy Iyz Mzw := by
+  fourBox {x y z w} Mxy Iyz Mzw _ := by
     obtain ⟨v, Ixv, Mvz⟩ := backward_confluent Mxy Iyz;
-    right;
     exact ⟨v, w, Ixv, trans_mRel Mvz Mzw, refl w⟩;
 
 lemma frameValidate_FourBox_of_frame_FourBox [F.FourBox] : F ⊧ (□A 🡒 □□A) := by
   intro V V_per V_fal x y Ixy hy z w Iyz Mzw v u Iwv Mvu;
-  rcases fourBox Mzw Iwv Mvu with hu | ⟨v₁, u₁, Izv₁, Mv₁u₁, Iu₁u⟩;
+  rcases fourBox' Mzw Iwv Mvu with hu | ⟨v₁, u₁, Izv₁, Mv₁u₁, Iu₁u⟩;
   . exact forces_of_fallible hu;
   . exact forces_persistent (hy v₁ u₁ (Trans.trans Iyz Izv₁) Mv₁u₁) Iu₁u;
 
@@ -37,26 +46,17 @@ lemma frame_FourBox_of_frameValidate_FourBox (h : F ⊧ (□(#0) 🡒 □□(#0)
   fourBox {x y z w} Mxy Iyz Mzw := by
     let M : Model κ := {
       toFrame := F,
-      val := fun v _ => (∃ u₁ t₁, x ≼ u₁ ∧ u₁ ⊏ t₁ ∧ t₁ ≼ v) ∨ F.Fallible v,
+      val := fun v _ => F.Infallible v → ∃ u₁ t₁, x ≼ u₁ ∧ u₁ ⊏ t₁ ∧ t₁ ≼ v,
       val_persistent := by
-        rintro v u a (⟨u₁, t₁, Ixu₁, Mu₁t₁, Itv⟩ | hv) Ivu;
-        . left;
-          exact ⟨u₁, t₁, Ixu₁, Mu₁t₁, Trans.trans Itv Ivu⟩;
-        . right;
-          exact F.fallible_iRel hv Ivu;
-      fallible_val := by
-        rintro v a hv;
-        right;
-        exact hv;
+        rintro v u a h Ivu Iu;
+        obtain ⟨u₁, t₁, Ixu₁, Mu₁t₁, Itv⟩ := h (infallible_iRel Iu Ivu);
+        exact ⟨u₁, t₁, Ixu₁, Mu₁t₁, Trans.trans Itv Ivu⟩;
+      fallible_val := by grind;
     }
-    have hxBoxA : x ⊩[M] □(#0) := fun v u₁ Ixv Mvu₁ => Or.inl ⟨v, u₁, Ixv, Mvu₁, refl u₁⟩;
+    have hxBoxA : x ⊩[M] □(#0) := fun v u₁ Ixv Mvu₁ _ => ⟨v, u₁, Ixv, Mvu₁, refl u₁⟩;
     have hxBoxBoxA : x ⊩[M] □□(#0) :=
       h M.val M.val_persistent M.fallible_val x x (refl x) hxBoxA;
-    rcases hxBoxBoxA x y (refl x) Mxy z w Iyz Mzw with ⟨v₁, u₁, Ixv₁, Mv₁u₁, Iu₁w⟩ | hw;
-    . right;
-      exact ⟨v₁, u₁, Ixv₁, Mv₁u₁, Iu₁w⟩;
-    . left;
-      exact hw;
+    exact hxBoxBoxA x y (refl x) Mxy z w Iyz Mzw;
 
 /-- `4□` defines the frames on which `⊏ ∘ ≼ ∘ ⊏` collapses to `≼ ∘ ⊏ ∘ ≼`, away from the
 fallible worlds. -/
