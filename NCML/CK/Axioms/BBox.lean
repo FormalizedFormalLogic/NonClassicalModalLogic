@@ -19,20 +19,12 @@ class BBox (F : Frame κ) : Prop where
   bBox : ∀ {x y z : F.World}, x ⊏ y → y ≼ z → ∃ w, z ⊏ w ∧ (x ≼ w ∨ F.Fallible w)
 export BBox (bBox)
 
-/-- `BBox` with the fallibility escape dropped: the reversing `⊏`-step lands `≼`-back at `x`. -/
-class StrictBBox (F : Frame κ) : Prop where
-  strict_bBox : ∀ {x y z : F.World}, x ⊏ y → y ≼ z → ∃ w, z ⊏ w ∧ x ≼ w
-export StrictBBox (strict_bBox)
-
-instance [F.StrictBBox] : F.BBox where
+instance [F.SymmetricMRel] [F.ForwardConfluent] : F.BBox where
   bBox Mxy Iyz := by
-    obtain ⟨w, Mzw, Ixw⟩ := strict_bBox Mxy Iyz;
-    exact ⟨w, Mzw, Or.inl Ixw⟩;
-
-instance [F.SymmetricMRel] [F.ForwardConfluent] : F.StrictBBox where
-  strict_bBox Mxy Iyz := by
     obtain ⟨w, Ixw, Mzw⟩ := forward_confluent (symm_mRel Mxy) Iyz;
-    exact ⟨w, Mzw, Ixw⟩;
+    refine ⟨w, Mzw, ?_⟩;
+    left;
+    exact Ixw;
 
 lemma valid_BBox [F.BBox] : F ⊧ (A 🡒 □◇A) := by
   intro V V_per V_fal x y Ixy hyA z w Iyz Mzw v Iwv;

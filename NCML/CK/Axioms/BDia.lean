@@ -20,18 +20,8 @@ class BDia (F : Frame κ) : Prop where
     ∃ y, x ≼ y ∧ ∀ z, y ⊏ z → ∃ w v, z ≼ w ∧ w ⊏ v ∧ v ≼ x
 export BDia (bDia)
 
-/-- `BDia` with the fallibility escape dropped: every world has such a returning `≼`-successor. -/
-class StrictBDia (F : Frame κ) : Prop where
-  strict_bDia : ∀ x : F.World,
-    ∃ y, x ≼ y ∧ ∀ z, y ⊏ z → ∃ w v, z ≼ w ∧ w ⊏ v ∧ v ≼ x
-export StrictBDia (strict_bDia)
-
-
-instance [F.StrictBDia] : F.BDia where
-  bDia x _ := strict_bDia x;
-
-instance [F.SymmetricMRel] : F.StrictBDia where
-  strict_bDia x := by
+instance [F.SymmetricMRel] : F.BDia where
+  bDia x _ := by
     use x;
     and_intros;
     . apply refl;
