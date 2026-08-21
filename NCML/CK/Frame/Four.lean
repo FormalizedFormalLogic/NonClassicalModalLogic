@@ -26,7 +26,7 @@ lemma frameValidate_Four_of_frame_Four [F.Four] : F ⊧ ((□A 🡒 □□A) ⋏
   ⟩;
 
 lemma frame_Four_of_frameValidate_Four
-    (h : F ⊧ ((□(#0) 🡒 □□(#0)) ⋏ (◇◇(#0) 🡒 ◇(#0)))) : F.Four where
+  (h : F ⊧ ((□(#0) 🡒 □□(#0)) ⋏ (◇◇(#0) 🡒 ◇(#0)))) : F.Four where
   toFourBox := frame_FourBox_of_frameValidate_FourBox (fun V V_per V_fal x => (h V V_per V_fal x).1)
   toFourDia := frame_FourDia_of_frameValidate_FourDia (fun V V_per V_fal x => (h V V_per V_fal x).2)
 

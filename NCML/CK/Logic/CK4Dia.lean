@@ -100,8 +100,7 @@ private lemma avoid_diaBlocked : ∀ A ∈ P.diaBlocked, A ∉ P.theory := by
   have h₂ : ◇(C 🡒 D) ∈ P.theory := P.theory.mdp (BDTheory.provable_mem (dia_mono d₂)) h₁;
   have h₃ : (◇(C 🡒 D) 🡒 ◇D) ∈ P.theory := P.theory.mdp (BDTheory.provable_mem dia_mdp) hC;
   have h₄ : ◇D ∈ P.theory := P.theory.mdp h₃ h₂;
-  obtain ⟨K, hne, hsub, rfl⟩ := hD;
-  exact P.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ h₄;
+  exact P.avoid (◇D) ⟨D, hD, rfl⟩ h₄;
 
 private lemma avoid_diaDisjSet_diaBlocked [L.FourDia] {T : BDTheory} [T.Mdp] [T.Of L]
   (h : ∀ A ∈ P.diaBlocked, A ∉ T) : ∀ A ∈ diaDisjSet P.diaBlocked, A ∉ T := by
