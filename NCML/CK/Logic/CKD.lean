@@ -6,6 +6,16 @@ public import NCML.CK.Soundness
 
 @[expose] public section
 
+namespace BDLogic
+
+class D (L : BDLogic) where
+  d {A} : (□A 🡒 ◇A) ∈ L
+export D (d)
+
+end BDLogic
+
+instance : LogicCKD.D := ⟨by grind⟩
+
 open ProvableBDHilbert
 open scoped BDFormulaSet BDFormulaList
 
@@ -30,12 +40,12 @@ end Model
 
 variable {L : BDLogic} [L.CK]
 
-lemma serialMRel_canonicalModel (hD : ∀ {A}, (□A 🡒 ◇A) ∈ L) : (canonicalModel L).SerialMRel where
+instance serialMRel_canonicalModel [L.D] : (canonicalModel L).SerialMRel where
   serial_mRel P := by
     have h : ∀ C ∈ disjSet P.forbidden, C ∉ □⁻¹P.theory := by
       rintro C ⟨K, hne, hsub, rfl⟩ hmem;
       exact P.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩
-        (P.theory.mdp (P.theory.subset (L := L) hD) hmem);
+        (P.theory.mdp (P.theory.subset L.d) hmem);
     obtain ⟨P₁, h₁, -, havoid⟩ :=
       CanonicalPair.exists_avoiding (L := L) (T := □⁻¹P.theory) orDirected_disjSet h;
     exact ⟨P₁, CanonicalPair.mRel_of_avoid_disjSet h₁ havoid⟩;
@@ -56,7 +66,7 @@ theorem LogicCKD_TFAE {A : BDFormula} : List.TFAE [
     obtain ⟨P, h₁⟩ := CK.exists_not_forces_of_not_mem h;
     refine ⟨_, (CK.canonicalModel LogicCKD).toFrame, ?_⟩;
     and_intros;
-    . exact CK.serialMRel_canonicalModel (by grind);
+    . infer_instance;
     . by_contra! hF;
       exact h₁ $ CK.Model.valid_of_toFrame_valid hF P;
   tfae_finish

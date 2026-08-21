@@ -6,6 +6,16 @@ public import NCML.CK.Soundness
 
 @[expose] public section
 
+namespace BDLogic
+
+class TDia (L : BDLogic) where
+  tDia {A} : (A 🡒 ◇A) ∈ L
+export TDia (tDia)
+
+end BDLogic
+
+instance : LogicCKTDia.TDia := ⟨by grind⟩
+
 open ProvableBDHilbert
 open scoped BDFormulaSet BDFormulaList
 
@@ -26,24 +36,22 @@ end Model
 
 variable {L : BDLogic} [L.CK]
 
-private lemma avoid_disjSet_mdpClosure (hTDia : ∀ {A}, (A 🡒 ◇A) ∈ L) (P : CanonicalPair L) :
+private lemma avoid_disjSet_mdpClosure [L.TDia] (P : CanonicalPair L) :
   ∀ C ∈ disjSet P.forbidden, C ∉ BDTheory.mdpClosure (P.theory ∪ □⁻¹P.theory) := by
   rintro C ⟨K, hne, hsub, rfl⟩ hmem;
   obtain ⟨D, hD, E, hE, hDE⟩ := BDTheory.mdpClosure_union_finite_char hmem;
   have h₁ : □(D 🡒 ⋁K) ∈ P.theory :=
     P.theory.mdp (BDTheory.provable_mem (box_mono (mdp imp_swap hDE))) hE;
   have h₂ : (◇D 🡒 ◇(⋁K)) ∈ P.theory := P.theory.mdp (BDTheory.provable_mem kDia) h₁;
-  have h₃ : ◇D ∈ P.theory := P.theory.mdp (P.theory.subset (L := L) hTDia) hD;
+  have h₃ : ◇D ∈ P.theory := P.theory.mdp (P.theory.subset L.tDia) hD;
   exact P.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ (P.theory.mdp h₂ h₃);
 
-lemma strictlyAscendingMRel_canonicalModel (hTDia : ∀ {A}, (A 🡒 ◇A) ∈ L) :
-  (canonicalModel L).StrictlyAscendingMRel where
+instance strictlyAscendingMRel_canonicalModel [L.TDia] : (canonicalModel L).StrictlyAscendingMRel where
   strictly_ascending_mRel P := by
-    have : BDTheory.Of L (P.theory ∪ □⁻¹P.theory) :=
-      ⟨(P.theory.subset (L := L)).trans Set.subset_union_left⟩;
+    have : BDTheory.Of L (P.theory ∪ □⁻¹P.theory) := ⟨P.theory.subset.trans Set.subset_union_left⟩;
     obtain ⟨P₁, h₁, -, havoid⟩ :=
       CanonicalPair.exists_avoiding (L := L) (T := BDTheory.mdpClosure (P.theory ∪ □⁻¹P.theory))
-      orDirected_disjSet (avoid_disjSet_mdpClosure hTDia P);
+      orDirected_disjSet (avoid_disjSet_mdpClosure P);
     have h₂ : P.theory ∪ □⁻¹P.theory ⊆ P₁.theory := BDTheory.subset_mdpClosure.trans h₁;
     use P₁;
     constructor;
@@ -65,7 +73,7 @@ theorem LogicCKTDia_TFAE {A : BDFormula} : List.TFAE [
     obtain ⟨P, h₁⟩ := CK.exists_not_forces_of_not_mem h;
     refine ⟨_, (CK.canonicalModel LogicCKTDia).toFrame, ?_⟩;
     and_intros;
-    . exact CK.strictlyAscendingMRel_canonicalModel (by grind);
+    . infer_instance;
     . by_contra! hF;
       exact h₁ $ CK.Model.valid_of_toFrame_valid hF P;
   tfae_finish

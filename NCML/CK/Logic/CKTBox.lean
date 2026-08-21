@@ -6,6 +6,16 @@ public import NCML.CK.Soundness
 
 @[expose] public section
 
+namespace BDLogic
+
+class TBox (L : BDLogic) where
+  tBox {A} : (□A 🡒 A) ∈ L
+export TBox (tBox)
+
+end BDLogic
+
+instance : LogicCKTBox.TBox := ⟨by grind⟩
+
 open ProvableBDHilbert
 
 namespace CK
@@ -25,11 +35,11 @@ end Model
 
 variable {L : BDLogic} [L.CK]
 
-lemma returningMRel_canonicalModel (hTBox : ∀ {A}, (□A 🡒 A) ∈ L) : (canonicalModel L).ReturningMRel where
+instance returningMRel_canonicalModel [L.TBox] : (canonicalModel L).ReturningMRel where
   returning_mRel P := ⟨
     P.erase,
     CanonicalPair.iRel_erase,
-    fun _ hA => P.theory.mdp (P.theory.subset (L := L) hTBox) hA,
+    fun _ hA => P.theory.mdp (P.theory.subset L.tBox) hA,
     by simp
   ⟩
 
@@ -48,7 +58,7 @@ theorem LogicCKTBox_TFAE {A : BDFormula} : List.TFAE [
     obtain ⟨P, h₁⟩ := CK.exists_not_forces_of_not_mem h;
     refine ⟨_, (CK.canonicalModel LogicCKTBox).toFrame, ?_⟩;
     and_intros;
-    . exact CK.returningMRel_canonicalModel (by grind);
+    . infer_instance;
     . by_contra! hF;
       exact h₁ $ CK.Model.valid_of_toFrame_valid hF P;
   tfae_finish
