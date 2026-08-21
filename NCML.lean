@@ -1,11 +1,10 @@
 module  -- shake: keep-all --deprecated_module: ignore
 
 public import NCML.CK.Canonical
-public import NCML.CK.Countermodel.AscendingMRel
 public import NCML.CK.Countermodel.BBox
 public import NCML.CK.Countermodel.ReturningMRel
 public import NCML.CK.Countermodel.SerialMRel
-public import NCML.CK.Frame.AscendingMRel
+public import NCML.CK.Countermodel.TDia
 public import NCML.CK.Frame.BBox
 public import NCML.CK.Frame.BDia
 public import NCML.CK.Frame.BackwardConfluent
@@ -21,6 +20,7 @@ public import NCML.CK.Frame.SerialMRel
 public import NCML.CK.Frame.StrictlyAscendingMRel
 public import NCML.CK.Frame.SymmetricMRel
 public import NCML.CK.Frame.TBox
+public import NCML.CK.Frame.TDia
 public import NCML.CK.Frame.TransitiveMRel
 public import NCML.CK.Logic.CK
 public import NCML.CK.Logic.CKB

@@ -18,8 +18,8 @@ namespace Model
 
 open CK.Frame
 
-lemma valid_of_mem_LogicCKTDia [M.AscendingMRel] (hA : A ∈ LogicCKTDia) : M ⊧ A :=
-  valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TDia_of_ascendingMRel) hA
+lemma valid_of_mem_LogicCKTDia [M.TDia] (hA : A ∈ LogicCKTDia) : M ⊧ A :=
+  valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TDia) hA
 
 end Model
 
@@ -53,7 +53,7 @@ end CK
 
 theorem LogicCKTDia_TFAE {A : BDFormula} : List.TFAE [
   A ∈ LogicCKTDia,
-  ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.AscendingMRel] → F ⊧ A,
+  ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.TDia] → F ⊧ A,
   ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.StrictlyAscendingMRel] → F ⊧ A,
 ] := by
   tfae_have 1 → 2 := fun h _ F _ V V_per V_fal => CK.Model.valid_of_mem_LogicCKTDia h

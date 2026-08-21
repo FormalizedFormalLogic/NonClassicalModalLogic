@@ -1,6 +1,6 @@
 module
 
-public import NCML.CK.Frame.AscendingMRel
+public import NCML.CK.Frame.TDia
 
 @[expose] public section
 
@@ -17,8 +17,8 @@ class StrictlyAscendingMRel (F : Frame κ) : Prop where
 
 export StrictlyAscendingMRel (strictly_ascending_mRel)
 
-instance [F.StrictlyAscendingMRel] : F.AscendingMRel where
-  ascending_mRel x := by
+instance [F.StrictlyAscendingMRel] : F.TDia where
+  tDia x := by
     obtain ⟨z, Mxz, Ixz⟩ := strictly_ascending_mRel x;
     refine ⟨z, Mxz, ?_⟩;
     left;
