@@ -71,9 +71,9 @@ lemma dia_iff_forward_of_forwardConfluent [M.ForwardConfluent] : x ⊩[_] ◇A �
   constructor;
   · intro h;
     exact h x (refl x);
-  · rintro ⟨y, Mxy, hyA⟩ x₁ Ixx₁;
-    obtain ⟨y₁, Iyy₁, Mx₁y₁⟩ := forward_confluent Mxy Ixx₁;
-    exact ⟨y₁, Mx₁y₁, forces_persistent hyA Iyy₁⟩;
+  · rintro ⟨y, Mxy, hyA⟩ z Ixz;
+    obtain ⟨w, Iyw, Mzw⟩ := forward_confluent Mxy Ixz;
+    exact ⟨w, Mzw, forces_persistent hyA Iyw⟩;
 
 end Model
 
@@ -100,8 +100,8 @@ lemma valid_DP_of_forwardConfluent [F.ForwardConfluent] : F ⊧ (◇(A ⋎ B) �
   intro val val_persistent fallible_val x y _ hy;
   obtain ⟨z, Myz, hz⟩ := Model.dia_iff_forward_of_forwardConfluent.mp hy;
   rcases hz with hz | hz;
-  · exact Or.inl (Model.dia_iff_forward_of_forwardConfluent.mpr ⟨z, Myz, hz⟩);
-  · exact Or.inr (Model.dia_iff_forward_of_forwardConfluent.mpr ⟨z, Myz, hz⟩);
+  · left; exact Model.dia_iff_forward_of_forwardConfluent.mpr ⟨z, Myz, hz⟩;
+  · right; exact Model.dia_iff_forward_of_forwardConfluent.mpr ⟨z, Myz, hz⟩;
 
 /--
 - [dGSC25]
