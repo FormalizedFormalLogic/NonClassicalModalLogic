@@ -85,14 +85,14 @@ lemma forces_top : x ⊩[_] ⊤ := fun _ _ h => h
 lemma forces_persistent (h : x ⊩[_] A) (Ixy : x ≼ y) : y ⊩[_] A := by
   induction A generalizing y with
   | imply A B _ _ =>
-    intro y₁ Iyy₁ hy₁A;
-    exact h y₁ (Trans.trans Ixy Iyy₁) hy₁A;
+    intro z Iyz hzA;
+    exact h z (Trans.trans Ixy Iyz) hzA;
   | box A _ =>
-    intro y₁ z₁ Iyy₁ My₁z₁;
-    exact h y₁ z₁ (Trans.trans Ixy Iyy₁) My₁z₁;
+    intro z w Iyz Mzw;
+    exact h z w (Trans.trans Ixy Iyz) Mzw;
   | dia A _ =>
-    intro y₁ Iyy₁;
-    exact h y₁ (Trans.trans Ixy Iyy₁);
+    intro z Iyz;
+    exact h z (Trans.trans Ixy Iyz);
   | _ => grind;
 
 @[grind =>]
@@ -109,7 +109,7 @@ def Model.Valid (M : Model κ) (A : BDFormula) := ∀ x : M.World, x ⊩[M] A
 infixl:80 " ⊧ " => Model.Valid
 
 def Frame.Valid (F : Frame κ) (A : BDFormula) : Prop :=
-  ∀ val val_persistent fallible_val, (Model.mk F val val_persistent fallible_val) ⊧ A
+  ∀ V V_per V_fal, (Model.mk F V V_per V_fal) ⊧ A
 infixl:80 " ⊧ " => Frame.Valid
 
 lemma Model.valid_of_toFrame_valid {M : Model κ} {A : BDFormula} (h : M.toFrame ⊧ A) : M ⊧ A :=

@@ -65,23 +65,23 @@ lemma valid_TDia_of_ascendingMRel [F.AscendingMRel] : F ⊧ (A 🡒 ◇A) :=
   fun _ _ _ => Model.valid_TDia_of_ascendingMRel
 
 lemma ascendingMRel_of_valid_TDia (h : F ⊧ (#0 🡒 ◇(#0))) : F.AscendingMRel where
-  ascending_mRel w := by
+  ascending_mRel x := by
     let M : Model κ := {
       toFrame := F,
-      val := fun x _ => w ≼ x ∨ F.Fallible x,
+      val := fun y _ => x ≼ y ∨ F.Fallible y,
       val_persistent := by
-        rintro x y a (Iwx | hx) Ixy;
+        rintro y z a (Ixy | hy) Iyz;
         . left;
-          exact Trans.trans Iwx Ixy;
+          exact Trans.trans Ixy Iyz;
         . right;
-          exact F.fallible_iRel hx Ixy;
+          exact F.fallible_iRel hy Iyz;
       fallible_val := by
-        rintro x a hx;
+        rintro y a hy;
         right;
-        exact hx;
+        exact hy;
     }
-    have hwA : w ⊩[M] (#0) := Or.inl (refl w);
-    exact h M.val M.val_persistent M.fallible_val w w (refl w) hwA w (refl w);
+    have hxA : x ⊩[M] (#0) := Or.inl (refl x);
+    exact h M.val M.val_persistent M.fallible_val x x (refl x) hxA x (refl x);
 
 /-- `T◇` defines the frames whose `⊏` is ascending. -/
 theorem ascendingMRel_TFAE : List.TFAE [
@@ -129,7 +129,7 @@ theorem LogicCKTDia_TFAE {A : BDFormula} : List.TFAE [
   ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.AscendingMRel] → F ⊧ A,
   ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.StrictlyAscendingMRel] → F ⊧ A,
 ] := by
-  tfae_have 1 → 2 := fun h _ F _ val vp fv => CK.Model.valid_of_mem_LogicCKTDia h
+  tfae_have 1 → 2 := fun h _ F _ V V_per V_fal => CK.Model.valid_of_mem_LogicCKTDia h
   tfae_have 2 → 3 := fun h _ F _ => h F
   tfae_have 3 → 1 := by
     contrapose!;

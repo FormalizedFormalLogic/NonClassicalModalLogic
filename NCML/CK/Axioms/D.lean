@@ -28,14 +28,14 @@ namespace Model
 open CK.Frame
 
 lemma valid_D_of_serialMRel [M.SerialMRel] : M ⊧ (□A 🡒 ◇A) := by
-  intro x y Ixy hyBoxA u Iyu;
-  obtain ⟨z, Muz⟩ := serial_mRel u;
-  exact ⟨z, Muz, hyBoxA u z Iyu Muz⟩;
+  intro x y Ixy hyBoxA z Iyz;
+  obtain ⟨w, Mzw⟩ := serial_mRel z;
+  exact ⟨w, Mzw, hyBoxA z w Iyz Mzw⟩;
 
 lemma valid_PDia_of_serialMRel [M.SerialMRel] : M ⊧ ◇⊤ := by
   intro x y Ixy;
-  obtain ⟨z, Mxz⟩ := serial_mRel y;
-  exact ⟨z, Mxz, by grind⟩;
+  obtain ⟨z, Myz⟩ := serial_mRel y;
+  exact ⟨z, Myz, by grind⟩;
 
 lemma valid_of_mem_LogicCKD [M.SerialMRel] (hA : A ∈ LogicCKD) : M ⊧ A :=
   valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_D_of_serialMRel) hA
@@ -64,8 +64,8 @@ lemma serialMRel_of_valid_D (h : F ⊧ (□(#0) 🡒 ◇(#0))) : F.SerialMRel wh
       fallible_val := by intros; trivial,
     }
     have hxBoxA : x ⊩[M] □(#0) := by intro y z _ _; trivial;
-    obtain ⟨z, Mxz, -⟩ := h M.val M.val_persistent M.fallible_val x x (refl x) hxBoxA x (refl x);
-    exact ⟨z, Mxz⟩;
+    obtain ⟨y, Mxy, -⟩ := h M.val M.val_persistent M.fallible_val x x (refl x) hxBoxA x (refl x);
+    exact ⟨y, Mxy⟩;
 
 lemma serialMRel_of_valid_PDia (h : F ⊧ ◇⊤) : F.SerialMRel where
   serial_mRel x := by
@@ -75,8 +75,8 @@ lemma serialMRel_of_valid_PDia (h : F ⊧ ◇⊤) : F.SerialMRel where
       val_persistent := by intros; trivial,
       fallible_val := by intros; trivial,
     }
-    obtain ⟨z, Mxz, -⟩ := h M.val M.val_persistent M.fallible_val x x (refl x);
-    exact ⟨z, Mxz⟩;
+    obtain ⟨y, Mxy, -⟩ := h M.val M.val_persistent M.fallible_val x x (refl x);
+    exact ⟨y, Mxy⟩;
 
 /-- `D` defines the frames whose `⊏` is serial. -/
 theorem serialMRel_TFAE : List.TFAE [
@@ -114,7 +114,7 @@ theorem LogicCKD_TFAE {A : BDFormula} : List.TFAE [
   ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.SerialMRel] → F ⊧ A,
 ] := by
   tfae_have 1 → 2 := LogicCKD.eq_CKPDia ▸ id
-  tfae_have 2 → 3 := fun h _ F _ val vp fv => CK.Model.valid_of_mem_LogicCKPDia h
+  tfae_have 2 → 3 := fun h _ F _ V V_per V_fal => CK.Model.valid_of_mem_LogicCKPDia h
   tfae_have 3 → 1 := by
     contrapose!;
     intro h;
