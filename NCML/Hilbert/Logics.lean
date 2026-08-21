@@ -31,6 +31,11 @@ abbrev LogicCKTBox : BDLogic := ProvableBDHilbert.logic { □A 🡒 A | (A) }
 
 abbrev LogicCKTDia : BDLogic := ProvableBDHilbert.logic { A 🡒 ◇A | (A) }
 
+abbrev LogicCKT : BDLogic := ProvableBDHilbert.logic (
+  { □A 🡒 A | (A) } ∪
+  { A 🡒 ◇A | (A) }
+)
+
 abbrev LogicCKD : BDLogic := ProvableBDHilbert.logic { □A 🡒 ◇A | (A) }
 
 abbrev LogicCKPDia : BDLogic := ProvableBDHilbert.logic { ◇⊤ }
@@ -51,6 +56,7 @@ lemma LogicCK.subset_IK : LogicCK ⊆ LogicIK := .logic_monotone (by grind)
 lemma LogicIK.subset_IKB : LogicIK ⊆ LogicIKB := .logic_monotone (by grind)
 lemma LogicCK.subset_CKTBox : LogicCK ⊆ LogicCKTBox := .logic_monotone (by grind)
 lemma LogicCK.subset_CKTDia : LogicCK ⊆ LogicCKTDia := .logic_monotone (by grind)
+lemma LogicCK.subset_CKT : LogicCK ⊆ LogicCKT := .logic_monotone (by grind)
 lemma LogicCK.subset_CKD : LogicCK ⊆ LogicCKD := .logic_monotone (by grind)
 lemma LogicCK.subset_CKPDia : LogicCK ⊆ LogicCKPDia := .logic_monotone (by grind)
 
@@ -117,6 +123,16 @@ open ProvableBDHilbert
 @[simp, grind .] lemma provable_D : (□A 🡒 ◇A) ∈ LogicCKTDia := provable_D_of_PDia provable_PDia
 
 end LogicCKTDia
+
+
+namespace LogicCKT
+
+open ProvableBDHilbert
+
+@[simp, grind .] lemma provable_TBox : (□A 🡒 A) ∈ LogicCKT := axm (by grind)
+@[simp, grind .] lemma provable_TDia : (A 🡒 ◇A) ∈ LogicCKT := axm (by grind)
+
+end LogicCKT
 
 
 namespace LogicCKD
