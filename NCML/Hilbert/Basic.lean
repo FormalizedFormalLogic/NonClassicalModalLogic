@@ -86,6 +86,9 @@ lemma imp_swap : ⊢ᴴ[CK;𝔸] (A 🡒 B 🡒 C) 🡒 (B 🡒 A 🡒 C) :=
 
 @[grind <=] lemma dia_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] ◇A 🡒 ◇B := mdp kDia (nec h)
 
+@[grind .] lemma dia_mdp : ⊢ᴴ[CK;𝔸] □A 🡒 ◇(A 🡒 B) 🡒 ◇B :=
+  imp_trans (box_mono (mdp imp_swap imp_id)) kDia
+
 @[grind .] lemma box_or_inl : ⊢ᴴ[CK;𝔸] □A 🡒 □(A ⋎ B) := box_mono orIntro₁
 
 @[grind .] lemma box_or_inr : ⊢ᴴ[CK;𝔸] □B 🡒 □(A ⋎ B) := box_mono orIntro₂

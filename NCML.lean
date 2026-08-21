@@ -1,6 +1,7 @@
 module  -- shake: keep-all --deprecated_module: ignore
 
 public import NCML.CK.Canonical
+public import NCML.CK.CanonicalHereditary
 public import NCML.CK.Countermodel.BBox
 public import NCML.CK.Countermodel.ReturningMRel
 public import NCML.CK.Countermodel.SerialMRel
@@ -9,10 +10,12 @@ public import NCML.CK.Countermodel.TDia
 public import NCML.CK.Frame.BBox
 public import NCML.CK.Frame.BDia
 public import NCML.CK.Frame.BackwardConfluent
+public import NCML.CK.Frame.CS4
 public import NCML.CK.Frame.EuclideanMRel
 public import NCML.CK.Frame.FiveBox
 public import NCML.CK.Frame.FiveDia
 public import NCML.CK.Frame.ForwardConfluent
+public import NCML.CK.Frame.Four
 public import NCML.CK.Frame.FourBox
 public import NCML.CK.Frame.FourDia
 public import NCML.CK.Frame.PBox
@@ -26,11 +29,15 @@ public import NCML.CK.Frame.TBox
 public import NCML.CK.Frame.TDia
 public import NCML.CK.Frame.TransitiveMRel
 public import NCML.CK.Logic.CK
+public import NCML.CK.Logic.CK4
+public import NCML.CK.Logic.CK4Box
+public import NCML.CK.Logic.CK4Dia
 public import NCML.CK.Logic.CKB
 public import NCML.CK.Logic.CKD
 public import NCML.CK.Logic.CKT
 public import NCML.CK.Logic.CKTBox
 public import NCML.CK.Logic.CKTDia
+public import NCML.CK.Logic.CS4
 public import NCML.CK.Semantics
 public import NCML.CK.Soundness
 public import NCML.Formula
