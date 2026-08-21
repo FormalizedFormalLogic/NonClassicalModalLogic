@@ -33,7 +33,7 @@ lemma counterModel_not_forwardConfluent : ¬counterModel.ForwardConfluent := by
   simp only [counterModel, Frame.mRel] at M2w;
   omega;
 
-lemma counterModel_not_circularMComp : ¬counterModel.CircularMComp := by
+lemma counterModel_not_bBox : ¬counterModel.BBox := by
   rintro ⟨h⟩;
   obtain ⟨w, M2w, -⟩ := h (x := 0) (y := 1) (z := 2) (by tauto) (by tauto);
   simp [counterModel, Frame.mRel] at M2w;
@@ -53,9 +53,9 @@ theorem exists_symmetricMRel_not_forces_bBox :
   ∃ (κ : Type) (M : Model κ), M.SymmetricMRel ∧ ∃ x : M.World, x ⊮[_] (#0 🡒 □◇(#0)) :=
   ⟨Fin 3, BBox.counterModel, inferInstance, 0, BBox.counterModel_not_forces⟩
 
-theorem exists_symmetricMRel_not_circularMComp :
-  ∃ (κ : Type) (F : Frame κ), F.SymmetricMRel ∧ ¬F.CircularMComp :=
-  ⟨Fin 3, BBox.counterModel.toFrame, inferInstance, BBox.counterModel_not_circularMComp⟩
+theorem exists_symmetricMRel_not_bBox :
+  ∃ (κ : Type) (F : Frame κ), F.SymmetricMRel ∧ ¬F.BBox :=
+  ⟨Fin 3, BBox.counterModel.toFrame, inferInstance, BBox.counterModel_not_bBox⟩
 
 end CK
 

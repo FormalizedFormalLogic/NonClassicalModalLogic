@@ -13,32 +13,35 @@ namespace Frame
 
 variable {F : Frame κ}
 
-class CircularMComp (F : Frame κ) : Prop where
-  circular_mComp : ∀ {x y z : F.World}, x ⊏ y → y ≼ z → ∃ w, z ⊏ w ∧ (x ≼ w ∨ F.Fallible w)
-export CircularMComp (circular_mComp)
+/-- The frame condition defined by `B□`: a `⊏`-step followed by a `≼`-step can always be
+reversed by a `⊏`-step, up to `≼` and fallibility. -/
+class BBox (F : Frame κ) : Prop where
+  bBox : ∀ {x y z : F.World}, x ⊏ y → y ≼ z → ∃ w, z ⊏ w ∧ (x ≼ w ∨ F.Fallible w)
+export BBox (bBox)
 
-class StrictlyCircularMComp (F : Frame κ) : Prop where
-  strictly_circular_mComp : ∀ {x y z : F.World}, x ⊏ y → y ≼ z → ∃ w, z ⊏ w ∧ x ≼ w
-export StrictlyCircularMComp (strictly_circular_mComp)
+/-- `BBox` with the fallibility escape dropped: the reversing `⊏`-step lands `≼`-back at `x`. -/
+class StrictBBox (F : Frame κ) : Prop where
+  strict_bBox : ∀ {x y z : F.World}, x ⊏ y → y ≼ z → ∃ w, z ⊏ w ∧ x ≼ w
+export StrictBBox (strict_bBox)
 
-instance [F.StrictlyCircularMComp] : F.CircularMComp where
-  circular_mComp Mxy Iyz := by
-    obtain ⟨w, Mzw, Ixw⟩ := strictly_circular_mComp Mxy Iyz;
+instance [F.StrictBBox] : F.BBox where
+  bBox Mxy Iyz := by
+    obtain ⟨w, Mzw, Ixw⟩ := strict_bBox Mxy Iyz;
     exact ⟨w, Mzw, Or.inl Ixw⟩;
 
-instance [F.SymmetricMRel] [F.ForwardConfluent] : F.StrictlyCircularMComp where
-  strictly_circular_mComp Mxy Iyz := by
+instance [F.SymmetricMRel] [F.ForwardConfluent] : F.StrictBBox where
+  strict_bBox Mxy Iyz := by
     obtain ⟨w, Ixw, Mzw⟩ := forward_confluent (symm_mRel Mxy) Iyz;
     exact ⟨w, Mzw, Ixw⟩;
 
-lemma valid_BBox_of_circularMComp [F.CircularMComp] : F ⊧ (A 🡒 □◇A) := by
+lemma valid_BBox [F.BBox] : F ⊧ (A 🡒 □◇A) := by
   intro V V_per V_fal x y Ixy hyA z w Iyz Mzw v Iwv;
-  obtain ⟨u, Mvu, Izu | hu⟩ := circular_mComp Mzw Iwv;
+  obtain ⟨u, Mvu, Izu | hu⟩ := bBox Mzw Iwv;
   . exact ⟨u, Mvu, forces_persistent hyA (Trans.trans Iyz Izu)⟩;
   . exact ⟨u, Mvu, forces_of_fallible hu⟩;
 
-lemma circularMComp_of_valid_BBox (h : F ⊧ (#0 🡒 □◇(#0))) : F.CircularMComp where
-  circular_mComp {x y z} Mxy Iyz := by
+lemma bBox_of_valid_BBox (h : F ⊧ (#0 🡒 □◇(#0))) : F.BBox where
+  bBox {x y z} Mxy Iyz := by
     let M : Model κ := {
       toFrame := F,
       val := fun w _ => x ≼ w ∨ F.Fallible w,
@@ -56,16 +59,14 @@ lemma circularMComp_of_valid_BBox (h : F ⊧ (#0 🡒 □◇(#0))) : F.CircularM
     have hxA : x ⊩[M] (#0) := Or.inl (refl x);
     exact h M.val M.val_persistent M.fallible_val x x (refl x) hxA x y (refl x) Mxy z Iyz;
 
-/-- `B□` defines the frames on which a `⊏`-step followed by a `≼`-step can always be
-reversed by a `⊏`-step, up to `≼` and fallibility. -/
-theorem circularMComp_TFAE : List.TFAE [
-  F.CircularMComp,
+theorem bBox_TFAE : List.TFAE [
+  F.BBox,
   ∀ A : BDFormula, F ⊧ (A 🡒 □◇A),
   F ⊧ (#0 🡒 □◇(#0)),
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_BBox_of_circularMComp;
+  tfae_have 1 → 2 := by intro h A; exact valid_BBox;
   tfae_have 2 → 3 := fun h => h _
-  tfae_have 3 → 1 := circularMComp_of_valid_BBox
+  tfae_have 3 → 1 := bBox_of_valid_BBox
   tfae_finish
 
 end Frame

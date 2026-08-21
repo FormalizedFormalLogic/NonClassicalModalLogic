@@ -13,23 +13,25 @@ namespace Frame
 
 variable {F : Frame κ}
 
-class ReturningMComp (F : Frame κ) : Prop where
-  returning_mComp : ∀ x : F.World, ¬F.Fallible x →
+/-- The frame condition defined by `B◇`: every world has a `≼`-successor all of whose
+`⊏`-successors return to it, unless it is fallible. -/
+class BDia (F : Frame κ) : Prop where
+  bDia : ∀ x : F.World, ¬F.Fallible x →
     ∃ y, x ≼ y ∧ ∀ z, y ⊏ z → ∃ w v, z ≼ w ∧ w ⊏ v ∧ v ≼ x
-export ReturningMComp (returning_mComp)
+export BDia (bDia)
 
-
-class StrictlyReturningMComp (F : Frame κ) : Prop where
-  strictly_returning_mComp : ∀ x : F.World,
+/-- `BDia` with the fallibility escape dropped: every world has such a returning `≼`-successor. -/
+class StrictBDia (F : Frame κ) : Prop where
+  strict_bDia : ∀ x : F.World,
     ∃ y, x ≼ y ∧ ∀ z, y ⊏ z → ∃ w v, z ≼ w ∧ w ⊏ v ∧ v ≼ x
-export StrictlyReturningMComp (strictly_returning_mComp)
+export StrictBDia (strict_bDia)
 
 
-instance [F.StrictlyReturningMComp] : F.ReturningMComp where
-  returning_mComp x _ := strictly_returning_mComp x;
+instance [F.StrictBDia] : F.BDia where
+  bDia x _ := strict_bDia x;
 
-instance [F.SymmetricMRel] : F.StrictlyReturningMComp where
-  strictly_returning_mComp x := by
+instance [F.SymmetricMRel] : F.StrictBDia where
+  strict_bDia x := by
     use x;
     and_intros;
     . apply refl;
@@ -40,17 +42,17 @@ instance [F.SymmetricMRel] : F.StrictlyReturningMComp where
       . apply symm_mRel Mxz;
       . apply refl;
 
-lemma valid_BDia_of_returningMComp [F.ReturningMComp] : F ⊧ (◇(□A) 🡒 A) := by
+lemma valid_BDia [F.BDia] : F ⊧ (◇(□A) 🡒 A) := by
   intro V V_per V_fal x y _ hy;
   by_cases hFallible : F.Fallible y;
   . exact forces_of_fallible hFallible;
-  . obtain ⟨z, Iyz, hz⟩ := returning_mComp y hFallible;
+  . obtain ⟨z, Iyz, hz⟩ := bDia y hFallible;
     obtain ⟨w, Izw, hw⟩ := hy z Iyz;
     obtain ⟨v, u, Iwv, Mvu, Iuy⟩ := hz w Izw;
     exact forces_persistent (hw v u Iwv Mvu) Iuy;
 
-lemma returningMComp_of_valid_BDia (h : F ⊧ (◇(□(#0)) 🡒 #0)) : F.ReturningMComp where
-  returning_mComp x hx := by
+lemma bDia_of_valid_BDia (h : F ⊧ (◇(□(#0)) 🡒 #0)) : F.BDia where
+  bDia x hx := by
     by_contra! hc;
     let M : Model κ := {
       toFrame := F,
@@ -77,16 +79,14 @@ lemma returningMComp_of_valid_BDia (h : F ⊧ (◇(□(#0)) 🡒 #0)) : F.Return
     . exact hc₁ (refl x);
     . exact hx hc₁;
 
-/-- `B◇` defines the frames on which every world has a `≼`-successor all of whose `⊏`-successors
-return to it. -/
-theorem returningMComp_TFAE : List.TFAE [
-  F.ReturningMComp,
+theorem bDia_TFAE : List.TFAE [
+  F.BDia,
   ∀ A : BDFormula, F ⊧ (◇(□A) 🡒 A),
   F ⊧ (◇(□(#0)) 🡒 #0),
 ] := by
-  tfae_have 1 → 2 := by intro h A; exact valid_BDia_of_returningMComp;
+  tfae_have 1 → 2 := by intro h A; exact valid_BDia;
   tfae_have 2 → 3 := fun h => h _
-  tfae_have 3 → 1 := returningMComp_of_valid_BDia
+  tfae_have 3 → 1 := bDia_of_valid_BDia
   tfae_finish
 
 end Frame
