@@ -1,6 +1,6 @@
 module
 
-public import NCML.CK.Axioms.TBox
+public import NCML.CK.Logic.CKTBox
 public import NCML.CK.Countermodel.D
 
 /-! CK-models refuting `◇⊤`, `D` and `∼◇⊥` over `CK + T□`. -/

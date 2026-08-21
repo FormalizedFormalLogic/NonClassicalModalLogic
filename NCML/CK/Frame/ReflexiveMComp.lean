@@ -1,10 +1,8 @@
 module
 
-public import NCML.CK.Canonical
+public import NCML.CK.Semantics
 
 @[expose] public section
-
-open ProvableBDHilbert
 
 namespace CK
 
@@ -20,17 +18,6 @@ class ReflexiveMComp (F : Frame κ) : Prop where
 
 export ReflexiveMComp (reflexive_mComp)
 
-class ReturningMRel (F : Frame κ) : Prop where
-  returning_mRel : ∀ x : F.World, ∃ y, x ≼ y ∧ y ⊏ x
-
-export ReturningMRel (returning_mRel)
-
-instance [F.ReturningMRel] : F.ReflexiveMComp where
-  reflexive_mComp x := by
-    obtain ⟨y, Ixy, Myx⟩ := returning_mRel x;
-    right;
-    exact ⟨y, x, Ixy, Myx, refl x⟩;
-
 end Frame
 
 namespace Model
@@ -42,9 +29,6 @@ lemma valid_TBox_of_reflexiveMComp [M.ReflexiveMComp] : M ⊧ (□A 🡒 A) := b
   rcases reflexive_mComp y with hFallible | ⟨y₁, z₁, Iyy₁, My₁z₁, Iz₁y⟩;
   · exact forces_of_fallible hFallible;
   · exact forces_persistent (hyBoxA y₁ z₁ Iyy₁ My₁z₁) Iz₁y;
-
-lemma valid_of_mem_LogicCKTBox [M.ReflexiveMComp] (hA : A ∈ LogicCKTBox) : M ⊧ A :=
-  valid_of_mem_logic (by rintro B ⟨C, rfl⟩; exact valid_TBox_of_reflexiveMComp) hA
 
 end Model
 
@@ -92,34 +76,6 @@ theorem reflexiveMComp_TFAE : List.TFAE [
 
 end Frame
 
-variable {L : BDLogic} [L.CK]
-
-lemma returningMRel_canonicalModel (hTBox : ∀ {A}, (□A 🡒 A) ∈ L) : (canonicalModel L).ReturningMRel where
-  returning_mRel P := ⟨
-    P.erase,
-    CanonicalPair.iRel_erase,
-    fun _ hA => P.theory.mdp (P.theory.subset (L := L) hTBox) hA,
-    by simp
-  ⟩
-
 end CK
-
-theorem LogicCKTBox_TFAE {A : BDFormula} : List.TFAE [
-  A ∈ LogicCKTBox,
-  ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.ReflexiveMComp] → F ⊧ A,
-  ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.ReturningMRel] → F ⊧ A,
-] := by
-  tfae_have 1 → 2 := fun h _ F _ val vp fv => CK.Model.valid_of_mem_LogicCKTBox h
-  tfae_have 2 → 3 := fun h _ F _ => h F
-  tfae_have 3 → 1 := by
-    contrapose!;
-    intro h;
-    obtain ⟨P, h₁⟩ := CK.exists_not_forces_of_not_mem h;
-    refine ⟨_, (CK.canonicalModel LogicCKTBox).toFrame, ?_⟩;
-    and_intros;
-    . exact CK.returningMRel_canonicalModel (by grind);
-    . by_contra! hF;
-      exact h₁ $ CK.Model.valid_of_toFrame_valid hF P;
-  tfae_finish
 
 end
