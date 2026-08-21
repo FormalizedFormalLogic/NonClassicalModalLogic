@@ -43,7 +43,7 @@ lemma valid_of_mem_LogicCK (hA : A ∈ LogicCK) : M ⊧ A := valid_of_mem_logic 
 lemma valid_of_mem_LogicCKB [M.IsCKB] (hA : A ∈ LogicCKB) : M ⊧ A :=
   valid_of_mem_logic (by
     rintro B (⟨C, rfl⟩ | ⟨C, rfl⟩);
-    · exact valid_of_toFrame_valid valid_BBox_of_symmetricMComp;
+    · exact valid_of_toFrame_valid valid_BBox_of_circularMComp;
     · exact valid_of_toFrame_valid valid_BDia_of_returningMComp;
   ) hA
 
@@ -54,7 +54,7 @@ lemma valid_of_mem_LogicIKB [M.IsIKB] (hA : A ∈ LogicIKB) : M ⊧ A :=
     · exact valid_of_toFrame_valid valid_FS_of_forwardConfluent_of_backwardConfluent;
     · exact valid_of_toFrame_valid valid_DP_of_forwardConfluent;
     · exact valid_of_toFrame_valid valid_N_of_symmetricMRel;
-    · exact valid_of_toFrame_valid valid_BBox_of_symmetricMComp;
+    · exact valid_of_toFrame_valid valid_BBox_of_circularMComp;
     · exact valid_of_toFrame_valid valid_BDia_of_returningMComp;
   ) hA
 
