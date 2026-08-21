@@ -323,6 +323,26 @@ lemma orDirected_disjSet : OrDirected L (disjSet Θ) := by
   · exact hK₁sub A hA;
   · exact hK₂sub A hA;
 
+variable {X : BDFormulaSet}
+
+lemma orDirected_of_or_mem (hor : ∀ {B C}, B ∈ X → C ∈ X → B ⋎ C ∈ X) : OrDirected L X := by
+  rintro C hC D hD;
+  exact ⟨C ⋎ D, hor hC hD, BDLogic.logicCK_subset imp_id⟩;
+
+/-- A set of formulas closed under `⋎` and under provably stronger formulas contains the
+disjunctions of its nonempty finite sublists. -/
+lemma disjSet_subset_of_or_mem
+  (hor : ∀ {B C}, B ∈ X → C ∈ X → B ⋎ C ∈ X)
+  (himp : ∀ {B C}, (B 🡒 C) ∈ LogicCK → C ∈ X → B ∈ X) :
+  disjSet X ⊆ X := by
+  rintro B ⟨K, hne, hsub, rfl⟩;
+  induction K with
+  | nil => exact absurd rfl hne;
+  | cons C K ih =>
+    rcases eq_or_ne K [] with rfl | hK;
+    · exact himp (BDLogic.logicCK_subset (or_imp imp_id efq)) (hsub C (by simp));
+    · exact hor (hsub C (by simp)) (ih hK fun A hA => hsub A (by simp [hA]));
+
 @[simp]
 lemma disjSet_empty : disjSet (∅ : BDFormulaSet) = ∅ := by
   ext B;
