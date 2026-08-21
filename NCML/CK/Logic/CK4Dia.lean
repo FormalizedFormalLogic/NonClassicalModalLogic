@@ -103,10 +103,71 @@ private lemma avoid_diaBlocked : ∀ A ∈ P.diaBlocked, A ∉ P.theory := by
   obtain ⟨K, hne, hsub, rfl⟩ := hD;
   exact P.avoid (◇(⋁K)) ⟨⋁K, ⟨K, hne, hsub, rfl⟩, rfl⟩ h₄;
 
+private lemma avoid_diaDisjSet_diaBlocked [L.FourDia] {T : BDTheory} [T.Mdp] [T.Of L]
+  (h : ∀ A ∈ P.diaBlocked, A ∉ T) : ∀ A ∈ diaDisjSet P.diaBlocked, A ∉ T := by
+  rintro A ⟨C, hC, rfl⟩ hmem;
+  obtain ⟨D, hD, d⟩ := disjSet_diaBlocked_subset hC;
+  have : T.Of LogicCK := BDTheory.of_logicCK (L := L);
+  have h₁ : ◇◇D ∈ T := T.mdp (BDTheory.provable_mem (dia_mono d)) hmem;
+  exact h (◇D) (dia_mem_diaBlocked hD) (T.mdp (T.subset L.fourDia) h₁);
+
+private lemma avoid_diaDisjSet_blocked {T : BDTheory}
+  (h : ∀ A ∈ P.diaBlocked, A ∉ T) : ∀ A ∈ diaDisjSet P.blocked, A ∉ T := by
+  rintro A ⟨C, hC, rfl⟩;
+  exact h (◇C) (dia_mem_diaBlocked (disjSet_blocked_subset hC));
+
+private lemma avoid_disjSet_mdpClosure_union {P₁ : CanonicalPair L}
+  (h : ∀ A ∈ P.blocked, A ∉ P₁.theory) :
+  ∀ A ∈ disjSet P.forbidden, A ∉ BDTheory.mdpClosure (P₁.theory ∪ □⁻¹P.theory) := by
+  rintro A ⟨K, hne, hsub, rfl⟩ hmem;
+  obtain ⟨D, hD, E, hE, d⟩ := BDTheory.mdpClosure_union_finite_char hmem;
+  exact h D ⟨E, hE, ⋁K, ⟨K, hne, hsub, rfl⟩, d⟩ hD;
+
 end
 
 end CanonicalPair
 
+variable {L : BDLogic} [L.CK]
+
+instance fourDia_canonicalModel [L.FourDia] : (canonicalModel L).FourDia where
+  fourDia P := by
+    obtain ⟨Y, hPY, hmdpY, hprimeY, hofY, havoidY⟩ :=
+      exists_prime_mdpClosed_avoiding (L := L) (T := P.theory) (Z := P.diaBlocked)
+        CanonicalPair.orDirected_diaBlocked CanonicalPair.avoid_diaBlocked;
+    refine ⟨⟨Y, P.diaBlocked, CanonicalPair.avoid_diaDisjSet_diaBlocked havoidY⟩, hPY, ?_⟩;
+    intro P₁ MQP₁;
+    obtain ⟨Y₁, hP₁Y₁, hmdpY₁, hprimeY₁, hofY₁, havoidY₁⟩ :=
+      exists_prime_mdpClosed_avoiding (L := L) (T := P₁.theory) (Z := P.diaBlocked)
+        CanonicalPair.orDirected_diaBlocked MQP₁.2;
+    refine ⟨⟨Y₁, P.blocked, CanonicalPair.avoid_diaDisjSet_blocked havoidY₁⟩, hP₁Y₁, ?_⟩;
+    intro P₂ MQ₁P₂;
+    have : BDTheory.Of L (P₂.theory ∪ □⁻¹P.theory) :=
+      ⟨P₂.theory.subset.trans Set.subset_union_left⟩;
+    obtain ⟨Q₂, h₁, -, havoid₂⟩ :=
+      CanonicalPair.exists_avoiding (L := L)
+        (T := BDTheory.mdpClosure (P₂.theory ∪ □⁻¹P.theory)) orDirected_disjSet
+        (CanonicalPair.avoid_disjSet_mdpClosure_union MQ₁P₂.2);
+    have h₂ : P₂.theory ∪ □⁻¹P.theory ⊆ Q₂.theory := BDTheory.subset_mdpClosure.trans h₁;
+    exact ⟨Q₂,
+      CanonicalPair.mRel_of_avoid_disjSet (Set.subset_union_right.trans h₂) havoid₂,
+      fun _ => Set.subset_union_left.trans h₂⟩;
+
 end CK
+
+theorem LogicCK4Dia_TFAE {A : BDFormula} : List.TFAE [
+  A ∈ LogicCK4Dia,
+  ∀ {κ : Type 0}, ∀ F : CK.Frame κ, [F.FourDia] → F ⊧ A,
+] := by
+  tfae_have 1 → 2 := fun h _ F _ V V_per V_fal => CK.Model.valid_of_mem_LogicCK4Dia h
+  tfae_have 2 → 1 := by
+    contrapose!;
+    intro h;
+    obtain ⟨P, h₁⟩ := CK.exists_not_forces_of_not_mem h;
+    refine ⟨_, (CK.canonicalModel LogicCK4Dia).toFrame, ?_⟩;
+    and_intros;
+    . infer_instance;
+    . by_contra! hF;
+      exact h₁ $ CK.Model.valid_of_toFrame_valid hF P;
+  tfae_finish
 
 end
