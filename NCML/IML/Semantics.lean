@@ -1,6 +1,6 @@
 module
 
-public import NCML.Formula
+public import NCML.Formula.BD.Basic
 public import Mathlib.Order.Basic
 public import Mathlib.Tactic
 
