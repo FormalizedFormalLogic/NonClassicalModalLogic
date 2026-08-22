@@ -61,15 +61,17 @@ lemma orElim : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((A 🡒 C) 🡒 
 lemma efq : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((⊥ : BDFormula) 🡒 A)) :=
   impR botL
 
+private lemma kPremise : ⊢ᵍᶜ[CK] (({A, A 🡒 B} : BDFormulaFinset) ⟹ some B) :=
+  wkL (impL (union A) (union B) : ⊢ᵍᶜ[CK] (insert (A 🡒 B) ({A} : BDFormulaFinset) ⟹ some B))
+
 lemma kBox : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (□(A 🡒 B) 🡒 □A 🡒 □B)) := by
   apply impR; apply impR;
-  have p : ⊢ᵍᶜ[CK] (insert (A 🡒 B) ({A} : BDFormulaFinset) ⟹ some B) := impL (union A) (union B);
-  have q : ⊢ᵍᶜ[CK] (({A, A 🡒 B} : BDFormulaFinset) ⟹ some B) := wkL p;
   simpa [BDFormulaFinset.box, Finset.image_insert, Finset.image_singleton, Finset.image_empty]
-    using box q
+    using box kPremise
 
 lemma kDia : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (□(A 🡒 B) 🡒 ◇A 🡒 ◇B)) := by
-  sorry
+  apply impR; apply impR;
+  simpa [BDFormulaFinset.box, Finset.image_singleton] using dia kPremise
 
 lemma nec (h : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some A)) :
     ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (□A)) := by
