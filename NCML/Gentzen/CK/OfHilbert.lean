@@ -78,7 +78,22 @@ lemma nec (h : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some A)) :
   simpa using box h
 
 lemma of_provable : (⊢ᴴ[CK;∅] A) → ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some A) := by
-  sorry
+  intro h;
+  induction h with
+  | axm hmem => simp at hmem;
+  | imply₁ => exact imply₁;
+  | imply₂ => exact imply₂;
+  | andElim₁ => exact andElim₁;
+  | andElim₂ => exact andElim₂;
+  | andIntro => exact andIntro;
+  | orIntro₁ => exact orIntro₁;
+  | orIntro₂ => exact orIntro₂;
+  | orElim => exact orElim;
+  | efq => exact efq;
+  | kBox => exact kBox;
+  | kDia => exact kDia;
+  | mdp h₁ h₂ ih₁ ih₂ => exact mdp ih₁ ih₂;
+  | nec h ih => exact nec ih;
 
 lemma lconj_of_forall_mem {L : BDFormulaList} (h : ∀ B ∈ L, B ∈ Γ) :
     ⊢ᵍᶜ[CK] (Γ ⟹ some (⋀L)) := by
