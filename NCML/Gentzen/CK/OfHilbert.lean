@@ -103,7 +103,9 @@ lemma lconj_of_forall_mem {L : BDFormulaList} (h : ∀ B ∈ L, B ∈ Γ) :
     exact andR (union B (h B (by grind))) (ih (by grind));
 
 lemma fconj : ⊢ᵍᶜ[CK] (Γ ⟹ some (⋀Γ)) := by
-  sorry
+  apply lconj_of_forall_mem;
+  intro B hB;
+  exact Finset.mem_toList.mp hB;
 
 lemma ofHilbert (h : ⊢ᴴ[CK;∅] (⋀Γ 🡒 A)) : ⊢ᵍᶜ[CK] (Γ ⟹ some A) := by
   sorry
