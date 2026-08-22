@@ -13,7 +13,7 @@ namespace LogicCK
 
 namespace ProvableGentzenWithCut
 
-variable {Γ Γ₁ Γ₂ : BDFormulaFinset} {Δ : Option BDFormula} {A B C : BDFormula}
+variable {Γ : BDFormulaFinset} {A B C : BDFormula}
 
 lemma union (A) (hΓ : A ∈ Γ := by grind) : ⊢ᵍᶜ[CK] (Γ ⟹ some A) := wkL (axm A)
 

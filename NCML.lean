@@ -42,6 +42,7 @@ public import NCML.CK.Semantics
 public import NCML.CK.Soundness
 public import NCML.Formula
 public import NCML.Gentzen.CK.Basic
+public import NCML.Gentzen.CK.OfHilbert
 public import NCML.Gentzen.CK.ToHilbert
 public import NCML.Gentzen.CK.WithCut
 public import NCML.Gentzen.Sequent
