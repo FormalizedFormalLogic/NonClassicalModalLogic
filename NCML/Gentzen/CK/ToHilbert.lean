@@ -33,7 +33,13 @@ lemma toHilbert_aux {S : Sequent} (h : ⊢ᵍᶜ[CK] S) : ⊢ᴴ[CK;∅] S.toFor
       (uncurry (or_imp (curry (imp_trans imp_fconj_insert ih₁)) (curry (imp_trans imp_fconj_insert ih₂))))
   | orR₁ h ih => exact imp_trans ih orIntro₁
   | orR₂ h ih => exact imp_trans ih orIntro₂
-  | impL h₁ h₂ ih₁ ih₂ => sorry
+  | impL h₁ h₂ ih₁ ih₂ =>
+    exact imp_trans
+      (and_intro_ctx
+        (mdp_ctx (fconj_imp (Finset.mem_insert_self _ _))
+          (imp_trans (fconj_subset (Finset.subset_insert _ _)) ih₁))
+        (fconj_subset (Finset.subset_insert _ _)))
+      (imp_trans imp_fconj_insert ih₂);
   | impR h ih => sorry
   | box h ih => sorry
   | dia h ih => sorry
