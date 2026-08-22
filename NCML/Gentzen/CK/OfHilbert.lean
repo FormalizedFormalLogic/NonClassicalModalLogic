@@ -58,8 +58,8 @@ lemma orElim : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((A 🡒 C) 🡒 
   have q₂ : ⊢ᵍᶜ[CK] (insert B ({B 🡒 C, A 🡒 C} : BDFormulaFinset) ⟹ some C) := wkL p₂;
   exact wkL (orL q₁ q₂)
 
-lemma efq : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((⊥ : BDFormula) 🡒 A)) := by
-  sorry
+lemma efq : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((⊥ : BDFormula) 🡒 A)) :=
+  impR botL
 
 lemma kBox : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (□(A 🡒 B) 🡒 □A 🡒 □B)) := by
   sorry
