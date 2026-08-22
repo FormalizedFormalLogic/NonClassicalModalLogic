@@ -27,7 +27,7 @@ lemma toHilbert_aux {S : Sequent} (h : ⊢ᵍᶜ[CK] S) : ⊢ᴴ[CK;∅] S.toFor
   | wkR h ih => exact imp_trans ih efq
   | andL₁ h ih => exact imp_trans (fconj_insert_mono andElim₁) ih
   | andL₂ h ih => exact imp_trans (fconj_insert_mono andElim₂) ih
-  | andR h₁ h₂ ih₁ ih₂ => sorry
+  | andR h₁ h₂ ih₁ ih₂ => exact and_intro_ctx ih₁ ih₂
   | orL h₁ h₂ ih₁ ih₂ => sorry
   | orR₁ h ih => sorry
   | orR₂ h ih => sorry
