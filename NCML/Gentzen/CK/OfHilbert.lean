@@ -23,8 +23,8 @@ lemma mdp (h₁ : ⊢ᵍᶜ[CK] (Γ ⟹ some (A 🡒 B))) (h₂ : ⊢ᵍᶜ[CK] 
   have h := cut h₁ e;
   rwa [Finset.union_self] at h;
 
-lemma imply₁ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A 🡒 B 🡒 A)) := by
-  sorry
+lemma imply₁ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A 🡒 B 🡒 A)) :=
+  impR (impR (union A))
 
 lemma imply₂ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((A 🡒 B 🡒 C) 🡒 (A 🡒 B) 🡒 A 🡒 C)) := by
   sorry
