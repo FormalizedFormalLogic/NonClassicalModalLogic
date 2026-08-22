@@ -27,10 +27,8 @@ inductive ProofGentzenWithCut : Sequent → Type
   | impR {Γ A B}    : ProofGentzenWithCut (insert A Γ ⟹ some B) → ProofGentzenWithCut (Γ ⟹ some (A 🡒 B))
   | box  {Γ A}      : ProofGentzenWithCut (Γ ⟹ some A) → ProofGentzenWithCut (□Γ ⟹ some (□A))
   | dia  {Γ A B}    : ProofGentzenWithCut (insert A Γ ⟹ some B) → ProofGentzenWithCut (insert (◇A) (□Γ) ⟹ some (◇B))
-  | cut {Γ₁ Γ₂ Δ A} : ProofGentzenWithCut (Γ₁ ⟹ some A) → ProofGentzenWithCut (insert A Γ₂ ⟹ Δ) →
-      ProofGentzenWithCut (Γ₁ ∪ Γ₂ ⟹ Δ)
-
-notation:120 "⊢ᵍᶜ[CK]! " S:121 => ProofGentzenWithCut S
+  | cut {Γ₁ Γ₂ Δ A} : ProofGentzenWithCut (Γ₁ ⟹ some A) → ProofGentzenWithCut (insert A Γ₂ ⟹ Δ) → ProofGentzenWithCut (Γ₁ ∪ Γ₂ ⟹ Δ)
+prefix:120 "⊢ᵍᶜ[CK]! " => ProofGentzenWithCut
 
 /-- Every cut-free proof is a proof in the cut-extended calculus. -/
 def ProofGentzenWithCut.ofProofGentzen {S : Sequent} : ⊢ᵍ[CK]! S → ⊢ᵍᶜ[CK]! S
@@ -48,10 +46,9 @@ def ProofGentzenWithCut.ofProofGentzen {S : Sequent} : ⊢ᵍ[CK]! S → ⊢ᵍ�
   | .impR h => .impR (ofProofGentzen h)
   | .box h => .box (ofProofGentzen h)
   | .dia h => .dia (ofProofGentzen h)
-
 abbrev ProvableGentzenWithCut (S : Sequent) : Prop := Nonempty (⊢ᵍᶜ[CK]! S)
-notation:120 "⊢ᵍᶜ[CK] " S:121 => ProvableGentzenWithCut S
-notation:120 "⊬ᵍᶜ[CK] " S:121 => ¬ ProvableGentzenWithCut S
+prefix:120 "⊢ᵍᶜ[CK] " => ProvableGentzenWithCut
+prefix:120 "⊬ᵍᶜ[CK] " => λ S => ¬ProvableGentzenWithCut S
 
 namespace ProvableGentzenWithCut
 
@@ -65,19 +62,15 @@ lemma wkL (h : ⊢ᵍᶜ[CK] (Γ ⟹ Δ)) (h' : Γ ⊆ Γ' := by grind) : ⊢ᵍ
 lemma wkR (h : ⊢ᵍᶜ[CK] (Γ ⟹ none)) : ⊢ᵍᶜ[CK] (Γ ⟹ some A) := ⟨ProofGentzenWithCut.wkR h.some⟩
 lemma andL₁ (h : ⊢ᵍᶜ[CK] (insert A Γ ⟹ Δ)) : ⊢ᵍᶜ[CK] (insert (A ⋏ B) Γ ⟹ Δ) := ⟨ProofGentzenWithCut.andL₁ h.some⟩
 lemma andL₂ (h : ⊢ᵍᶜ[CK] (insert B Γ ⟹ Δ)) : ⊢ᵍᶜ[CK] (insert (A ⋏ B) Γ ⟹ Δ) := ⟨ProofGentzenWithCut.andL₂ h.some⟩
-lemma andR (h₁ : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) (h₂ : ⊢ᵍᶜ[CK] (Γ ⟹ some B)) : ⊢ᵍᶜ[CK] (Γ ⟹ some (A ⋏ B)) :=
-  ⟨ProofGentzenWithCut.andR h₁.some h₂.some⟩
-lemma orL (h₁ : ⊢ᵍᶜ[CK] (insert A Γ ⟹ Δ)) (h₂ : ⊢ᵍᶜ[CK] (insert B Γ ⟹ Δ)) : ⊢ᵍᶜ[CK] (insert (A ⋎ B) Γ ⟹ Δ) :=
-  ⟨ProofGentzenWithCut.orL h₁.some h₂.some⟩
+lemma andR (h₁ : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) (h₂ : ⊢ᵍᶜ[CK] (Γ ⟹ some B)) : ⊢ᵍᶜ[CK] (Γ ⟹ some (A ⋏ B)) := ⟨ProofGentzenWithCut.andR h₁.some h₂.some⟩
+lemma orL (h₁ : ⊢ᵍᶜ[CK] (insert A Γ ⟹ Δ)) (h₂ : ⊢ᵍᶜ[CK] (insert B Γ ⟹ Δ)) : ⊢ᵍᶜ[CK] (insert (A ⋎ B) Γ ⟹ Δ) := ⟨ProofGentzenWithCut.orL h₁.some h₂.some⟩
 lemma orR₁ (h : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) : ⊢ᵍᶜ[CK] (Γ ⟹ some (A ⋎ B)) := ⟨ProofGentzenWithCut.orR₁ h.some⟩
 lemma orR₂ (h : ⊢ᵍᶜ[CK] (Γ ⟹ some B)) : ⊢ᵍᶜ[CK] (Γ ⟹ some (A ⋎ B)) := ⟨ProofGentzenWithCut.orR₂ h.some⟩
-lemma impL (h₁ : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) (h₂ : ⊢ᵍᶜ[CK] (insert B Γ ⟹ Δ)) : ⊢ᵍᶜ[CK] (insert (A 🡒 B) Γ ⟹ Δ) :=
-  ⟨ProofGentzenWithCut.impL h₁.some h₂.some⟩
+lemma impL (h₁ : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) (h₂ : ⊢ᵍᶜ[CK] (insert B Γ ⟹ Δ)) : ⊢ᵍᶜ[CK] (insert (A 🡒 B) Γ ⟹ Δ) := ⟨ProofGentzenWithCut.impL h₁.some h₂.some⟩
 lemma impR (h : ⊢ᵍᶜ[CK] (insert A Γ ⟹ some B)) : ⊢ᵍᶜ[CK] (Γ ⟹ some (A 🡒 B)) := ⟨ProofGentzenWithCut.impR h.some⟩
 lemma box (h : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) : ⊢ᵍᶜ[CK] (□Γ ⟹ some (□A)) := ⟨ProofGentzenWithCut.box h.some⟩
 lemma dia (h : ⊢ᵍᶜ[CK] (insert A Γ ⟹ some B)) : ⊢ᵍᶜ[CK] (insert (◇A) (□Γ) ⟹ some (◇B)) := ⟨ProofGentzenWithCut.dia h.some⟩
-lemma cut (h₁ : ⊢ᵍᶜ[CK] (Γ₁ ⟹ some A)) (h₂ : ⊢ᵍᶜ[CK] (insert A Γ₂ ⟹ Δ)) : ⊢ᵍᶜ[CK] (Γ₁ ∪ Γ₂ ⟹ Δ) :=
-  ⟨ProofGentzenWithCut.cut h₁.some h₂.some⟩
+lemma cut (h₁ : ⊢ᵍᶜ[CK] (Γ₁ ⟹ some A)) (h₂ : ⊢ᵍᶜ[CK] (insert A Γ₂ ⟹ Δ)) : ⊢ᵍᶜ[CK] (Γ₁ ∪ Γ₂ ⟹ Δ) := ⟨ProofGentzenWithCut.cut h₁.some h₂.some⟩
 
 @[induction_eliminator]
 lemma rec

@@ -31,8 +31,7 @@ inductive ProofGentzen : Sequent → Type
   | impR {Γ A B}    : ProofGentzen (insert A Γ ⟹ some B) → ProofGentzen (Γ ⟹ some (A 🡒 B))
   | box  {Γ A}      : ProofGentzen (Γ ⟹ some A) → ProofGentzen (□Γ ⟹ some (□A))
   | dia  {Γ A B}    : ProofGentzen (insert A Γ ⟹ some B) → ProofGentzen (insert (◇A) (□Γ) ⟹ some (◇B))
-
-notation:120 "⊢ᵍ[CK]! " S:121 => ProofGentzen S
+prefix:120 "⊢ᵍ[CK]! " => ProofGentzen
 
 
 namespace ProofGentzen
@@ -55,8 +54,8 @@ end ProofGentzen
 
 
 abbrev ProvableGentzen (S : Sequent) : Prop := Nonempty (⊢ᵍ[CK]! S)
-notation:120 "⊢ᵍ[CK] " S:121 => ProvableGentzen S
-notation:120 "⊬ᵍ[CK] " S:121 => ¬ ProvableGentzen S
+prefix:120 "⊢ᵍ[CK] " => ProvableGentzen
+prefix:120 "⊬ᵍ[CK] " => λ S => ¬ProvableGentzen S
 
 namespace ProvableGentzen
 
