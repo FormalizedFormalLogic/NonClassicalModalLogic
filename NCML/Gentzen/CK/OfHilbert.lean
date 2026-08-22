@@ -62,7 +62,11 @@ lemma efq : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((⊥ : BDFormula) �
   impR botL
 
 lemma kBox : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (□(A 🡒 B) 🡒 □A 🡒 □B)) := by
-  sorry
+  apply impR; apply impR;
+  have p : ⊢ᵍᶜ[CK] (insert (A 🡒 B) ({A} : BDFormulaFinset) ⟹ some B) := impL (union A) (union B);
+  have q : ⊢ᵍᶜ[CK] (({A, A 🡒 B} : BDFormulaFinset) ⟹ some B) := wkL p;
+  simpa [BDFormulaFinset.box, Finset.image_insert, Finset.image_singleton, Finset.image_empty]
+    using box q
 
 lemma kDia : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (□(A 🡒 B) 🡒 ◇A 🡒 ◇B)) := by
   sorry
