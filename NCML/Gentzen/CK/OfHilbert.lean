@@ -1,5 +1,6 @@
 module
 
+public import NCML.Gentzen.CK.ToHilbert
 public import NCML.Gentzen.CK.WithCut
 public import NCML.Hilbert.Basic
 
@@ -112,6 +113,10 @@ lemma ofHilbert (h : ⊢ᴴ[CK;∅] (⋀Γ 🡒 A)) : ⊢ᵍᶜ[CK] (Γ ⟹ some
   have e : ⊢ᵍᶜ[CK] (insert (⋀Γ 🡒 A) Γ ⟹ some A) := impL fconj (union A);
   have c := cut d e;
   rwa [Finset.empty_union] at c;
+
+/-- - [Sat26, Proposition 4.18]
+- [Dal25, Theorem 6.3] -/
+theorem iff_hilbert : ⊢ᵍᶜ[CK] (Γ ⟹ some A) ↔ ⊢ᴴ[CK;∅] (⋀Γ 🡒 A) := ⟨toHilbert, ofHilbert⟩
 
 end ProvableGentzenWithCut
 

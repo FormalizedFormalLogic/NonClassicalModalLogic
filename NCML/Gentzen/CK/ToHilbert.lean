@@ -52,9 +52,7 @@ lemma toHilbert_aux {S : Sequent} (h : ⊢ᵍᶜ[CK] S) : ⊢ᴴ[CK;∅] S.toFor
       (and_intro_ctx (imp_trans (fconj_subset Finset.subset_union_left) ih₁) (fconj_subset Finset.subset_union_right))
       (imp_trans imp_fconj_insert ih₂)
 
-/-- - [Sat26, Proposition 4.18]
-- [Dal25, Theorem 6.3] -/
-theorem toHilbert (h : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) : ⊢ᴴ[CK;∅] (⋀Γ 🡒 A) := toHilbert_aux h
+lemma toHilbert (h : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) : ⊢ᴴ[CK;∅] (⋀Γ 🡒 A) := toHilbert_aux h
 
 end ProvableGentzenWithCut
 
