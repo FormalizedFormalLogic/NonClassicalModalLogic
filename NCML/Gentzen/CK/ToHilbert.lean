@@ -31,8 +31,8 @@ lemma toHilbert_aux {S : Sequent} (h : ⊢ᵍᶜ[CK] S) : ⊢ᴴ[CK;∅] S.toFor
   | orL h₁ h₂ ih₁ ih₂ =>
     exact imp_trans fconj_insert_imp
       (uncurry (or_imp (curry (imp_trans imp_fconj_insert ih₁)) (curry (imp_trans imp_fconj_insert ih₂))))
-  | orR₁ h ih => sorry
-  | orR₂ h ih => sorry
+  | orR₁ h ih => exact imp_trans ih orIntro₁
+  | orR₂ h ih => exact imp_trans ih orIntro₂
   | impL h₁ h₂ ih₁ ih₂ => sorry
   | impR h ih => sorry
   | box h ih => sorry
