@@ -108,7 +108,10 @@ lemma fconj : ⊢ᵍᶜ[CK] (Γ ⟹ some (⋀Γ)) := by
   exact Finset.mem_toList.mp hB;
 
 lemma ofHilbert (h : ⊢ᴴ[CK;∅] (⋀Γ 🡒 A)) : ⊢ᵍᶜ[CK] (Γ ⟹ some A) := by
-  sorry
+  have d := of_provable h;
+  have e : ⊢ᵍᶜ[CK] (insert (⋀Γ 🡒 A) Γ ⟹ some A) := impL fconj (union A);
+  have c := cut d e;
+  rwa [Finset.empty_union] at c;
 
 end ProvableGentzenWithCut
 
