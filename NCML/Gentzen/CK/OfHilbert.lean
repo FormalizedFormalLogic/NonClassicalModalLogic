@@ -97,7 +97,10 @@ lemma of_provable : (⊢ᴴ[CK;∅] A) → ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset
 
 lemma lconj_of_forall_mem {L : BDFormulaList} (h : ∀ B ∈ L, B ∈ Γ) :
     ⊢ᵍᶜ[CK] (Γ ⟹ some (⋀L)) := by
-  sorry
+  induction L with
+  | nil => exact of_without_cut ProvableGentzen.verum;
+  | cons B L ih =>
+    exact andR (union B (h B (by grind))) (ih (by grind));
 
 lemma fconj : ⊢ᵍᶜ[CK] (Γ ⟹ some (⋀Γ)) := by
   sorry
