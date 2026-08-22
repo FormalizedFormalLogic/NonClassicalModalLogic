@@ -4,17 +4,13 @@ public import NCML.Gentzen.Sequent
 public import NCML.Hilbert.Basic
 public import NCML.Hilbert.Logics
 
-/-! This file defines the cut-free sequent calculus `GCK` and its cut-extended variant
-`GCK + cut` for `LogicCK`, translates their proofs to and from Hilbert-style `CK`
-derivations, and shows the two systems are equivalent. -/
-
 @[expose] public section
 
 open scoped BDFormulaFinset BDFormulaList
 
 namespace LogicCK
 
-/-- The cut-free sequent calculus `GCK` for `LogicCK`.
+/-- The cut-free sequent calculus for `LogicCK`.
 
 - [Wij90, Section 1.2]
 - [Sat26, Definition B.1]
@@ -36,7 +32,6 @@ inductive ProofGentzen : Sequent → Type
   | dia  {Γ A B}    : ProofGentzen (insert A Γ ⟹ some B) → ProofGentzen (insert (◇A) (□Γ) ⟹ some (◇B))
 prefix:120 "⊢ᵍ[CK]! " => ProofGentzen
 
-
 namespace ProofGentzen
 
 variable {Γ : BDFormulaFinset} {Δ : Option BDFormula} {A B : BDFormula}
@@ -55,7 +50,6 @@ def verum : ⊢ᵍ[CK]! (Γ ⟹ some ⊤) := impR (wkL botL)
 
 end ProofGentzen
 
-
 abbrev ProvableGentzen (S : Sequent) : Prop := Nonempty (⊢ᵍ[CK]! S)
 prefix:120 "⊢ᵍ[CK] " => ProvableGentzen
 prefix:120 "⊬ᵍ[CK] " => λ S => ¬ProvableGentzen S
@@ -64,7 +58,7 @@ namespace ProvableGentzen
 
 variable {Γ Γ' : BDFormulaFinset} {Δ : Option BDFormula} {A B : BDFormula}
 
-lemma axm (A : BDFormula) : ⊢ᵍ[CK] ({A} ⟹ some A) := ⟨ProofGentzen.axm A⟩
+lemma axm (A) : ⊢ᵍ[CK] ({A} ⟹ some A) := ⟨ProofGentzen.axm A⟩
 lemma botL : ⊢ᵍ[CK] ({⊥} ⟹ Δ) := ⟨ProofGentzen.botL⟩
 lemma wkL (h : ⊢ᵍ[CK] (Γ ⟹ Δ)) (h' : Γ ⊆ Γ' := by grind) : ⊢ᵍ[CK] (Γ' ⟹ Δ) := ⟨ProofGentzen.wkL h.some h'⟩
 lemma wkR (h : ⊢ᵍ[CK] (Γ ⟹ none)) : ⊢ᵍ[CK] (Γ ⟹ some A) := ⟨ProofGentzen.wkR h.some⟩
@@ -124,7 +118,7 @@ lemma iff_unprovableGentzen_isEmpty_ProofGentzen {S : Sequent} : (⊬ᵍ[CK] S) 
 
 end ProvableGentzen
 
-/-- The sequent calculus `GCK` extended with the cut rule.
+/-- The sequent calculus extended with the cut rule.
 
 - [Wij90, Section 1.2]
 -/
@@ -146,7 +140,6 @@ inductive ProofGentzenWithCut : Sequent → Type
   | cut {Γ₁ Γ₂ Δ A} : ProofGentzenWithCut (Γ₁ ⟹ some A) → ProofGentzenWithCut (insert A Γ₂ ⟹ Δ) → ProofGentzenWithCut (Γ₁ ∪ Γ₂ ⟹ Δ)
 prefix:120 "⊢ᵍᶜ[CK]! " => ProofGentzenWithCut
 
-/-- Every cut-free proof is a proof in the cut-extended calculus. -/
 def ProofGentzenWithCut.ofProofGentzen {S : Sequent} : ⊢ᵍ[CK]! S → ⊢ᵍᶜ[CK]! S
   | .axm A => .axm A
   | .botL => .botL
@@ -168,11 +161,11 @@ prefix:120 "⊬ᵍᶜ[CK] " => λ S => ¬ProvableGentzenWithCut S
 
 namespace ProvableGentzenWithCut
 
-variable {Γ Γ' Γ₁ Γ₂ : BDFormulaFinset} {Δ : Option BDFormula} {A B : BDFormula}
+variable {Γ Γ' Γ₁ Γ₂ : BDFormulaFinset} {Δ : Option BDFormula} {A B : BDFormula} {S : Sequent}
 
-theorem of_without_cut {S : Sequent} : ⊢ᵍ[CK] S → ⊢ᵍᶜ[CK] S := λ ⟨p⟩ => ⟨ProofGentzenWithCut.ofProofGentzen p⟩
+theorem of_without_cut : ⊢ᵍ[CK] S → ⊢ᵍᶜ[CK] S := λ ⟨p⟩ => ⟨ProofGentzenWithCut.ofProofGentzen p⟩
 
-lemma axm (A : BDFormula) : ⊢ᵍᶜ[CK] ({A} ⟹ some A) := ⟨ProofGentzenWithCut.axm A⟩
+lemma axm (A) : ⊢ᵍᶜ[CK] ({A} ⟹ some A) := ⟨ProofGentzenWithCut.axm A⟩
 lemma botL : ⊢ᵍᶜ[CK] ({⊥} ⟹ Δ) := ⟨ProofGentzenWithCut.botL⟩
 lemma wkL (h : ⊢ᵍᶜ[CK] (Γ ⟹ Δ)) (h' : Γ ⊆ Γ' := by grind) : ⊢ᵍᶜ[CK] (Γ' ⟹ Δ) := ⟨ProofGentzenWithCut.wkL h.some h'⟩
 lemma wkR (h : ⊢ᵍᶜ[CK] (Γ ⟹ none)) : ⊢ᵍᶜ[CK] (Γ ⟹ some A) := ⟨ProofGentzenWithCut.wkR h.some⟩
@@ -245,9 +238,8 @@ end ProvableGentzenWithCut
 
 end LogicCK
 
-/-- The Hilbert-style translation `⋀Γ 🡒 A` of a sequent `Γ ⟹ some A`, or `⋀Γ 🡒 ⊥` if the
-succedent is `none`. -/
-noncomputable def Sequent.toFormula (S : Sequent) : BDFormula := ⋀S.ant 🡒 S.suc.getD ⊥
+/-- The Hilbert-style translation of a sequent. -/
+noncomputable def Sequent.toFormula (S : Sequent) := ⋀S.ant 🡒 S.suc.getD ⊥
 
 section
 
@@ -257,9 +249,9 @@ namespace LogicCK
 
 namespace ProvableGentzenWithCut
 
-variable {Γ Γ₁ Γ₂ : BDFormulaFinset} {A : BDFormula}
+variable {Γ Γ₁ Γ₂ : BDFormulaFinset} {A : BDFormula} {S : Sequent}
 
-lemma toHilbert_aux {S : Sequent} (h : ⊢ᵍᶜ[CK] S) : ⊢ʰ[CK;∅] S.toFormula := by
+lemma toHilbert_aux (h : ⊢ᵍᶜ[CK] S) : ⊢ʰ[CK;∅] S.toFormula := by
   induction h with
   | axm A => exact fconj_imp (Finset.mem_singleton_self A)
   | botL => exact imp_trans (fconj_imp (Finset.mem_singleton_self ⊥)) efq
@@ -309,17 +301,17 @@ variable {Γ : BDFormulaFinset} {A B C : BDFormula}
 
 lemma union (A) (hΓ : A ∈ Γ := by grind) : ⊢ᵍᶜ[CK] (Γ ⟹ some A) := wkL (axm A)
 
-lemma mdp (h₁ : ⊢ᵍᶜ[CK] (Γ ⟹ some (A 🡒 B))) (h₂ : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) :
-    ⊢ᵍᶜ[CK] (Γ ⟹ some B) := by
+lemma mdp (h₁ : ⊢ᵍᶜ[CK] (Γ ⟹ some (A 🡒 B))) (h₂ : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) : ⊢ᵍᶜ[CK] (Γ ⟹ some B) := by
   have e : ⊢ᵍᶜ[CK] (insert (A 🡒 B) Γ ⟹ some B) := impL h₂ (union B);
   have h := cut h₁ e;
   rwa [Finset.union_self] at h;
 
-lemma imply₁ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A 🡒 B 🡒 A)) :=
-  impR (impR (union A))
+lemma imply₁ : ⊢ᵍᶜ[CK] (∅ ⟹ some (A 🡒 B 🡒 A)) := impR (impR (union A))
 
-lemma imply₂ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((A 🡒 B 🡒 C) 🡒 (A 🡒 B) 🡒 A 🡒 C)) := by
-  apply impR; apply impR; apply impR;
+lemma imply₂ : ⊢ᵍᶜ[CK] (∅ ⟹ some ((A 🡒 B 🡒 C) 🡒 (A 🡒 B) 🡒 A 🡒 C)) := by
+  apply impR;
+  apply impR;
+  apply impR;
   have p₁ : ⊢ᵍᶜ[CK] (insert (B 🡒 C) ({A, B} : BDFormulaFinset) ⟹ some C) := impL (union B) (union C);
   have p₂ : ⊢ᵍᶜ[CK] (insert B ({A, B 🡒 C} : BDFormulaFinset) ⟹ some C) := wkL p₁;
   have p₃ : ⊢ᵍᶜ[CK] (insert (A 🡒 B) ({A, B 🡒 C} : BDFormulaFinset) ⟹ some C) := impL (union A) p₂;
@@ -327,22 +319,13 @@ lemma imply₂ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((A 🡒 B 🡒
   have p₅ : ⊢ᵍᶜ[CK] (insert (A 🡒 B 🡒 C) ({A, A 🡒 B} : BDFormulaFinset) ⟹ some C) := impL (union A) p₄;
   exact wkL p₅
 
-lemma andElim₁ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A ⋏ B 🡒 A)) :=
-  impR (andL₁ (axm A))
+lemma andElim₁ : ⊢ᵍᶜ[CK] (∅ ⟹ some (A ⋏ B 🡒 A)) := impR (andL₁ (axm A))
+lemma andElim₂ : ⊢ᵍᶜ[CK] (∅ ⟹ some (A ⋏ B 🡒 B)) := impR (andL₂ (axm B))
+lemma andIntro : ⊢ᵍᶜ[CK] (∅ ⟹ some (A 🡒 B 🡒 A ⋏ B)) := impR (impR (andR (union A) (union B)))
+lemma orIntro₁ : ⊢ᵍᶜ[CK] (∅ ⟹ some (A 🡒 A ⋎ B)) := impR (orR₁ (axm A))
+lemma orIntro₂ : ⊢ᵍᶜ[CK] (∅ ⟹ some (B 🡒 A ⋎ B)) := impR (orR₂ (axm B))
 
-lemma andElim₂ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A ⋏ B 🡒 B)) :=
-  impR (andL₂ (axm B))
-
-lemma andIntro : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A 🡒 B 🡒 A ⋏ B)) :=
-  impR (impR (andR (union A) (union B)))
-
-lemma orIntro₁ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A 🡒 A ⋎ B)) :=
-  impR (orR₁ (axm A))
-
-lemma orIntro₂ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (B 🡒 A ⋎ B)) :=
-  impR (orR₂ (axm B))
-
-lemma orElim : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((A 🡒 C) 🡒 (B 🡒 C) 🡒 (A ⋎ B 🡒 C))) := by
+lemma orElim : ⊢ᵍᶜ[CK] (∅ ⟹ some ((A 🡒 C) 🡒 (B 🡒 C) 🡒 (A ⋎ B 🡒 C))) := by
   apply impR; apply impR; apply impR;
   have p₁ : ⊢ᵍᶜ[CK] (insert (A 🡒 C) ({A} : BDFormulaFinset) ⟹ some C) := impL (union A) (union C);
   have q₁ : ⊢ᵍᶜ[CK] (insert A ({B 🡒 C, A 🡒 C} : BDFormulaFinset) ⟹ some C) := wkL p₁;
@@ -350,26 +333,27 @@ lemma orElim : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((A 🡒 C) 🡒 
   have q₂ : ⊢ᵍᶜ[CK] (insert B ({B 🡒 C, A 🡒 C} : BDFormulaFinset) ⟹ some C) := wkL p₂;
   exact wkL (orL q₁ q₂)
 
-lemma efq : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((⊥ : BDFormula) 🡒 A)) :=
+lemma efq : ⊢ᵍᶜ[CK] (∅ ⟹ some (⊥ 🡒 A)) :=
   impR botL
 
-private lemma kPremise : ⊢ᵍᶜ[CK] (({A, A 🡒 B} : BDFormulaFinset) ⟹ some B) :=
+private lemma kPremise : ⊢ᵍᶜ[CK] (({A, A 🡒 B}) ⟹ some B) :=
   wkL (impL (union A) (union B) : ⊢ᵍᶜ[CK] (insert (A 🡒 B) ({A} : BDFormulaFinset) ⟹ some B))
 
-lemma kBox : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (□(A 🡒 B) 🡒 □A 🡒 □B)) := by
-  apply impR; apply impR;
+lemma kBox : ⊢ᵍᶜ[CK] (∅ ⟹ some (□(A 🡒 B) 🡒 □A 🡒 □B)) := by
+  apply impR;
+  apply impR;
   simpa [BDFormulaFinset.box, Finset.image_insert, Finset.image_singleton, Finset.image_empty]
     using box kPremise
 
-lemma kDia : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (□(A 🡒 B) 🡒 ◇A 🡒 ◇B)) := by
-  apply impR; apply impR;
+lemma kDia : ⊢ᵍᶜ[CK] (∅ ⟹ some (□(A 🡒 B) 🡒 ◇A 🡒 ◇B)) := by
+  apply impR;
+  apply impR;
   simpa [BDFormulaFinset.box, Finset.image_singleton] using dia kPremise
 
-lemma nec (h : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some A)) :
-    ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (□A)) := by
+lemma nec (h : ⊢ᵍᶜ[CK] (∅ ⟹ some A)) : ⊢ᵍᶜ[CK] (∅ ⟹ some (□A)) := by
   simpa using box h
 
-lemma of_provable : (⊢ʰ[CK;∅] A) → ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some A) := by
+lemma of_provable : (⊢ʰ[CK;∅] A) → ⊢ᵍᶜ[CK] (∅ ⟹ some A) := by
   intro h;
   induction h with
   | axm hmem => simp at hmem;
@@ -387,8 +371,7 @@ lemma of_provable : (⊢ʰ[CK;∅] A) → ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset)
   | mdp h₁ h₂ ih₁ ih₂ => exact mdp ih₁ ih₂;
   | nec h ih => exact nec ih;
 
-lemma lconj_of_forall_mem {L : BDFormulaList} (h : ∀ B ∈ L, B ∈ Γ) :
-    ⊢ᵍᶜ[CK] (Γ ⟹ some (⋀L)) := by
+lemma lconj_of_forall_mem {L : BDFormulaList} (h : ∀ B ∈ L, B ∈ Γ) : ⊢ᵍᶜ[CK] (Γ ⟹ some (⋀L)) := by
   induction L with
   | nil => exact of_without_cut ProvableGentzen.verum;
   | cons B L ih =>
@@ -405,8 +388,10 @@ lemma ofHilbert (h : ⊢ʰ[CK;∅] (⋀Γ 🡒 A)) : ⊢ᵍᶜ[CK] (Γ ⟹ some 
   have c := cut d e;
   rwa [Finset.empty_union] at c;
 
-/-- - [Sat26, Proposition 4.18]
-- [Dal25, Theorem 6.3] -/
+/--
+- [Sat26, Proposition 4.18]
+- [Dal25, Theorem 6.3]
+-/
 theorem iff_hilbert : ⊢ᵍᶜ[CK] (Γ ⟹ some A) ↔ ⊢ʰ[CK;∅] (⋀Γ 🡒 A) := ⟨toHilbert, ofHilbert⟩
 
 end ProvableGentzenWithCut
