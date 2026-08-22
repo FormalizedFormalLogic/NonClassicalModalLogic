@@ -41,7 +41,7 @@ public import NCML.CK.Logic.CS4
 public import NCML.CK.Semantics
 public import NCML.CK.Soundness
 public import NCML.Formula
-public import NCML.Gentzen.CK
+public import NCML.Gentzen.CK.Basic
 public import NCML.Gentzen.Sequent
 public import NCML.Hilbert.Basic
 public import NCML.Hilbert.Logics
