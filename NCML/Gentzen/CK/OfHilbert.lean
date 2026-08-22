@@ -27,7 +27,13 @@ lemma imply₁ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A 🡒 B 🡒 
   impR (impR (union A))
 
 lemma imply₂ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((A 🡒 B 🡒 C) 🡒 (A 🡒 B) 🡒 A 🡒 C)) := by
-  sorry
+  apply impR; apply impR; apply impR;
+  have p₁ : ⊢ᵍᶜ[CK] (insert (B 🡒 C) ({A, B} : BDFormulaFinset) ⟹ some C) := impL (union B) (union C);
+  have p₂ : ⊢ᵍᶜ[CK] (insert B ({A, B 🡒 C} : BDFormulaFinset) ⟹ some C) := wkL p₁;
+  have p₃ : ⊢ᵍᶜ[CK] (insert (A 🡒 B) ({A, B 🡒 C} : BDFormulaFinset) ⟹ some C) := impL (union A) p₂;
+  have p₄ : ⊢ᵍᶜ[CK] (insert (B 🡒 C) ({A, A 🡒 B} : BDFormulaFinset) ⟹ some C) := wkL p₃;
+  have p₅ : ⊢ᵍᶜ[CK] (insert (A 🡒 B 🡒 C) ({A, A 🡒 B} : BDFormulaFinset) ⟹ some C) := impL (union A) p₄;
+  exact wkL p₅
 
 lemma andElim₁ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A ⋏ B 🡒 A)) := by
   sorry
