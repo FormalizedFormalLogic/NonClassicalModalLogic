@@ -75,7 +75,7 @@ lemma kDia : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (□(A 🡒 B) 🡒
 
 lemma nec (h : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some A)) :
     ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (□A)) := by
-  sorry
+  simpa using box h
 
 lemma of_provable : (⊢ᴴ[CK;∅] A) → ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some A) := by
   sorry
