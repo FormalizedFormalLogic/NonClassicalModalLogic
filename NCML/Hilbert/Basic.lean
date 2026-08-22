@@ -30,104 +30,104 @@ namespace ProvableBDHilbert
 
 variable {𝔸 𝔸₁ 𝔸₂ : Set BDFormula} {A B C D : BDFormula} {Γ Γ₁ Γ₂ : BDFormulaList}
 
-notation:50 "⊢ᴴ[CK;" 𝔸 "] " A:51 => ProvableBDHilbert 𝔸 A
+notation:50 "⊢ʰ[CK;" 𝔸 "] " A:51 => ProvableBDHilbert 𝔸 A
 
-lemma axm (h : A ∈ 𝔸) : ⊢ᴴ[CK;𝔸] A := ⟨ProofBDHilbert.axm h⟩
-@[simp, grind .] lemma imply₁ : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 A := ⟨ProofBDHilbert.imply₁⟩
-@[simp, grind .] lemma imply₂ : ⊢ᴴ[CK;𝔸] (A 🡒 B 🡒 C) 🡒 (A 🡒 B) 🡒 A 🡒 C := ⟨ProofBDHilbert.imply₂⟩
-@[simp, grind .] lemma andElim₁ : ⊢ᴴ[CK;𝔸] A ⋏ B 🡒 A := ⟨ProofBDHilbert.andElim₁⟩
-@[simp, grind .] lemma andElim₂ : ⊢ᴴ[CK;𝔸] A ⋏ B 🡒 B := ⟨ProofBDHilbert.andElim₂⟩
-@[simp, grind .] lemma andIntro : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 A ⋏ B := ⟨ProofBDHilbert.andIntro⟩
-@[simp, grind .] lemma orIntro₁ : ⊢ᴴ[CK;𝔸] A 🡒 A ⋎ B := ⟨ProofBDHilbert.orIntro₁⟩
-@[simp, grind .] lemma orIntro₂ : ⊢ᴴ[CK;𝔸] B 🡒 A ⋎ B := ⟨ProofBDHilbert.orIntro₂⟩
-@[simp, grind .] lemma orElim : ⊢ᴴ[CK;𝔸] (A 🡒 C) 🡒 (B 🡒 C) 🡒 (A ⋎ B 🡒 C) := ⟨ProofBDHilbert.orElim⟩
-@[simp, grind .] lemma efq : ⊢ᴴ[CK;𝔸] ⊥ 🡒 A := ⟨ProofBDHilbert.efq⟩
-@[simp, grind .] lemma kBox : ⊢ᴴ[CK;𝔸] □(A 🡒 B) 🡒 □A 🡒 □B := ⟨ProofBDHilbert.kBox⟩
-@[simp, grind .] lemma kDia : ⊢ᴴ[CK;𝔸] □(A 🡒 B) 🡒 ◇A 🡒 ◇B := ⟨ProofBDHilbert.kDia⟩
+lemma axm (h : A ∈ 𝔸) : ⊢ʰ[CK;𝔸] A := ⟨ProofBDHilbert.axm h⟩
+@[simp, grind .] lemma imply₁ : ⊢ʰ[CK;𝔸] A 🡒 B 🡒 A := ⟨ProofBDHilbert.imply₁⟩
+@[simp, grind .] lemma imply₂ : ⊢ʰ[CK;𝔸] (A 🡒 B 🡒 C) 🡒 (A 🡒 B) 🡒 A 🡒 C := ⟨ProofBDHilbert.imply₂⟩
+@[simp, grind .] lemma andElim₁ : ⊢ʰ[CK;𝔸] A ⋏ B 🡒 A := ⟨ProofBDHilbert.andElim₁⟩
+@[simp, grind .] lemma andElim₂ : ⊢ʰ[CK;𝔸] A ⋏ B 🡒 B := ⟨ProofBDHilbert.andElim₂⟩
+@[simp, grind .] lemma andIntro : ⊢ʰ[CK;𝔸] A 🡒 B 🡒 A ⋏ B := ⟨ProofBDHilbert.andIntro⟩
+@[simp, grind .] lemma orIntro₁ : ⊢ʰ[CK;𝔸] A 🡒 A ⋎ B := ⟨ProofBDHilbert.orIntro₁⟩
+@[simp, grind .] lemma orIntro₂ : ⊢ʰ[CK;𝔸] B 🡒 A ⋎ B := ⟨ProofBDHilbert.orIntro₂⟩
+@[simp, grind .] lemma orElim : ⊢ʰ[CK;𝔸] (A 🡒 C) 🡒 (B 🡒 C) 🡒 (A ⋎ B 🡒 C) := ⟨ProofBDHilbert.orElim⟩
+@[simp, grind .] lemma efq : ⊢ʰ[CK;𝔸] ⊥ 🡒 A := ⟨ProofBDHilbert.efq⟩
+@[simp, grind .] lemma kBox : ⊢ʰ[CK;𝔸] □(A 🡒 B) 🡒 □A 🡒 □B := ⟨ProofBDHilbert.kBox⟩
+@[simp, grind .] lemma kDia : ⊢ʰ[CK;𝔸] □(A 🡒 B) 🡒 ◇A 🡒 ◇B := ⟨ProofBDHilbert.kDia⟩
 
 @[grind =>]
-lemma mdp : (⊢ᴴ[CK;𝔸] A 🡒 B) → (⊢ᴴ[CK;𝔸] A) → (⊢ᴴ[CK;𝔸] B) :=
+lemma mdp : (⊢ʰ[CK;𝔸] A 🡒 B) → (⊢ʰ[CK;𝔸] A) → (⊢ʰ[CK;𝔸] B) :=
   fun ⟨h₁⟩ ⟨h₂⟩ => ⟨ProofBDHilbert.mdp h₁ h₂⟩
 
 @[grind <=]
-lemma nec : (⊢ᴴ[CK;𝔸] A) → (⊢ᴴ[CK;𝔸] □A) :=
+lemma nec : (⊢ʰ[CK;𝔸] A) → (⊢ʰ[CK;𝔸] □A) :=
   fun ⟨h⟩ => ⟨ProofBDHilbert.nec h⟩
 
-@[grind <=] lemma imp_trans (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 C :=
+@[grind <=] lemma imp_trans (h₁ : ⊢ʰ[CK;𝔸] A 🡒 B) (h₂ : ⊢ʰ[CK;𝔸] B 🡒 C) : ⊢ʰ[CK;𝔸] A 🡒 C :=
   mdp (mdp imply₂ (mdp imply₁ h₂)) h₁
 
-@[grind .] lemma imp_id : ⊢ᴴ[CK;𝔸] A 🡒 A := mdp (mdp imply₂ (imply₁ (B := A 🡒 A))) (imply₁ (B := A))
+@[grind .] lemma imp_id : ⊢ʰ[CK;𝔸] A 🡒 A := mdp (mdp imply₂ (imply₁ (B := A 🡒 A))) (imply₁ (B := A))
 
-@[grind .] lemma verum : ⊢ᴴ[CK;𝔸] ⊤ := imp_id
+@[grind .] lemma verum : ⊢ʰ[CK;𝔸] ⊤ := imp_id
 
-lemma dhyp (h : ⊢ᴴ[CK;𝔸] B) : ⊢ᴴ[CK;𝔸] A 🡒 B := mdp imply₁ h
+lemma dhyp (h : ⊢ʰ[CK;𝔸] B) : ⊢ʰ[CK;𝔸] A 🡒 B := mdp imply₁ h
 
-lemma mdp_ctx (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 C) (h₂ : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] A 🡒 C :=
+lemma mdp_ctx (h₁ : ⊢ʰ[CK;𝔸] A 🡒 B 🡒 C) (h₂ : ⊢ʰ[CK;𝔸] A 🡒 B) : ⊢ʰ[CK;𝔸] A 🡒 C :=
   mdp (mdp imply₂ h₁) h₂
 
-lemma mdp_ctx₂ (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 C 🡒 D) (h₂ : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 D :=
+lemma mdp_ctx₂ (h₁ : ⊢ʰ[CK;𝔸] A 🡒 B 🡒 C 🡒 D) (h₂ : ⊢ʰ[CK;𝔸] A 🡒 B 🡒 C) : ⊢ʰ[CK;𝔸] A 🡒 B 🡒 D :=
   mdp_ctx (imp_trans h₁ imply₂) h₂
 
-lemma imp_comp_left (h : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] (A 🡒 B) 🡒 (A 🡒 C) := mdp imply₂ (dhyp h)
+lemma imp_comp_left (h : ⊢ʰ[CK;𝔸] B 🡒 C) : ⊢ʰ[CK;𝔸] (A 🡒 B) 🡒 (A 🡒 C) := mdp imply₂ (dhyp h)
 
-lemma imp_comp_right (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] (B 🡒 C) 🡒 (A 🡒 C) :=
+lemma imp_comp_right (h : ⊢ʰ[CK;𝔸] A 🡒 B) : ⊢ʰ[CK;𝔸] (B 🡒 C) 🡒 (A 🡒 C) :=
   mdp_ctx (imp_trans imply₁ imply₂) (dhyp h)
 
-@[grind <=] lemma and_intro_ctx (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] A 🡒 C) : ⊢ᴴ[CK;𝔸] A 🡒 B ⋏ C :=
+@[grind <=] lemma and_intro_ctx (h₁ : ⊢ʰ[CK;𝔸] A 🡒 B) (h₂ : ⊢ʰ[CK;𝔸] A 🡒 C) : ⊢ʰ[CK;𝔸] A 🡒 B ⋏ C :=
   mdp_ctx (imp_trans h₁ andIntro) h₂
 
-lemma imp_swap : ⊢ᴴ[CK;𝔸] (A 🡒 B 🡒 C) 🡒 (B 🡒 A 🡒 C) :=
+lemma imp_swap : ⊢ʰ[CK;𝔸] (A 🡒 B 🡒 C) 🡒 (B 🡒 A 🡒 C) :=
   mdp_ctx₂ (imp_trans imply₂ imply₁) (dhyp imply₁)
 
-@[grind <=] lemma or_imp (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 C) (h₂ : ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] A ⋎ B 🡒 C :=
+@[grind <=] lemma or_imp (h₁ : ⊢ʰ[CK;𝔸] A 🡒 C) (h₂ : ⊢ʰ[CK;𝔸] B 🡒 C) : ⊢ʰ[CK;𝔸] A ⋎ B 🡒 C :=
   mdp (mdp orElim h₁) h₂
 
-@[grind <=] lemma box_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] □A 🡒 □B := mdp kBox (nec h)
+@[grind <=] lemma box_mono (h : ⊢ʰ[CK;𝔸] A 🡒 B) : ⊢ʰ[CK;𝔸] □A 🡒 □B := mdp kBox (nec h)
 
-@[grind <=] lemma dia_mono (h : ⊢ᴴ[CK;𝔸] A 🡒 B) : ⊢ᴴ[CK;𝔸] ◇A 🡒 ◇B := mdp kDia (nec h)
+@[grind <=] lemma dia_mono (h : ⊢ʰ[CK;𝔸] A 🡒 B) : ⊢ʰ[CK;𝔸] ◇A 🡒 ◇B := mdp kDia (nec h)
 
-@[grind .] lemma dia_mdp : ⊢ᴴ[CK;𝔸] □A 🡒 ◇(A 🡒 B) 🡒 ◇B :=
+@[grind .] lemma dia_mdp : ⊢ʰ[CK;𝔸] □A 🡒 ◇(A 🡒 B) 🡒 ◇B :=
   imp_trans (box_mono (mdp imp_swap imp_id)) kDia
 
-@[grind .] lemma box_or_inl : ⊢ᴴ[CK;𝔸] □A 🡒 □(A ⋎ B) := box_mono orIntro₁
+@[grind .] lemma box_or_inl : ⊢ʰ[CK;𝔸] □A 🡒 □(A ⋎ B) := box_mono orIntro₁
 
-@[grind .] lemma box_or_inr : ⊢ᴴ[CK;𝔸] □B 🡒 □(A ⋎ B) := box_mono orIntro₂
+@[grind .] lemma box_or_inr : ⊢ʰ[CK;𝔸] □B 🡒 □(A ⋎ B) := box_mono orIntro₂
 
-@[grind .] lemma box_and_intro : ⊢ᴴ[CK;𝔸] □A 🡒 □B 🡒 □(A ⋏ B) := imp_trans (mdp kBox (nec andIntro)) kBox
+@[grind .] lemma box_and_intro : ⊢ʰ[CK;𝔸] □A 🡒 □B 🡒 □(A ⋏ B) := imp_trans (mdp kBox (nec andIntro)) kBox
 
 @[grind .]
-lemma imp_bot_imp_box_bot : ⊢ᴴ[CK;𝔸] (A 🡒 ⊥) 🡒 (A 🡒 □⊥) := imp_comp_left (efq (A := □⊥))
+lemma imp_bot_imp_box_bot : ⊢ʰ[CK;𝔸] (A 🡒 ⊥) 🡒 (A 🡒 □⊥) := imp_comp_left (efq (A := □⊥))
 
 open scoped BDFormulaList
 
-lemma lconj_append_left : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₁ := by
+lemma lconj_append_left : ⊢ʰ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₁ := by
   induction Γ₁ with
   | nil => exact dhyp verum;
   | cons A Γ₁ ih => exact and_intro_ctx andElim₁ (imp_trans andElim₂ ih);
 
-lemma lconj_append_right : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₂ := by
+lemma lconj_append_right : ⊢ʰ[CK;𝔸] ⋀(Γ₁ ++ Γ₂) 🡒 ⋀Γ₂ := by
   induction Γ₁ with
   | nil => exact imp_id;
   | cons A Γ₁ ih => exact imp_trans andElim₂ ih;
 
-lemma ldisj_append_left : ⊢ᴴ[CK;𝔸] ⋁Γ₁ 🡒 ⋁(Γ₁ ++ Γ₂) := by
+lemma ldisj_append_left : ⊢ʰ[CK;𝔸] ⋁Γ₁ 🡒 ⋁(Γ₁ ++ Γ₂) := by
   induction Γ₁ with
   | nil => exact efq;
   | cons A Γ₁ ih => exact or_imp orIntro₁ (imp_trans ih orIntro₂);
 
-lemma ldisj_append_right : ⊢ᴴ[CK;𝔸] ⋁Γ₂ 🡒 ⋁(Γ₁ ++ Γ₂) := by
+lemma ldisj_append_right : ⊢ʰ[CK;𝔸] ⋁Γ₂ 🡒 ⋁(Γ₁ ++ Γ₂) := by
   induction Γ₁ with
   | nil => exact imp_id;
   | cons A Γ₁ ih => exact imp_trans ih orIntro₂;
 
 @[grind <=]
-lemma ldisj_imp (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] ⋁Γ 🡒 C := by
+lemma ldisj_imp (h : ∀ B ∈ Γ, ⊢ʰ[CK;𝔸] B 🡒 C) : ⊢ʰ[CK;𝔸] ⋁Γ 🡒 C := by
   induction Γ with
   | nil => exact efq;
   | cons A Γ ih => exact or_imp (h A (.head ..)) (ih fun B hB => h B (.tail _ hB));
 
 @[grind <=]
-lemma imp_ldisj (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] A 🡒 ⋁Γ := by
+lemma imp_ldisj (h : A ∈ Γ) : ⊢ʰ[CK;𝔸] A 🡒 ⋁Γ := by
   induction Γ with
   | nil => simp at h;
   | cons B Γ ih =>
@@ -135,7 +135,7 @@ lemma imp_ldisj (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] A 🡒 ⋁Γ := by
     · exact orIntro₁;
     · exact imp_trans (ih hmem) orIntro₂;
 
-lemma lconj_imp (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] ⋀Γ 🡒 A := by
+lemma lconj_imp (h : A ∈ Γ) : ⊢ʰ[CK;𝔸] ⋀Γ 🡒 A := by
   induction Γ with
   | nil => simp at h;
   | cons B Γ ih =>
@@ -143,12 +143,12 @@ lemma lconj_imp (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] ⋀Γ 🡒 A := by
     · exact andElim₁;
     · exact imp_trans andElim₂ (ih hmem);
 
-lemma imp_lconj (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] C 🡒 B) : ⊢ᴴ[CK;𝔸] C 🡒 ⋀Γ := by
+lemma imp_lconj (h : ∀ B ∈ Γ, ⊢ʰ[CK;𝔸] C 🡒 B) : ⊢ʰ[CK;𝔸] C 🡒 ⋀Γ := by
   induction Γ with
   | nil => exact dhyp verum;
   | cons A Γ ih => exact and_intro_ctx (h A (.head ..)) (ih fun B hB => h B (.tail _ hB));
 
-lemma lconj_box : ⊢ᴴ[CK;𝔸] ⋀□Γ 🡒 □⋀Γ := by
+lemma lconj_box : ⊢ʰ[CK;𝔸] ⋀□Γ 🡒 □⋀Γ := by
   induction Γ with
   | nil => exact dhyp (nec verum);
   | cons A Γ ih => exact mdp_ctx (imp_trans andElim₁ box_and_intro) (imp_trans andElim₂ ih);
@@ -159,52 +159,52 @@ open scoped BDFormulaFinset
 
 variable {Γ Γ₁ Γ₂ : BDFormulaFinset}
 
-lemma fconj_imp (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] ⋀Γ 🡒 A :=
+lemma fconj_imp (h : A ∈ Γ) : ⊢ʰ[CK;𝔸] ⋀Γ 🡒 A :=
   lconj_imp (Finset.mem_toList.mpr h)
 
-lemma imp_fconj (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] C 🡒 B) : ⊢ᴴ[CK;𝔸] C 🡒 ⋀Γ :=
+lemma imp_fconj (h : ∀ B ∈ Γ, ⊢ʰ[CK;𝔸] C 🡒 B) : ⊢ʰ[CK;𝔸] C 🡒 ⋀Γ :=
   imp_lconj fun B hB => h B (Finset.mem_toList.mp hB)
 
 @[grind <=]
-lemma fdisj_imp (h : ∀ B ∈ Γ, ⊢ᴴ[CK;𝔸] B 🡒 C) : ⊢ᴴ[CK;𝔸] ⋁Γ 🡒 C :=
+lemma fdisj_imp (h : ∀ B ∈ Γ, ⊢ʰ[CK;𝔸] B 🡒 C) : ⊢ʰ[CK;𝔸] ⋁Γ 🡒 C :=
   ldisj_imp fun B hB => h B (Finset.mem_toList.mp hB)
 
 @[grind <=]
-lemma imp_fdisj (h : A ∈ Γ) : ⊢ᴴ[CK;𝔸] A 🡒 ⋁Γ :=
+lemma imp_fdisj (h : A ∈ Γ) : ⊢ʰ[CK;𝔸] A 🡒 ⋁Γ :=
   imp_ldisj (Finset.mem_toList.mpr h)
 
-lemma fconj_union_left : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ∪ Γ₂) 🡒 ⋀Γ₁ :=
+lemma fconj_union_left : ⊢ʰ[CK;𝔸] ⋀(Γ₁ ∪ Γ₂) 🡒 ⋀Γ₁ :=
   imp_fconj fun _ hB => fconj_imp (Finset.mem_union_left _ hB)
 
-lemma fconj_union_right : ⊢ᴴ[CK;𝔸] ⋀(Γ₁ ∪ Γ₂) 🡒 ⋀Γ₂ :=
+lemma fconj_union_right : ⊢ʰ[CK;𝔸] ⋀(Γ₁ ∪ Γ₂) 🡒 ⋀Γ₂ :=
   imp_fconj fun _ hB => fconj_imp (Finset.mem_union_right _ hB)
 
-lemma fdisj_union_left : ⊢ᴴ[CK;𝔸] ⋁Γ₁ 🡒 ⋁(Γ₁ ∪ Γ₂) :=
+lemma fdisj_union_left : ⊢ʰ[CK;𝔸] ⋁Γ₁ 🡒 ⋁(Γ₁ ∪ Γ₂) :=
   fdisj_imp fun _ hB => imp_fdisj (Finset.mem_union_left _ hB)
 
-lemma fdisj_union_right : ⊢ᴴ[CK;𝔸] ⋁Γ₂ 🡒 ⋁(Γ₁ ∪ Γ₂) :=
+lemma fdisj_union_right : ⊢ʰ[CK;𝔸] ⋁Γ₂ 🡒 ⋁(Γ₁ ∪ Γ₂) :=
   fdisj_imp fun _ hB => imp_fdisj (Finset.mem_union_right _ hB)
 
 end
 
 @[induction_eliminator]
 lemma rec
-    {motive : (A : BDFormula) → (⊢ᴴ[CK;𝔸] A) → Prop}
+    {motive : (A : BDFormula) → (⊢ʰ[CK;𝔸] A) → Prop}
     (axm       : ∀ {A} (h : A ∈ 𝔸), motive A (axm h))
-    (imply₁    : ∀ {A B} (h : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 A), motive _ h)
-    (imply₂    : ∀ {A B C} (h : ⊢ᴴ[CK;𝔸] (A 🡒 B 🡒 C) 🡒 (A 🡒 B) 🡒 A 🡒 C), motive _ h)
-    (andElim₁  : ∀ {A B} (h : ⊢ᴴ[CK;𝔸] A ⋏ B 🡒 A), motive _ h)
-    (andElim₂  : ∀ {A B} (h : ⊢ᴴ[CK;𝔸] A ⋏ B 🡒 B), motive _ h)
-    (andIntro  : ∀ {A B} (h : ⊢ᴴ[CK;𝔸] A 🡒 B 🡒 A ⋏ B), motive _ h)
-    (orIntro₁  : ∀ {A B} (h : ⊢ᴴ[CK;𝔸] A 🡒 A ⋎ B), motive _ h)
-    (orIntro₂  : ∀ {A B} (h : ⊢ᴴ[CK;𝔸] B 🡒 A ⋎ B), motive _ h)
-    (orElim    : ∀ {A B C} (h : ⊢ᴴ[CK;𝔸] (A 🡒 C) 🡒 (B 🡒 C) 🡒 (A ⋎ B 🡒 C)), motive _ h)
-    (efq       : ∀ {A} (h : ⊢ᴴ[CK;𝔸] ⊥ 🡒 A), motive _ h)
-    (kBox      : ∀ {A B} (h : ⊢ᴴ[CK;𝔸] □(A 🡒 B) 🡒 □A 🡒 □B), motive _ h)
-    (kDia      : ∀ {A B} (h : ⊢ᴴ[CK;𝔸] □(A 🡒 B) 🡒 ◇A 🡒 ◇B), motive _ h)
-    (mdp       : ∀ {A B} (h₁ : ⊢ᴴ[CK;𝔸] A 🡒 B) (h₂ : ⊢ᴴ[CK;𝔸] A), motive _ h₁ → motive _ h₂ → motive _ (mdp h₁ h₂))
-    (nec       : ∀ {A} (h : ⊢ᴴ[CK;𝔸] A), motive A h → motive _ (nec h)) :
-    ∀ {A} (h : ⊢ᴴ[CK;𝔸] A), motive _ h := by
+    (imply₁    : ∀ {A B} (h : ⊢ʰ[CK;𝔸] A 🡒 B 🡒 A), motive _ h)
+    (imply₂    : ∀ {A B C} (h : ⊢ʰ[CK;𝔸] (A 🡒 B 🡒 C) 🡒 (A 🡒 B) 🡒 A 🡒 C), motive _ h)
+    (andElim₁  : ∀ {A B} (h : ⊢ʰ[CK;𝔸] A ⋏ B 🡒 A), motive _ h)
+    (andElim₂  : ∀ {A B} (h : ⊢ʰ[CK;𝔸] A ⋏ B 🡒 B), motive _ h)
+    (andIntro  : ∀ {A B} (h : ⊢ʰ[CK;𝔸] A 🡒 B 🡒 A ⋏ B), motive _ h)
+    (orIntro₁  : ∀ {A B} (h : ⊢ʰ[CK;𝔸] A 🡒 A ⋎ B), motive _ h)
+    (orIntro₂  : ∀ {A B} (h : ⊢ʰ[CK;𝔸] B 🡒 A ⋎ B), motive _ h)
+    (orElim    : ∀ {A B C} (h : ⊢ʰ[CK;𝔸] (A 🡒 C) 🡒 (B 🡒 C) 🡒 (A ⋎ B 🡒 C)), motive _ h)
+    (efq       : ∀ {A} (h : ⊢ʰ[CK;𝔸] ⊥ 🡒 A), motive _ h)
+    (kBox      : ∀ {A B} (h : ⊢ʰ[CK;𝔸] □(A 🡒 B) 🡒 □A 🡒 □B), motive _ h)
+    (kDia      : ∀ {A B} (h : ⊢ʰ[CK;𝔸] □(A 🡒 B) 🡒 ◇A 🡒 ◇B), motive _ h)
+    (mdp       : ∀ {A B} (h₁ : ⊢ʰ[CK;𝔸] A 🡒 B) (h₂ : ⊢ʰ[CK;𝔸] A), motive _ h₁ → motive _ h₂ → motive _ (mdp h₁ h₂))
+    (nec       : ∀ {A} (h : ⊢ʰ[CK;𝔸] A), motive A h → motive _ (nec h)) :
+    ∀ {A} (h : ⊢ʰ[CK;𝔸] A), motive _ h := by
   rintro A ⟨h⟩;
   induction h with
   | axm hmem => exact axm hmem;
@@ -212,23 +212,23 @@ lemma rec
   | nec h ih => exact nec ⟨h⟩ ih;
   | _ => grind
 
-lemma monotone (h : 𝔸₁ ⊆ 𝔸₂) : ⊢ᴴ[CK;𝔸₁] A → ⊢ᴴ[CK;𝔸₂] A := by
+lemma monotone (h : 𝔸₁ ⊆ 𝔸₂) : ⊢ʰ[CK;𝔸₁] A → ⊢ʰ[CK;𝔸₂] A := by
   intro p;
   induction p with
   | axm hmem => exact axm (h hmem);
   | _ => grind
 
 lemma provable_of_provable_axioms
-    (h : ∀ B ∈ 𝔸₁, ⊢ᴴ[CK;𝔸₂] B) : (⊢ᴴ[CK;𝔸₁] A) → ⊢ᴴ[CK;𝔸₂] A := by
+    (h : ∀ B ∈ 𝔸₁, ⊢ʰ[CK;𝔸₂] B) : (⊢ʰ[CK;𝔸₁] A) → ⊢ʰ[CK;𝔸₂] A := by
   intro p;
   induction p with
   | axm hmem => exact h _ hmem;
   | _ => grind
 
-abbrev logic (𝔸 : Set BDFormula) : BDLogic := { A | ⊢ᴴ[CK;𝔸] A }
+abbrev logic (𝔸 : Set BDFormula) : BDLogic := { A | ⊢ʰ[CK;𝔸] A }
 
 @[simp]
-lemma mem_logic : A ∈ logic 𝔸 ↔ ⊢ᴴ[CK;𝔸] A := Iff.rfl
+lemma mem_logic : A ∈ logic 𝔸 ↔ ⊢ʰ[CK;𝔸] A := Iff.rfl
 
 lemma logic_monotone (h : 𝔸₁ ⊆ 𝔸₂) : logic 𝔸₁ ⊆ logic 𝔸₂ := fun _ => monotone h
 

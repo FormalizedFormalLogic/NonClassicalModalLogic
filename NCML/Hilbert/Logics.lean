@@ -81,8 +81,8 @@ lemma LogicCK.subset_CK4 : LogicCK ⊆ LogicCK4 := .logic_monotone (by grind)
 lemma LogicCK.subset_CS4 : LogicCK ⊆ LogicCS4 := .logic_monotone (by grind)
 
 lemma ProvableBDHilbert.provable_D_of_PDia
-    {𝔸 : Set BDFormula} {A : BDFormula} (h : ⊢ᴴ[CK;𝔸] (◇⊤ : BDFormula)) :
-    ⊢ᴴ[CK;𝔸] □A 🡒 ◇A :=
+    {𝔸 : Set BDFormula} {A : BDFormula} (h : ⊢ʰ[CK;𝔸] (◇⊤ : BDFormula)) :
+    ⊢ʰ[CK;𝔸] □A 🡒 ◇A :=
   ProvableBDHilbert.mdp_ctx (ProvableBDHilbert.imp_trans (ProvableBDHilbert.box_mono
     ProvableBDHilbert.imply₁) ProvableBDHilbert.kDia) (ProvableBDHilbert.dhyp h)
 
