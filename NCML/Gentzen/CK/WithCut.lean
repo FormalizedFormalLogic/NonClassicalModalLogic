@@ -30,10 +30,10 @@ inductive ProofGentzenWithCut : Sequent → Type
   | cut {Γ₁ Γ₂ Δ A} : ProofGentzenWithCut (Γ₁ ⟹ some A) → ProofGentzenWithCut (insert A Γ₂ ⟹ Δ) →
       ProofGentzenWithCut (Γ₁ ∪ Γ₂ ⟹ Δ)
 
-notation:120 "⊢ᴳᶜ[CK]! " S:121 => ProofGentzenWithCut S
+notation:120 "⊢ᵍᶜ[CK]! " S:121 => ProofGentzenWithCut S
 
 /-- Every cut-free proof is a proof in the cut-extended calculus. -/
-def ProofGentzenWithCut.ofProofGentzen {S : Sequent} : ⊢ᴳ[CK]! S → ⊢ᴳᶜ[CK]! S
+def ProofGentzenWithCut.ofProofGentzen {S : Sequent} : ⊢ᵍ[CK]! S → ⊢ᵍᶜ[CK]! S
   | .axm A => .axm A
   | .botL => .botL
   | .wkL h h' => .wkL (ofProofGentzen h) h'
@@ -49,70 +49,71 @@ def ProofGentzenWithCut.ofProofGentzen {S : Sequent} : ⊢ᴳ[CK]! S → ⊢ᴳ�
   | .box h => .box (ofProofGentzen h)
   | .dia h => .dia (ofProofGentzen h)
 
-abbrev ProvableGentzenWithCut (S : Sequent) : Prop := Nonempty (⊢ᴳᶜ[CK]! S)
-notation:120 "⊢ᴳᶜ[CK] " S:121 => ProvableGentzenWithCut S
-notation:120 "⊬ᴳᶜ[CK] " S:121 => ¬ ProvableGentzenWithCut S
+abbrev ProvableGentzenWithCut (S : Sequent) : Prop := Nonempty (⊢ᵍᶜ[CK]! S)
+notation:120 "⊢ᵍᶜ[CK] " S:121 => ProvableGentzenWithCut S
+notation:120 "⊬ᵍᶜ[CK] " S:121 => ¬ ProvableGentzenWithCut S
 
 namespace ProvableGentzenWithCut
 
 variable {Γ Γ' Γ₁ Γ₂ : BDFormulaFinset} {Δ : Option BDFormula} {A B : BDFormula}
 
-theorem of_without_cut {S : Sequent} : ⊢ᴳ[CK] S → ⊢ᴳᶜ[CK] S := λ ⟨p⟩ => ⟨ProofGentzenWithCut.ofProofGentzen p⟩
+theorem of_without_cut {S : Sequent} : ⊢ᵍ[CK] S → ⊢ᵍᶜ[CK] S := λ ⟨p⟩ => ⟨ProofGentzenWithCut.ofProofGentzen p⟩
 
-lemma axm (A : BDFormula) : ⊢ᴳᶜ[CK] ({A} ⟹ some A) := ⟨ProofGentzenWithCut.axm A⟩
-lemma botL : ⊢ᴳᶜ[CK] ({⊥} ⟹ Δ) := ⟨ProofGentzenWithCut.botL⟩
-lemma wkL (π : ⊢ᴳᶜ[CK] (Γ ⟹ Δ)) (h : Γ ⊆ Γ' := by grind) : ⊢ᴳᶜ[CK] (Γ' ⟹ Δ) := ⟨ProofGentzenWithCut.wkL π.some h⟩
-lemma wkR (π : ⊢ᴳᶜ[CK] (Γ ⟹ none)) : ⊢ᴳᶜ[CK] (Γ ⟹ some A) := ⟨ProofGentzenWithCut.wkR π.some⟩
-lemma andL₁ (π : ⊢ᴳᶜ[CK] (insert A Γ ⟹ Δ)) : ⊢ᴳᶜ[CK] (insert (A ⋏ B) Γ ⟹ Δ) := ⟨ProofGentzenWithCut.andL₁ π.some⟩
-lemma andL₂ (π : ⊢ᴳᶜ[CK] (insert B Γ ⟹ Δ)) : ⊢ᴳᶜ[CK] (insert (A ⋏ B) Γ ⟹ Δ) := ⟨ProofGentzenWithCut.andL₂ π.some⟩
-lemma andR (π₁ : ⊢ᴳᶜ[CK] (Γ ⟹ some A)) (π₂ : ⊢ᴳᶜ[CK] (Γ ⟹ some B)) : ⊢ᴳᶜ[CK] (Γ ⟹ some (A ⋏ B)) :=
-  ⟨ProofGentzenWithCut.andR π₁.some π₂.some⟩
-lemma orL (π₁ : ⊢ᴳᶜ[CK] (insert A Γ ⟹ Δ)) (π₂ : ⊢ᴳᶜ[CK] (insert B Γ ⟹ Δ)) : ⊢ᴳᶜ[CK] (insert (A ⋎ B) Γ ⟹ Δ) :=
-  ⟨ProofGentzenWithCut.orL π₁.some π₂.some⟩
-lemma orR₁ (π : ⊢ᴳᶜ[CK] (Γ ⟹ some A)) : ⊢ᴳᶜ[CK] (Γ ⟹ some (A ⋎ B)) := ⟨ProofGentzenWithCut.orR₁ π.some⟩
-lemma orR₂ (π : ⊢ᴳᶜ[CK] (Γ ⟹ some B)) : ⊢ᴳᶜ[CK] (Γ ⟹ some (A ⋎ B)) := ⟨ProofGentzenWithCut.orR₂ π.some⟩
-lemma impL (π₁ : ⊢ᴳᶜ[CK] (Γ ⟹ some A)) (π₂ : ⊢ᴳᶜ[CK] (insert B Γ ⟹ Δ)) : ⊢ᴳᶜ[CK] (insert (A 🡒 B) Γ ⟹ Δ) :=
-  ⟨ProofGentzenWithCut.impL π₁.some π₂.some⟩
-lemma impR (π : ⊢ᴳᶜ[CK] (insert A Γ ⟹ some B)) : ⊢ᴳᶜ[CK] (Γ ⟹ some (A 🡒 B)) := ⟨ProofGentzenWithCut.impR π.some⟩
-lemma box (π : ⊢ᴳᶜ[CK] (Γ ⟹ some A)) : ⊢ᴳᶜ[CK] (□Γ ⟹ some (□A)) := ⟨ProofGentzenWithCut.box π.some⟩
-lemma dia (π : ⊢ᴳᶜ[CK] (insert A Γ ⟹ some B)) : ⊢ᴳᶜ[CK] (insert (◇A) (□Γ) ⟹ some (◇B)) := ⟨ProofGentzenWithCut.dia π.some⟩
-lemma cut (π₁ : ⊢ᴳᶜ[CK] (Γ₁ ⟹ some A)) (π₂ : ⊢ᴳᶜ[CK] (insert A Γ₂ ⟹ Δ)) : ⊢ᴳᶜ[CK] (Γ₁ ∪ Γ₂ ⟹ Δ) :=
-  ⟨ProofGentzenWithCut.cut π₁.some π₂.some⟩
+lemma axm (A : BDFormula) : ⊢ᵍᶜ[CK] ({A} ⟹ some A) := ⟨ProofGentzenWithCut.axm A⟩
+lemma botL : ⊢ᵍᶜ[CK] ({⊥} ⟹ Δ) := ⟨ProofGentzenWithCut.botL⟩
+lemma wkL (h : ⊢ᵍᶜ[CK] (Γ ⟹ Δ)) (h' : Γ ⊆ Γ' := by grind) : ⊢ᵍᶜ[CK] (Γ' ⟹ Δ) := ⟨ProofGentzenWithCut.wkL h.some h'⟩
+lemma wkR (h : ⊢ᵍᶜ[CK] (Γ ⟹ none)) : ⊢ᵍᶜ[CK] (Γ ⟹ some A) := ⟨ProofGentzenWithCut.wkR h.some⟩
+lemma andL₁ (h : ⊢ᵍᶜ[CK] (insert A Γ ⟹ Δ)) : ⊢ᵍᶜ[CK] (insert (A ⋏ B) Γ ⟹ Δ) := ⟨ProofGentzenWithCut.andL₁ h.some⟩
+lemma andL₂ (h : ⊢ᵍᶜ[CK] (insert B Γ ⟹ Δ)) : ⊢ᵍᶜ[CK] (insert (A ⋏ B) Γ ⟹ Δ) := ⟨ProofGentzenWithCut.andL₂ h.some⟩
+lemma andR (h₁ : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) (h₂ : ⊢ᵍᶜ[CK] (Γ ⟹ some B)) : ⊢ᵍᶜ[CK] (Γ ⟹ some (A ⋏ B)) :=
+  ⟨ProofGentzenWithCut.andR h₁.some h₂.some⟩
+lemma orL (h₁ : ⊢ᵍᶜ[CK] (insert A Γ ⟹ Δ)) (h₂ : ⊢ᵍᶜ[CK] (insert B Γ ⟹ Δ)) : ⊢ᵍᶜ[CK] (insert (A ⋎ B) Γ ⟹ Δ) :=
+  ⟨ProofGentzenWithCut.orL h₁.some h₂.some⟩
+lemma orR₁ (h : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) : ⊢ᵍᶜ[CK] (Γ ⟹ some (A ⋎ B)) := ⟨ProofGentzenWithCut.orR₁ h.some⟩
+lemma orR₂ (h : ⊢ᵍᶜ[CK] (Γ ⟹ some B)) : ⊢ᵍᶜ[CK] (Γ ⟹ some (A ⋎ B)) := ⟨ProofGentzenWithCut.orR₂ h.some⟩
+lemma impL (h₁ : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) (h₂ : ⊢ᵍᶜ[CK] (insert B Γ ⟹ Δ)) : ⊢ᵍᶜ[CK] (insert (A 🡒 B) Γ ⟹ Δ) :=
+  ⟨ProofGentzenWithCut.impL h₁.some h₂.some⟩
+lemma impR (h : ⊢ᵍᶜ[CK] (insert A Γ ⟹ some B)) : ⊢ᵍᶜ[CK] (Γ ⟹ some (A 🡒 B)) := ⟨ProofGentzenWithCut.impR h.some⟩
+lemma box (h : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) : ⊢ᵍᶜ[CK] (□Γ ⟹ some (□A)) := ⟨ProofGentzenWithCut.box h.some⟩
+lemma dia (h : ⊢ᵍᶜ[CK] (insert A Γ ⟹ some B)) : ⊢ᵍᶜ[CK] (insert (◇A) (□Γ) ⟹ some (◇B)) := ⟨ProofGentzenWithCut.dia h.some⟩
+lemma cut (h₁ : ⊢ᵍᶜ[CK] (Γ₁ ⟹ some A)) (h₂ : ⊢ᵍᶜ[CK] (insert A Γ₂ ⟹ Δ)) : ⊢ᵍᶜ[CK] (Γ₁ ∪ Γ₂ ⟹ Δ) :=
+  ⟨ProofGentzenWithCut.cut h₁.some h₂.some⟩
 
+@[induction_eliminator]
 lemma rec
-  {motive : (S : Sequent) → ⊢ᴳᶜ[CK] S → Prop}
+  {motive : (S : Sequent) → ⊢ᵍᶜ[CK] S → Prop}
   (axm : ∀ A, motive ({A} ⟹ some A) (ProvableGentzenWithCut.axm A))
   (botL : ∀ {Δ}, motive ({⊥} ⟹ Δ) ProvableGentzenWithCut.botL)
-  (wkL : ∀ {Γ Γ' Δ} (h : ⊢ᴳᶜ[CK] (Γ ⟹ Δ)) (h' : Γ ⊆ Γ'), motive (Γ ⟹ Δ) h → motive (Γ' ⟹ Δ) (wkL h h'))
-  (wkR : ∀ {Γ A} (h : ⊢ᴳᶜ[CK] (Γ ⟹ none)), motive (Γ ⟹ none) h → motive (Γ ⟹ some A) (wkR h))
-  (andL₁ : ∀ {Γ Δ A B} (h : ⊢ᴳᶜ[CK] (insert A Γ ⟹ Δ)),
+  (wkL : ∀ {Γ Γ' Δ} (h : ⊢ᵍᶜ[CK] (Γ ⟹ Δ)) (h' : Γ ⊆ Γ'), motive (Γ ⟹ Δ) h → motive (Γ' ⟹ Δ) (wkL h h'))
+  (wkR : ∀ {Γ A} (h : ⊢ᵍᶜ[CK] (Γ ⟹ none)), motive (Γ ⟹ none) h → motive (Γ ⟹ some A) (wkR h))
+  (andL₁ : ∀ {Γ Δ A B} (h : ⊢ᵍᶜ[CK] (insert A Γ ⟹ Δ)),
     motive (insert A Γ ⟹ Δ) h → motive (insert (A ⋏ B) Γ ⟹ Δ) (andL₁ h)
   )
-  (andL₂ : ∀ {Γ Δ A B} (h : ⊢ᴳᶜ[CK] (insert B Γ ⟹ Δ)),
+  (andL₂ : ∀ {Γ Δ A B} (h : ⊢ᵍᶜ[CK] (insert B Γ ⟹ Δ)),
     motive (insert B Γ ⟹ Δ) h → motive (insert (A ⋏ B) Γ ⟹ Δ) (andL₂ h)
   )
-  (andR : ∀ {Γ A B} (h₁ : ⊢ᴳᶜ[CK] (Γ ⟹ some A)) (h₂ : ⊢ᴳᶜ[CK] (Γ ⟹ some B)),
+  (andR : ∀ {Γ A B} (h₁ : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) (h₂ : ⊢ᵍᶜ[CK] (Γ ⟹ some B)),
     motive (Γ ⟹ some A) h₁ → motive (Γ ⟹ some B) h₂ → motive (Γ ⟹ some (A ⋏ B)) (andR h₁ h₂)
   )
-  (orL : ∀ {Γ Δ A B} (h₁ : ⊢ᴳᶜ[CK] (insert A Γ ⟹ Δ)) (h₂ : ⊢ᴳᶜ[CK] (insert B Γ ⟹ Δ)),
+  (orL : ∀ {Γ Δ A B} (h₁ : ⊢ᵍᶜ[CK] (insert A Γ ⟹ Δ)) (h₂ : ⊢ᵍᶜ[CK] (insert B Γ ⟹ Δ)),
     motive (insert A Γ ⟹ Δ) h₁ → motive (insert B Γ ⟹ Δ) h₂ → motive (insert (A ⋎ B) Γ ⟹ Δ) (orL h₁ h₂)
   )
-  (orR₁ : ∀ {Γ A B} (h : ⊢ᴳᶜ[CK] (Γ ⟹ some A)), motive (Γ ⟹ some A) h → motive (Γ ⟹ some (A ⋎ B)) (orR₁ h))
-  (orR₂ : ∀ {Γ A B} (h : ⊢ᴳᶜ[CK] (Γ ⟹ some B)), motive (Γ ⟹ some B) h → motive (Γ ⟹ some (A ⋎ B)) (orR₂ h))
-  (impL : ∀ {Γ Δ A B} (h₁ : ⊢ᴳᶜ[CK] (Γ ⟹ some A)) (h₂ : ⊢ᴳᶜ[CK] (insert B Γ ⟹ Δ)),
+  (orR₁ : ∀ {Γ A B} (h : ⊢ᵍᶜ[CK] (Γ ⟹ some A)), motive (Γ ⟹ some A) h → motive (Γ ⟹ some (A ⋎ B)) (orR₁ h))
+  (orR₂ : ∀ {Γ A B} (h : ⊢ᵍᶜ[CK] (Γ ⟹ some B)), motive (Γ ⟹ some B) h → motive (Γ ⟹ some (A ⋎ B)) (orR₂ h))
+  (impL : ∀ {Γ Δ A B} (h₁ : ⊢ᵍᶜ[CK] (Γ ⟹ some A)) (h₂ : ⊢ᵍᶜ[CK] (insert B Γ ⟹ Δ)),
     motive (Γ ⟹ some A) h₁ → motive (insert B Γ ⟹ Δ) h₂ → motive (insert (A 🡒 B) Γ ⟹ Δ) (impL h₁ h₂)
   )
-  (impR : ∀ {Γ A B} (h : ⊢ᴳᶜ[CK] (insert A Γ ⟹ some B)),
+  (impR : ∀ {Γ A B} (h : ⊢ᵍᶜ[CK] (insert A Γ ⟹ some B)),
     motive (insert A Γ ⟹ some B) h → motive (Γ ⟹ some (A 🡒 B)) (impR h)
   )
-  (box : ∀ {Γ A} (h : ⊢ᴳᶜ[CK] (Γ ⟹ some A)), motive (Γ ⟹ some A) h → motive (□Γ ⟹ some (□A)) (box h))
-  (dia : ∀ {Γ A B} (h : ⊢ᴳᶜ[CK] (insert A Γ ⟹ some B)),
+  (box : ∀ {Γ A} (h : ⊢ᵍᶜ[CK] (Γ ⟹ some A)), motive (Γ ⟹ some A) h → motive (□Γ ⟹ some (□A)) (box h))
+  (dia : ∀ {Γ A B} (h : ⊢ᵍᶜ[CK] (insert A Γ ⟹ some B)),
     motive (insert A Γ ⟹ some B) h → motive (insert (◇A) (□Γ) ⟹ some (◇B)) (dia h)
   )
-  (cut : ∀ {Γ₁ Γ₂ Δ A} (h₁ : ⊢ᴳᶜ[CK] (Γ₁ ⟹ some A)) (h₂ : ⊢ᴳᶜ[CK] (insert A Γ₂ ⟹ Δ)),
+  (cut : ∀ {Γ₁ Γ₂ Δ A} (h₁ : ⊢ᵍᶜ[CK] (Γ₁ ⟹ some A)) (h₂ : ⊢ᵍᶜ[CK] (insert A Γ₂ ⟹ Δ)),
     motive (Γ₁ ⟹ some A) h₁ → motive (insert A Γ₂ ⟹ Δ) h₂ → motive (Γ₁ ∪ Γ₂ ⟹ Δ) (cut h₁ h₂)
   )
-  : ∀ {S : Sequent} (h : ⊢ᴳᶜ[CK] S), motive S h := by
+  : ∀ {S : Sequent} (h : ⊢ᵍᶜ[CK] S), motive S h := by
     rintro S ⟨h⟩;
     induction h with
     | axm A => apply axm;
