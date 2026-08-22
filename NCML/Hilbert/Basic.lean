@@ -76,6 +76,15 @@ lemma imp_comp_right (h : ⊢ʰ[CK;𝔸] A 🡒 B) : ⊢ʰ[CK;𝔸] (B 🡒 C) �
 @[grind <=] lemma and_intro_ctx (h₁ : ⊢ʰ[CK;𝔸] A 🡒 B) (h₂ : ⊢ʰ[CK;𝔸] A 🡒 C) : ⊢ʰ[CK;𝔸] A 🡒 B ⋏ C :=
   mdp_ctx (imp_trans h₁ andIntro) h₂
 
+lemma curry (h : ⊢ʰ[CK;𝔸] A ⋏ B 🡒 C) : ⊢ʰ[CK;𝔸] A 🡒 B 🡒 C :=
+  imp_trans andIntro (imp_comp_left h)
+
+lemma uncurry (h : ⊢ʰ[CK;𝔸] A 🡒 B 🡒 C) : ⊢ʰ[CK;𝔸] A ⋏ B 🡒 C :=
+  mdp_ctx (imp_trans andElim₁ h) andElim₂
+
+lemma and_mono_left (h : ⊢ʰ[CK;𝔸] A 🡒 B) : ⊢ʰ[CK;𝔸] A ⋏ C 🡒 B ⋏ C :=
+  and_intro_ctx (imp_trans andElim₁ h) andElim₂
+
 lemma imp_swap : ⊢ʰ[CK;𝔸] (A 🡒 B 🡒 C) 🡒 (B 🡒 A 🡒 C) :=
   mdp_ctx₂ (imp_trans imply₂ imply₁) (dhyp imply₁)
 
@@ -165,6 +174,22 @@ lemma fconj_imp (h : A ∈ Γ) : ⊢ʰ[CK;𝔸] ⋀Γ 🡒 A :=
 lemma imp_fconj (h : ∀ B ∈ Γ, ⊢ʰ[CK;𝔸] C 🡒 B) : ⊢ʰ[CK;𝔸] C 🡒 ⋀Γ :=
   imp_lconj fun B hB => h B (Finset.mem_toList.mp hB)
 
+lemma fconj_subset (h : Γ₁ ⊆ Γ₂) : ⊢ʰ[CK;𝔸] ⋀Γ₂ 🡒 ⋀Γ₁ :=
+  imp_fconj (by intro B hB; exact fconj_imp (h hB))
+
+lemma fconj_insert_imp : ⊢ʰ[CK;𝔸] ⋀(insert A Γ) 🡒 A ⋏ ⋀Γ :=
+  and_intro_ctx (fconj_imp (Finset.mem_insert_self A Γ)) (fconj_subset (Finset.subset_insert A Γ))
+
+lemma imp_fconj_insert : ⊢ʰ[CK;𝔸] A ⋏ ⋀Γ 🡒 ⋀(insert A Γ) :=
+  imp_fconj (by
+    intro B hB;
+    rcases Finset.mem_insert.mp hB with rfl | hB
+    · exact andElim₁;
+    · exact imp_trans andElim₂ (fconj_imp hB))
+
+lemma fconj_insert_mono (h : ⊢ʰ[CK;𝔸] B 🡒 A) : ⊢ʰ[CK;𝔸] ⋀(insert B Γ) 🡒 ⋀(insert A Γ) :=
+  imp_trans fconj_insert_imp (imp_trans (and_mono_left h) imp_fconj_insert)
+
 @[grind <=]
 lemma fdisj_imp (h : ∀ B ∈ Γ, ⊢ʰ[CK;𝔸] B 🡒 C) : ⊢ʰ[CK;𝔸] ⋁Γ 🡒 C :=
   ldisj_imp fun B hB => h B (Finset.mem_toList.mp hB)
@@ -179,11 +204,23 @@ lemma fconj_union_left : ⊢ʰ[CK;𝔸] ⋀(Γ₁ ∪ Γ₂) 🡒 ⋀Γ₁ :=
 lemma fconj_union_right : ⊢ʰ[CK;𝔸] ⋀(Γ₁ ∪ Γ₂) 🡒 ⋀Γ₂ :=
   imp_fconj fun _ hB => fconj_imp (Finset.mem_union_right _ hB)
 
+lemma fconj_union : ⊢ʰ[CK;𝔸] ⋀(Γ₁ ∪ Γ₂) 🡒 ⋀Γ₁ ⋏ ⋀Γ₂ :=
+  and_intro_ctx fconj_union_left fconj_union_right
+
 lemma fdisj_union_left : ⊢ʰ[CK;𝔸] ⋁Γ₁ 🡒 ⋁(Γ₁ ∪ Γ₂) :=
   fdisj_imp fun _ hB => imp_fdisj (Finset.mem_union_left _ hB)
 
 lemma fdisj_union_right : ⊢ʰ[CK;𝔸] ⋁Γ₂ 🡒 ⋁(Γ₁ ∪ Γ₂) :=
   fdisj_imp fun _ hB => imp_fdisj (Finset.mem_union_right _ hB)
+
+lemma fconj_box : ⊢ʰ[CK;𝔸] ⋀(□Γ) 🡒 □(⋀Γ) := by
+  have h₁ : ⊢ʰ[CK;𝔸] ⋀(□Γ) 🡒 ⋀(□Γ.toList) :=
+    imp_lconj (by
+      intro B hB;
+      obtain ⟨C, hC, rfl⟩ := BDFormulaList.mem_box_iff.mp hB;
+      exact fconj_imp (BDFormulaFinset.mem_box.mpr (Finset.mem_toList.mp hC)))
+  have h₂ : ⊢ʰ[CK;𝔸] ⋀(□Γ.toList) 🡒 □(⋀Γ.toList) := lconj_box
+  exact imp_trans h₁ h₂;
 
 end
 

@@ -1,6 +1,7 @@
 module
 
 public import Mathlib.Data.Finset.Dedup
+public import Mathlib.Data.Finset.Image
 public import Mathlib.Data.Set.Defs
 
 @[expose] public section
@@ -146,6 +147,41 @@ noncomputable def conj (Γ : BDFormulaFinset) : BDFormula := ⋀Γ.toList
 noncomputable def disj (Γ : BDFormulaFinset) : BDFormula := ⋁Γ.toList
 
 @[inherit_doc] scoped prefix:90 "⋁" => BDFormulaFinset.disj
+
+/-- The image of `Γ` under `□`. -/
+def box (Γ : BDFormulaFinset) : BDFormulaFinset := Γ.image (□·)
+
+/-- The image of `Γ` under `◇`. -/
+def dia (Γ : BDFormulaFinset) : BDFormulaFinset := Γ.image (◇·)
+
+@[inherit_doc] scoped prefix:90 "□" => BDFormulaFinset.box
+@[inherit_doc] scoped prefix:91 "◇" => BDFormulaFinset.dia
+
+variable {Γ Γ₁ Γ₂ : BDFormulaFinset} {A : BDFormula}
+
+lemma mem_box_iff : A ∈ □Γ ↔ ∃ B ∈ Γ, □B = A := Finset.mem_image
+
+lemma mem_dia_iff : A ∈ ◇Γ ↔ ∃ B ∈ Γ, ◇B = A := Finset.mem_image
+
+@[simp, grind =] lemma mem_box : □A ∈ □Γ ↔ A ∈ Γ := by grind [mem_box_iff];
+
+@[simp, grind =] lemma mem_dia : ◇A ∈ ◇Γ ↔ A ∈ Γ := by grind [mem_dia_iff];
+
+@[simp, grind =] lemma box_empty : □(∅ : BDFormulaFinset) = ∅ := Finset.image_empty _
+
+@[simp, grind =] lemma dia_empty : ◇(∅ : BDFormulaFinset) = ∅ := Finset.image_empty _
+
+@[simp, grind =] lemma box_insert : □(insert A Γ) = insert (□A) (□Γ) := Finset.image_insert ..
+
+@[simp, grind =] lemma dia_insert : ◇(insert A Γ) = insert (◇A) (◇Γ) := Finset.image_insert ..
+
+@[simp, grind =] lemma box_union : □(Γ₁ ∪ Γ₂) = □Γ₁ ∪ □Γ₂ := Finset.image_union ..
+
+@[simp, grind =] lemma dia_union : ◇(Γ₁ ∪ Γ₂) = ◇Γ₁ ∪ ◇Γ₂ := Finset.image_union ..
+
+lemma box_subset : Γ₁ ⊆ Γ₂ → □Γ₁ ⊆ □Γ₂ := Finset.image_subset_image
+
+lemma dia_subset : Γ₁ ⊆ Γ₂ → ◇Γ₁ ⊆ ◇Γ₂ := Finset.image_subset_image
 
 end BDFormulaFinset
 
