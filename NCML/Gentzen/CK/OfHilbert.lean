@@ -35,23 +35,28 @@ lemma imply₂ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((A 🡒 B 🡒
   have p₅ : ⊢ᵍᶜ[CK] (insert (A 🡒 B 🡒 C) ({A, A 🡒 B} : BDFormulaFinset) ⟹ some C) := impL (union A) p₄;
   exact wkL p₅
 
-lemma andElim₁ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A ⋏ B 🡒 A)) := by
-  sorry
+lemma andElim₁ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A ⋏ B 🡒 A)) :=
+  impR (andL₁ (axm A))
 
-lemma andElim₂ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A ⋏ B 🡒 B)) := by
-  sorry
+lemma andElim₂ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A ⋏ B 🡒 B)) :=
+  impR (andL₂ (axm B))
 
-lemma andIntro : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A 🡒 B 🡒 A ⋏ B)) := by
-  sorry
+lemma andIntro : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A 🡒 B 🡒 A ⋏ B)) :=
+  impR (impR (andR (union A) (union B)))
 
-lemma orIntro₁ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A 🡒 A ⋎ B)) := by
-  sorry
+lemma orIntro₁ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (A 🡒 A ⋎ B)) :=
+  impR (orR₁ (axm A))
 
-lemma orIntro₂ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (B 🡒 A ⋎ B)) := by
-  sorry
+lemma orIntro₂ : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (B 🡒 A ⋎ B)) :=
+  impR (orR₂ (axm B))
 
 lemma orElim : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((A 🡒 C) 🡒 (B 🡒 C) 🡒 (A ⋎ B 🡒 C))) := by
-  sorry
+  apply impR; apply impR; apply impR;
+  have p₁ : ⊢ᵍᶜ[CK] (insert (A 🡒 C) ({A} : BDFormulaFinset) ⟹ some C) := impL (union A) (union C);
+  have q₁ : ⊢ᵍᶜ[CK] (insert A ({B 🡒 C, A 🡒 C} : BDFormulaFinset) ⟹ some C) := wkL p₁;
+  have p₂ : ⊢ᵍᶜ[CK] (insert (B 🡒 C) ({B} : BDFormulaFinset) ⟹ some C) := impL (union B) (union C);
+  have q₂ : ⊢ᵍᶜ[CK] (insert B ({B 🡒 C, A 🡒 C} : BDFormulaFinset) ⟹ some C) := wkL p₂;
+  exact wkL (orL q₁ q₂)
 
 lemma efq : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some ((⊥ : BDFormula) 🡒 A)) := by
   sorry
