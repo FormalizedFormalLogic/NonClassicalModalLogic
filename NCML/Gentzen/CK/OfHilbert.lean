@@ -78,7 +78,7 @@ lemma nec (h : ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some A)) :
     ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some (□A)) := by
   simpa using box h
 
-lemma of_provable : (⊢ᴴ[CK;∅] A) → ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some A) := by
+lemma of_provable : (⊢ʰ[CK;∅] A) → ⊢ᵍᶜ[CK] ((∅ : BDFormulaFinset) ⟹ some A) := by
   intro h;
   induction h with
   | axm hmem => simp at hmem;
@@ -108,7 +108,7 @@ lemma fconj : ⊢ᵍᶜ[CK] (Γ ⟹ some (⋀Γ)) := by
   intro B hB;
   exact Finset.mem_toList.mp hB;
 
-lemma ofHilbert (h : ⊢ᴴ[CK;∅] (⋀Γ 🡒 A)) : ⊢ᵍᶜ[CK] (Γ ⟹ some A) := by
+lemma ofHilbert (h : ⊢ʰ[CK;∅] (⋀Γ 🡒 A)) : ⊢ᵍᶜ[CK] (Γ ⟹ some A) := by
   have d := of_provable h;
   have e : ⊢ᵍᶜ[CK] (insert (⋀Γ 🡒 A) Γ ⟹ some A) := impL fconj (union A);
   have c := cut d e;
@@ -116,7 +116,7 @@ lemma ofHilbert (h : ⊢ᴴ[CK;∅] (⋀Γ 🡒 A)) : ⊢ᵍᶜ[CK] (Γ ⟹ some
 
 /-- - [Sat26, Proposition 4.18]
 - [Dal25, Theorem 6.3] -/
-theorem iff_hilbert : ⊢ᵍᶜ[CK] (Γ ⟹ some A) ↔ ⊢ᴴ[CK;∅] (⋀Γ 🡒 A) := ⟨toHilbert, ofHilbert⟩
+theorem iff_hilbert : ⊢ᵍᶜ[CK] (Γ ⟹ some A) ↔ ⊢ʰ[CK;∅] (⋀Γ 🡒 A) := ⟨toHilbert, ofHilbert⟩
 
 end ProvableGentzenWithCut
 
