@@ -41,6 +41,9 @@ public import NCML.CK.Logic.CS4
 public import NCML.CK.Semantics
 public import NCML.CK.Soundness
 public import NCML.Formula
+public import NCML.Formula.B.Basic
+public import NCML.Formula.BD.Basic
+public import NCML.Formula.D.Basic
 public import NCML.Hilbert.Basic
 public import NCML.Hilbert.Logics
 public import NCML.Hilbert.Theory
