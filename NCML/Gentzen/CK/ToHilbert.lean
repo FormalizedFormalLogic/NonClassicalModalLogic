@@ -23,7 +23,7 @@ lemma toHilbert_aux {S : Sequent} (h : ⊢ᵍᶜ[CK] S) : ⊢ᴴ[CK;∅] S.toFor
   induction h with
   | axm A => exact fconj_imp (Finset.mem_singleton_self A)
   | botL => exact imp_trans (fconj_imp (Finset.mem_singleton_self ⊥)) efq
-  | wkL h h' ih => sorry
+  | wkL h h' ih => exact imp_trans (fconj_subset h') ih
   | wkR h ih => sorry
   | andL₁ h ih => sorry
   | andL₂ h ih => sorry
