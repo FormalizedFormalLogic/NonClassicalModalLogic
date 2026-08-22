@@ -99,7 +99,7 @@ lemma IntrinsicForces.persistent : x₁ ⊩ⁱ[_] A → x₁ ≼ x₂ → x₂ �
     use y₁;
   | _ => grind;
 
-lemma ExtrinsicForces.persistent_of_diaFree [M.MRelLifting] (hA : A.diaFree) :
+lemma ExtrinsicForces.persistent_of_diaFree [M.MRelLifting] (hA : A.DiaFree) :
   x₁ ⊩ᵉ[_] A → x₁ ≼ x₂ → x₂ ⊩ᵉ[_] A := by
   intro h Ix₁x₂;
   induction A generalizing x₁ x₂ with
@@ -113,7 +113,7 @@ lemma ExtrinsicForces.persistent_of_diaFree [M.MRelLifting] (hA : A.diaFree) :
     obtain ⟨y₁, Iy₁y₂, Mx₁y₁⟩ := M.mRel_lifting Ix₁x₂ Mx₂y₂;
     apply ihA (by grind) (h y₁ Mx₁y₁) Iy₁y₂;
 
-lemma ExtrinsicForces.persistent_of_boxFree [M.MixConfluent] (hA : A.boxFree) :
+lemma ExtrinsicForces.persistent_of_boxFree [M.MixConfluent] (hA : A.BoxFree) :
   x₁ ⊩ᵉ[_] A → x₁ ≼ x₂ → x₂ ⊩ᵉ[_] A := by
   intro h Ix₁x₂;
   induction A generalizing x₁ x₂ with
@@ -209,7 +209,7 @@ lemma logicIntrinsic_ssubset_logicExtrinsic : logicIntrinsic.{0} ⊂ logicExtrin
     axiomCDia_mem_logicExtrinsic, axiomCDia_notMem_logicIntrinsic⟩;
 
 
-abbrev logicDiaFreeExtrinsic := { A : BDFormula | A.diaFree ∧ (∀ {κ : Type*}, ∀ M : Model κ, [M.MRelLifting] → M ⊧ᵉ A) }
+abbrev logicDiaFreeExtrinsic := { A : BDFormula | A.DiaFree ∧ (∀ {κ : Type*}, ∀ M : Model κ, [M.MRelLifting] → M ⊧ᵉ A) }
 
 lemma dnBoxBot_mem_logicExtrinsic : (∼∼□⊥ 🡒 □⊥) ∈ logicExtrinsic := by
   rintro κ M _ _ x₁ x₂ Ix₁x₂ h y₂ Mx₂y₂;
@@ -257,7 +257,7 @@ lemma logicDiaFreeExtrinsic_ssubset_logicExtrinsic : logicDiaFreeExtrinsic.{0} �
   . exact ⟨∼∼□⊥ 🡒 □⊥, dnBoxBot_mem_logicExtrinsic, dnBoxBot_notMem_logicDiaFreeExtrinsic⟩;
 
 lemma extrinsicForces_iff_intrinsicForces_of_diaFree {M : Model κ} [M.MRelLifting] {A}
-  (hA : A.diaFree) {x₁ : M.World} : x₁ ⊩ᵉ[_] A ↔ x₁ ⊩ⁱ[_] A := by
+  (hA : A.DiaFree) {x₁ : M.World} : x₁ ⊩ᵉ[_] A ↔ x₁ ⊩ⁱ[_] A := by
   induction A generalizing x₁ with
   | box A ihA =>
     constructor;
@@ -268,7 +268,7 @@ lemma extrinsicForces_iff_intrinsicForces_of_diaFree {M : Model κ} [M.MRelLifti
       exact ihA (by grind) |>.mpr $ h x₁ (refl x₁) y₁ Mx₁y₁;
   | _ => grind;
 
-lemma iff_mem_logicIntrinsic_mem_logicDiaFreeExtrinsic_of_diaFree (hA : A.diaFree) :
+lemma iff_mem_logicIntrinsic_mem_logicDiaFreeExtrinsic_of_diaFree (hA : A.DiaFree) :
   (A ∈ logicIntrinsic.{u}) ↔ A ∈ logicDiaFreeExtrinsic.{u} := by
   simp only [Set.mem_ofPred_eq];
   constructor;
@@ -294,7 +294,7 @@ lemma iff_mem_logicIntrinsic_mem_logicDiaFreeExtrinsic_of_diaFree (hA : A.diaFre
         . right;
           exact ⟨x₃, _root_.trans Ix₁x₂ Ix₂x₃, Mx₃y₂⟩;
     ⟩
-    have : ∀ B, B.diaFree → ∀ x₁, (x₁ ⊩ⁱ[M] B ↔ x₁ ⊩ᵉ[M'] B) := by
+    have : ∀ B, B.DiaFree → ∀ x₁, (x₁ ⊩ⁱ[M] B ↔ x₁ ⊩ᵉ[M'] B) := by
       intro B hB x₁;
       induction B generalizing x₁ with
       | box B ih =>

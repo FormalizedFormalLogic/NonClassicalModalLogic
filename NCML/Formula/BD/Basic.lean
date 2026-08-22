@@ -36,18 +36,18 @@ abbrev top : BDFormula := ∼⊥
 notation:max "⊤" => top
 
 @[grind]
-def boxFree : BDFormula → Prop
+def BoxFree : BDFormula → Prop
   | □_ => False
   | #_ | ⊥ => True
-  | φ ⋏ ψ | φ ⋎ ψ | φ 🡒 ψ => φ.boxFree ∧ ψ.boxFree
-  | ◇φ => φ.boxFree
+  | φ ⋏ ψ | φ ⋎ ψ | φ 🡒 ψ => φ.BoxFree ∧ ψ.BoxFree
+  | ◇φ => φ.BoxFree
 
 @[grind]
-def diaFree : BDFormula → Prop
+def DiaFree : BDFormula → Prop
   | ◇_ => False
   | #_ | ⊥ => True
-  | φ ⋏ ψ | φ ⋎ ψ | φ 🡒 ψ => φ.diaFree ∧ ψ.diaFree
-  | □φ => φ.diaFree
+  | φ ⋏ ψ | φ ⋎ ψ | φ 🡒 ψ => φ.DiaFree ∧ ψ.DiaFree
+  | □φ => φ.DiaFree
 
 end BDFormula
 
