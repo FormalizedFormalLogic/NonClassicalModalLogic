@@ -45,9 +45,6 @@ public import NCML.Formula.B.Basic
 public import NCML.Formula.BD.Basic
 public import NCML.Formula.D.Basic
 public import NCML.Gentzen.CK.Basic
-public import NCML.Gentzen.CK.OfHilbert
-public import NCML.Gentzen.CK.ToHilbert
-public import NCML.Gentzen.CK.WithCut
 public import NCML.Gentzen.Sequent
 public import NCML.Hilbert.Basic
 public import NCML.Hilbert.Logics
